@@ -1,4 +1,4 @@
-package pl.lemanski.tc
+package pl.lemanski.tc.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image

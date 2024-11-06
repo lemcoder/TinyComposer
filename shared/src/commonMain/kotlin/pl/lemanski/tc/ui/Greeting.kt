@@ -1,4 +1,6 @@
-package pl.lemanski.tc
+package pl.lemanski.tc.ui
+
+import pl.lemanski.tc.getPlatform
 
 class Greeting {
     private val platform = getPlatform()
