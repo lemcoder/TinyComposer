@@ -2,16 +2,12 @@ package pl.lemanski.tc.domain.service.chord
 
 import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.core.Note
-import pl.lemanski.tc.domain.model.core.majorSeventh
 import pl.lemanski.tc.domain.model.core.majorThird
-import pl.lemanski.tc.domain.model.core.minorSeventh
-import pl.lemanski.tc.domain.model.core.minorSixth
 import pl.lemanski.tc.domain.model.core.minorThird
-import pl.lemanski.tc.domain.model.core.natural
-import pl.lemanski.tc.domain.model.core.perfectFifth
-import pl.lemanski.tc.domain.model.core.tritone
 
+// TODO enable building custom chords
 internal class ChordBuilderService {
+
     private lateinit var baseNote: Note
 
     fun setBaseNote(note: Note) {
@@ -21,38 +17,38 @@ internal class ChordBuilderService {
     // Triad builder methods
 
     fun buildMinorTriad(): Chord = Chord(
-        name = baseNote.name,
-        noteValues = listOf(
-            baseNote.natural,
+        name = "${baseNote.name}min",
+        notes = listOf(
+            baseNote,
             baseNote.minorThird(),
-            baseNote.perfectFifth(),
+            baseNote.minorThird().majorThird(),
         )
     )
 
     fun buildMajorTriad(): Chord = Chord(
         name = baseNote.name,
-        noteValues = listOf(
-            baseNote.natural,
+        notes = listOf(
+            baseNote,
             baseNote.majorThird(),
-            baseNote.perfectFifth(),
+            baseNote.majorThird().minorThird(),
         )
     )
 
     fun buildDiminishedTriad(): Chord = Chord(
-        name = "${baseNote.name}b",
-        noteValues = listOf(
-            baseNote.natural,
+        name = "${baseNote.name}dim",
+        notes = listOf(
+            baseNote,
             baseNote.minorThird(),
-            baseNote.tritone(),
+            baseNote.minorThird().minorThird(),
         )
     )
 
     fun buildAugmentedTriad(): Chord = Chord(
-        name = "${baseNote.name}#",
-        noteValues = listOf(
-            baseNote.natural,
+        name = "${baseNote.name}aug",
+        notes = listOf(
+            baseNote,
             baseNote.majorThird(),
-            baseNote.minorSixth(),
+            baseNote.majorThird().majorThird(),
         )
     )
 
@@ -60,31 +56,31 @@ internal class ChordBuilderService {
 
     fun buildMinorSeventh(): Chord = Chord(
         name = "${baseNote.name}min7",
-        noteValues = listOf(
-            baseNote.natural,
+        notes = listOf(
+            baseNote,
             baseNote.minorThird(),
-            baseNote.perfectFifth(),
-            baseNote.minorSeventh(),
+            baseNote.minorThird().majorThird(),
+            baseNote.minorThird().majorThird().minorThird(),
         )
     )
 
     fun buildMajorSeventh(): Chord = Chord(
         name = "${baseNote.name}maj7",
-        noteValues = listOf(
-            baseNote.natural,
+        notes = listOf(
+            baseNote,
             baseNote.majorThird(),
-            baseNote.perfectFifth(),
-            baseNote.majorSeventh(),
+            baseNote.majorThird().minorThird(),
+            baseNote.majorThird().minorThird().majorThird(),
         )
     )
 
     fun buildDominantSeventh(): Chord = Chord(
         name = "${baseNote.name}7",
-        noteValues = listOf(
-            baseNote.natural,
+        notes = listOf(
+            baseNote,
             baseNote.majorThird(),
-            baseNote.perfectFifth(),
-            baseNote.majorSeventh(),
+            baseNote.majorThird().minorThird(),
+            baseNote.majorThird().minorThird().minorThird(),
         )
     )
 }

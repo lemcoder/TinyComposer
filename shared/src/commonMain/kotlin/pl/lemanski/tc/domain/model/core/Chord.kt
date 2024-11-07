@@ -5,5 +5,5 @@ package pl.lemanski.tc.domain.model.core
  */
 data class Chord(
     val name: String,
-    val noteValues: List<Int>
+    val notes: List<Note>
 )

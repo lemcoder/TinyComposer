@@ -1,5 +1,7 @@
 package pl.lemanski.tc.domain.model.navigation
 
-internal sealed interface Destination
+sealed interface Destination
 
-internal data object StartScreen : Destination
+data object StartDestination : Destination
+
+data object ProjectsDestination: Destination
