@@ -1,6 +1,6 @@
 package pl.lemanski.tc.data.chord
 
-import pl.lemanski.tc.domain.model.song.ChordBeats
+import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.repository.chord.ChordRepository
 import pl.lemanski.tc.utils.UUID
 

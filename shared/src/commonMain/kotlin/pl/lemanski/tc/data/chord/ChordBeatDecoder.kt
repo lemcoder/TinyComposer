@@ -1,13 +1,18 @@
 package pl.lemanski.tc.data.chord
 
 import pl.lemanski.tc.domain.model.core.Chord
-import pl.lemanski.tc.domain.model.song.ChordBeats
+import pl.lemanski.tc.domain.model.core.Chord.Type
+import pl.lemanski.tc.domain.model.core.Note
+import pl.lemanski.tc.domain.model.core.build
+import pl.lemanski.tc.domain.model.project.ChordBeats
 
-internal fun String.decode(): List<ChordBeats> = split(";").map {
-    val (chordName, beat) = it.split(":")
+internal fun String.tryDecodeChordBeats(): List<ChordBeats> = split(SEPARATOR).map {
+    val (chordName, beat) = it.split(BEAT_DELIMITER)
     ChordBeats(chordName.toChord(), beat.toInt())
 }
 
-private fun String.toChord(): Chord {
-    TODO("Not yet implemented")
+internal fun String.toChord(): Chord {
+    val (baseNote, typeNotation) = split(CHORD_DELIMITER, limit = 2)
+    val type = Type.entries.first { it.notation == typeNotation }
+    return type.build(Note(baseNote.toInt()))
 }

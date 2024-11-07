@@ -1,19 +1,26 @@
 package pl.lemanski.tc.data.project
 
+import pl.lemanski.tc.data.persistent.TcDatabase
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.repository.project.ProjectRepository
 import pl.lemanski.tc.utils.UUID
 
-internal class ProjectRepositoryImpl: ProjectRepository {
-    override fun getProjects(): List<Project> {
-        TODO("Not yet implemented")
-    }
+internal class ProjectRepositoryImpl : ProjectRepository {
+    override fun getProjects(): List<Project> = TcDatabase.getFiles().mapNotNull { getProject(it) }
 
     override fun getProject(id: UUID): Project? {
-        TODO("Not yet implemented")
+        try {
+            val project = TcDatabase.loadFile(id).tryParseProject()
+            return project
+        } catch (ex: Exception) {
+            // TODO handle
+        }
+
+        return null
     }
 
     override fun saveProject(project: Project): Project {
-        TODO("Not yet implemented")
+        TcDatabase.saveFile(project.id, project.encodeToString())
+        return project
     }
 }

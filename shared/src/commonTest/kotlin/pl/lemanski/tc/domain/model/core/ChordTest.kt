@@ -1,21 +1,14 @@
-package pl.lemanski.tc.domain.service.chord
+package pl.lemanski.tc.domain.model.core
 
-import pl.lemanski.tc.domain.model.core.Note
-import pl.lemanski.tc.domain.model.core.majorThird
-import pl.lemanski.tc.domain.model.core.minorThird
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-
-class ChordBuilderServiceTest {
-    private var chordBuilderService: ChordBuilderService = ChordBuilderService()
-
+class ChordTest {
     @Test
     fun buildMinorTriad_should_return_correct_notes() {
         val baseNote = Note(12) // assuming C is the base note
-        chordBuilderService.setBaseNote(baseNote)
 
-        val chord = chordBuilderService.buildMinorTriad()
+        val chord = buildMinorTriad(baseNote)
         val expectedNotes = listOf(
             baseNote,
             baseNote.minorThird(),
@@ -29,25 +22,23 @@ class ChordBuilderServiceTest {
     @Test
     fun buildMajorTriad_should_return_correct_notes() {
         val baseNote = Note(12)
-        chordBuilderService.setBaseNote(baseNote)
 
-        val chord = chordBuilderService.buildMajorTriad()
+        val chord = buildMajorTriad(baseNote)
         val expectedNotes = listOf(
             baseNote,
             baseNote.majorThird(),
             baseNote.majorThird().minorThird()
         )
 
-        assertEquals("C", chord.name)
+        assertEquals("Cmaj", chord.name)
         assertEquals(expectedNotes, chord.notes)
     }
 
     @Test
     fun buildDiminishedTriad_should_return_correct_notes() {
         val baseNote = Note(12)
-        chordBuilderService.setBaseNote(baseNote)
 
-        val chord = chordBuilderService.buildDiminishedTriad()
+        val chord = buildDiminishedTriad(baseNote)
         val expectedNotes = listOf(
             baseNote,
             baseNote.minorThird(),
@@ -61,9 +52,8 @@ class ChordBuilderServiceTest {
     @Test
     fun buildAugmentedTriad_should_return_correct_notes() {
         val baseNote = Note(12)
-        chordBuilderService.setBaseNote(baseNote)
 
-        val chord = chordBuilderService.buildAugmentedTriad()
+        val chord = buildAugmentedTriad(baseNote)
         val expectedNotes = listOf(
             baseNote,
             baseNote.majorThird(),
@@ -77,9 +67,8 @@ class ChordBuilderServiceTest {
     @Test
     fun buildMinorSeventh_should_return_correct_notes() {
         val baseNote = Note(12)
-        chordBuilderService.setBaseNote(baseNote)
 
-        val chord = chordBuilderService.buildMinorSeventh()
+        val chord = buildMinorSeventh(baseNote)
         val expectedNotes = listOf(
             baseNote,
             baseNote.minorThird(),
@@ -94,9 +83,8 @@ class ChordBuilderServiceTest {
     @Test
     fun buildMajorSeventh_should_return_correct_notes() {
         val baseNote = Note(12)
-        chordBuilderService.setBaseNote(baseNote)
 
-        val chord = chordBuilderService.buildMajorSeventh()
+        val chord = buildMajorSeventh(baseNote)
         val expectedNotes = listOf(
             baseNote,
             baseNote.majorThird(),
@@ -111,9 +99,8 @@ class ChordBuilderServiceTest {
     @Test
     fun buildDominantSeventh_should_return_correct_notes() {
         val baseNote = Note(12)
-        chordBuilderService.setBaseNote(baseNote)
 
-        val chord = chordBuilderService.buildDominantSeventh()
+        val chord = buildDominantSeventh(baseNote)
         val expectedNotes = listOf(
             baseNote,
             baseNote.majorThird(),
@@ -122,6 +109,54 @@ class ChordBuilderServiceTest {
         )
 
         assertEquals("C7", chord.name)
+        assertEquals(expectedNotes, chord.notes)
+    }
+
+    @Test
+    fun buildMinorSixth_should_return_correct_notes() {
+        val baseNote = Note(12)
+
+        val chord = buildMinorSixth(baseNote)
+        val expectedNotes = listOf(
+            baseNote,
+            baseNote.minorThird(),
+            baseNote.minorThird().majorThird(), // Perfect fifth
+            baseNote.minorThird().majorThird().majorSecond() // Major sixth
+        )
+
+        assertEquals("Cmin6", chord.name)
+        assertEquals(expectedNotes, chord.notes)
+    }
+
+    @Test
+    fun buildMajorSixth_should_return_correct_notes() {
+        val baseNote = Note(12)
+
+        val chord = buildMajorSixth(baseNote)
+        val expectedNotes = listOf(
+            baseNote,
+            baseNote.majorThird(),
+            baseNote.majorThird().minorThird(), // Perfect fifth
+            baseNote.majorThird().minorThird().majorSecond() // Major sixth
+        )
+
+        assertEquals("Cmaj6", chord.name)
+        assertEquals(expectedNotes, chord.notes)
+    }
+
+    @Test
+    fun buildDiminishedSeventh_should_return_correct_notes() {
+        val baseNote = Note(12)
+
+        val chord = buildDiminishedSeventh(baseNote)
+        val expectedNotes = listOf(
+            baseNote,
+            baseNote.minorThird(),
+            baseNote.minorThird().minorThird(), // Diminished fifth
+            baseNote.minorThird().minorThird().minorThird() // Diminished seventh
+        )
+
+        assertEquals("Cdim7", chord.name)
         assertEquals(expectedNotes, chord.notes)
     }
 }

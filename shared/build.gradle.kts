@@ -1,6 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
@@ -34,8 +31,11 @@ kotlin {
             implementation(compose.material)
             implementation(compose.ui)
             implementation(compose.components.resources)
+
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            implementation(libs.kotlinx.io)
         }
 
         commonTest.dependencies {

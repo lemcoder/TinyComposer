@@ -9,21 +9,16 @@ import kotlin.uuid.Uuid
  */
 @OptIn(ExperimentalUuidApi::class)
 class UUID(
-    val value: ByteArray
+    private val value: String
 ) {
     companion object {
         fun random(): UUID {
-            return UUID(Uuid.random().toByteArray())
+            return UUID(Uuid.random().toString())
         }
     }
 
-    @OptIn(ExperimentalStdlibApi::class)
     override fun toString(): String {
-        return value.toHexString()
-    }
-
-    override fun hashCode(): Int {
-        return value.contentHashCode()
+        return value
     }
 
     override fun equals(other: Any?): Boolean {
@@ -33,5 +28,9 @@ class UUID(
         other as UUID
 
         return value.contentEquals(other.value)
+    }
+
+    override fun hashCode(): Int {
+        return value.hashCode()
     }
 }

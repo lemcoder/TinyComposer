@@ -1,12 +1,5 @@
-package pl.lemanski.tc.domain.model
+package pl.lemanski.tc.domain.model.core
 
-import pl.lemanski.tc.domain.model.core.Note
-import pl.lemanski.tc.domain.model.core.flat
-import pl.lemanski.tc.domain.model.core.majorSecond
-import pl.lemanski.tc.domain.model.core.majorThird
-import pl.lemanski.tc.domain.model.core.minorSecond
-import pl.lemanski.tc.domain.model.core.minorThird
-import pl.lemanski.tc.domain.model.core.sharp
 import pl.lemanski.tc.exception.InvalidNoteException
 import kotlin.test.Test
 import kotlin.test.assertEquals
