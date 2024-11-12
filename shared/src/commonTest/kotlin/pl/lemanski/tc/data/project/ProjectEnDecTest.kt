@@ -20,7 +20,7 @@ class ProjectEnDecTest {
         val project = Project(
             id = projectId,
             name = "Test Project",
-            lengthInBeats = 120,
+            lengthInMeasures = 120,
             bpm = 100,
             rhythm = Rhythm.FOUR_FOURS,
             chords = listOf(
@@ -48,7 +48,7 @@ class ProjectEnDecTest {
         val expectedProject = Project(
             id = projectId,
             name = "Test Project",
-            lengthInBeats = 120,
+            lengthInMeasures = 120,
             bpm = 100,
             rhythm = Rhythm.FOUR_FOURS,
             chords = listOf(

@@ -8,5 +8,5 @@ internal const val projectFileHeader = "id, name, lengthInBeats, bpm, rhythm, ch
 internal fun Project.encodeToString(): String = with(StringBuilder()) {
     append(projectFileHeader)
     append('\n')
-    append("$id, $name, $lengthInBeats, $bpm, ${rhythm.name}, ${chords.encodeToString()}\n")
+    append("$id, $name, $lengthInMeasures, $bpm, ${rhythm.name}, ${chords.encodeToString()}\n")
 }.toString()

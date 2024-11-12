@@ -1,0 +1,16 @@
+<resources>
+    <string name="common_ok">Ok</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_close">Close</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
+    <string name="common_confirm">Confirm</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_edit">Edit</string>
+    <string name="common_add">Add</string>
+    <string name="common_save">Save</string>
+    <string name="common_reset">Reset</string>
+
+    <string name="project_list_title">Projects</string>
+    <string name="project_list_add_project">Create project</string>
+</resources>

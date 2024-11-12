@@ -8,7 +8,7 @@ typealias ChordBeats = Pair<Chord, Int>
 data class Project(
     val id: UUID,
     val name: String,
-    val lengthInBeats: Int,
+    val lengthInMeasures: Int,
     val bpm: Int,
     val rhythm: Rhythm,
     val chords: List<ChordBeats>

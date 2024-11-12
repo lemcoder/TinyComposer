@@ -24,7 +24,7 @@ internal fun String.tryParseProject(): Project {
     return Project(
         id = id,
         name = name,
-        lengthInBeats = length,
+        lengthInMeasures = length,
         bpm = bpm,
         rhythm = rhythm,
         chords = chords
