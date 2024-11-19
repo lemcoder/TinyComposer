@@ -1,8 +1,15 @@
 package pl.lemanski.tc.domain.service.navigation
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
-import pl.lemanski.tc.exception.NavigationStateException
+import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
+import pl.lemanski.tc.utils.Logger
+import pl.lemanski.tc.utils.exception.NavigationStateException
 
 /**
  * Service that is responsible for navigation between [Destination]s
@@ -10,40 +17,99 @@ import pl.lemanski.tc.exception.NavigationStateException
  * on each supported platform
  */
 class NavigationService {
-    private lateinit var listener: OnNavigateListener
-    internal val navStack: ArrayDeque<Destination> = ArrayDeque()
+    // TODO logger should be injected (maybe use context receiver here?)
+    internal val logger = Logger(this::class)
 
-    fun setOnNavigateListener(listener: OnNavigateListener) {
-        this.listener = listener
+    private val listenerMut: Mutex = Mutex()
+    private var listener: OnNavigateListener? = null
+
+    private val historyMut: Mutex = Mutex()
+    private var history: Set<Destination> = setOf(WelcomeDestination)
+
+    fun setOnNavigateListener(listener: OnNavigateListener?) = runBlocking {
+        logger.debug("Set on navigate listener")
+
+        listenerMut.withLock {
+            this@NavigationService.listener = listener
+        }
     }
 
-    internal fun goTo(destination: Destination) {
-        navStack.addLast(destination)
+    internal fun getOnNavigateListener(): OnNavigateListener? = runBlocking {
+        logger.info("Get on navigate listener")
 
-        listener.onNavigate(NavigationEvent(
-            destination = navStack.last(),
+        return@runBlocking listenerMut.withLock {
+            listener
+        }
+    }
+
+    internal suspend fun updateHistory(reducer: (Set<Destination>) -> Set<Destination>) {
+        val newHistory = reducer(history)
+        logger.debug("Update history with:\n${newHistory.joinToString(separator = "\n") { it.toString() }}")
+
+        historyMut.withLock {
+            history = newHistory
+        }
+    }
+
+    internal suspend fun history(): Set<Destination> {
+        logger.info("History")
+
+        return historyMut.withLock {
+            history
+        }
+    }
+}
+
+fun NavigationService.goTo(destination: Destination) = runBlocking {
+    logger.debug("Go to: $destination")
+
+    updateHistory { history ->
+        val newHistory = history.toMutableList()
+        newHistory.add(destination)
+        newHistory.toSet()
+    }
+
+    getOnNavigateListener()?.onNavigate(
+        NavigationEvent(
+            destination = history().last(),
             direction = NavigationEvent.Direction.FORWARD
-        ))
-    }
+        )
+    )
+}
 
-    internal fun back(): Boolean {
-        if (navStack.size <= 1) {
-            return false
+fun NavigationService.back(): Boolean = runBlocking {
+    logger.debug("Back")
+
+    updateHistory { history ->
+        if (history.size <= 1) {
+            logger.debug("Back: No more destinations")
+            return@updateHistory history
         }
 
-        navStack.removeLast()
-
-        listener.onNavigate(NavigationEvent(
-            destination = navStack.last(),
-            direction = NavigationEvent.Direction.BACKWARD
-        ))
-
-        return true
+        val newHistory = history.toMutableList()
+        newHistory.removeLast()
+        newHistory.toSet()
     }
 
-    internal inline fun <reified T : Destination> key(): T? {
-        val entry: List<T> = navStack.filterIsInstance<T>()
-        if (entry.size > 1) throw NavigationStateException("More than one key of the same type on the stack: \n ${navStack.map { "- $it\n" }}")
-        return entry.firstOrNull()
+    val newHistory = history()
+
+    getOnNavigateListener()?.onNavigate(
+        NavigationEvent(
+            destination = newHistory.last(),
+            direction = NavigationEvent.Direction.BACKWARD
+        )
+    )
+
+    return@runBlocking true
+}
+
+internal inline fun <reified T : Destination> NavigationService.key(): T? = runBlocking {
+    logger.debug("Key: ${T::class.simpleName}")
+
+    withContext(Dispatchers.Default) {
+        val history = history()
+        val entry: List<T> = history.filterIsInstance<T>()
+        if (entry.size > 1) throw NavigationStateException("More than one key of the same type on the stack: \n ${history.map { "- $it\n" }}")
+        return@withContext entry.firstOrNull()
     }
 }

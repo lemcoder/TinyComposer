@@ -20,11 +20,13 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
@@ -35,8 +37,10 @@ android {
 dependencies {
     implementation(projects.shared)
 
-    implementation(compose.preview)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.koin.android)
+    implementation(libs.androidx.material3.android)
 
+    debugImplementation(compose.preview)
     debugImplementation(compose.uiTooling)
 }

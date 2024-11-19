@@ -1,6 +1,7 @@
 package pl.lemanski.tc.data.project
 
-import pl.lemanski.tc.data.chord.encodeToString
+import pl.lemanski.tc.data.persistent.encoder.encodeToString
+import pl.lemanski.tc.data.persistent.decoder.tryParseProject
 import pl.lemanski.tc.domain.model.core.Note
 import pl.lemanski.tc.domain.model.core.buildMajorSeventh
 import pl.lemanski.tc.domain.model.core.buildMinorTriad

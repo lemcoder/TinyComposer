@@ -1,6 +1,6 @@
 package pl.lemanski.tc.domain.model.core
 
-import pl.lemanski.tc.exception.InvalidNoteException
+import pl.lemanski.tc.utils.exception.InvalidNoteException
 
 /**
  * Represents a note in a musical context.

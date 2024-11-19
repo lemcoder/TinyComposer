@@ -1,6 +1,6 @@
 package pl.lemanski.tc.domain.model.core
 
-import pl.lemanski.tc.exception.InvalidNoteException
+import pl.lemanski.tc.utils.exception.InvalidNoteException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
