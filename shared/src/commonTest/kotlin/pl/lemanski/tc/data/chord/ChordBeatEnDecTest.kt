@@ -4,6 +4,7 @@ import pl.lemanski.tc.data.persistent.encoder.codeName
 import pl.lemanski.tc.data.persistent.encoder.encodeToString
 import pl.lemanski.tc.data.persistent.decoder.toChord
 import pl.lemanski.tc.data.persistent.decoder.tryDecodeChordBeats
+import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.core.Note
 import pl.lemanski.tc.domain.model.core.buildMajorSeventh
 import pl.lemanski.tc.domain.model.core.buildMajorTriad
@@ -32,6 +33,15 @@ class ChordBeatEnDecTest {
             ChordBeats(buildMinorTriad(Note(12)), 1),
             ChordBeats(buildMajorSeventh(Note(15)), 3)
         )
+
+        assertEquals(expectedChordBeatsList, encodedString.tryDecodeChordBeats())
+    }
+
+    @Test
+    fun tryDecodeChordBeats_should_return_empty_list_for_empty_string() {
+        val encodedString = ""
+
+        val expectedChordBeatsList = listOf<ChordBeats>()
 
         assertEquals(expectedChordBeatsList, encodedString.tryDecodeChordBeats())
     }

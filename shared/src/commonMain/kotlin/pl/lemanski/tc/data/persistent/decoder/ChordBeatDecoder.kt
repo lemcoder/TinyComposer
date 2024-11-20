@@ -9,10 +9,14 @@ import pl.lemanski.tc.domain.model.core.Note
 import pl.lemanski.tc.domain.model.core.build
 import pl.lemanski.tc.domain.model.project.ChordBeats
 
-internal fun String.tryDecodeChordBeats(): List<ChordBeats> = split(SEPARATOR).map {
-    val (chordName, beat) = it.split(BEAT_DELIMITER)
-    ChordBeats(chordName.toChord(), beat.toInt())
+internal fun String.tryDecodeChordBeats(): List<ChordBeats> = when {
+    isEmpty() -> emptyList()
+    else      -> split(SEPARATOR).map {
+        val (chordName, beat) = it.split(BEAT_DELIMITER)
+        ChordBeats(chordName.toChord(), beat.toInt())
+    }
 }
+
 
 internal fun String.toChord(): Chord {
     val (baseNote, typeNotation) = split(CHORD_DELIMITER, limit = 2)
