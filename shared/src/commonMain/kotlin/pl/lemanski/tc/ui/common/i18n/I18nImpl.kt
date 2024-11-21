@@ -3,7 +3,6 @@ package pl.lemanski.tc.ui.common.i18n
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
-import tinycomposer.shared.generated.resources.Res
 import tinycomposer.shared.generated.resources.*
 
 internal class I18nImpl : I18n {
@@ -14,6 +13,7 @@ internal class I18nImpl : I18n {
     override val projectList: I18n.ProjectList by lazy { ProjectList() }
     override val projectCreate: I18n.ProjectCreate by lazy { ProjectCreate() }
     override val welcome: I18n.Welcome by lazy { Welcome() }
+    override val rhythm: I18n.Rhythm by lazy { Rhythm() }
 
     private inner class Welcome : I18n.Welcome {
         override val title: String = stringResourceBlocking(Res.string.welcome_title)
@@ -43,8 +43,16 @@ internal class I18nImpl : I18n {
     private inner class ProjectCreate : I18n.ProjectCreate {
         override val title: String = stringResourceBlocking(Res.string.project_create_title)
         override val projectName: String = stringResourceBlocking(Res.string.project_create_project_name)
+        override val invalidProjectName: String = stringResourceBlocking(Res.string.project_create_invalid_project_name)
         override val projectBpm: String = stringResourceBlocking(Res.string.project_create_project_bpm)
+        override val invalidProjectBpm: String = stringResourceBlocking(Res.string.project_create_invalid_project_bpm)
         override val projectRhythm: String = stringResourceBlocking(Res.string.project_create_project_rhythm)
         override val createProjectButton: String = stringResourceBlocking(Res.string.common_save)
+        override val projectCreationError: String = stringResourceBlocking(Res.string.project_create_project_creation_error)
+    }
+
+    private inner class Rhythm : I18n.Rhythm {
+        override val fourFours: String = stringResourceBlocking(Res.string.rhythm_four_fours)
+        override val threeFours: String = stringResourceBlocking(Res.string.rhythm_three_fours)
     }
 }

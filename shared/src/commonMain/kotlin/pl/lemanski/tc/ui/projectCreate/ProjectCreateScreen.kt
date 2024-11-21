@@ -1,18 +1,23 @@
 package pl.lemanski.tc.ui.projectCreate
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.composables.LoaderScaffold
-import pl.lemanski.tc.ui.common.composables.toComposable
+import pl.lemanski.tc.ui.common.composables.ToComposable
 
 @Composable
 internal fun ProjectCreateScreen(
@@ -23,24 +28,42 @@ internal fun ProjectCreateScreen(
     projectRhythm: StateComponent.SelectInput<Rhythm>,
     createProjectButton: StateComponent.Button
 ) {
-    LoaderScaffold(isLoading) { paddingValues ->
+    LoaderScaffold(isLoading) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .safeContentPadding(),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.h3
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
-            projectName.toComposable()
+                IconButton({}) {}
+            }
 
-            projectBpm.toComposable()
+            projectName.ToComposable()
 
-            projectRhythm.toComposable()
+            projectBpm.ToComposable()
 
-            createProjectButton.toComposable()
+            projectRhythm.ToComposable()
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                createProjectButton.ToComposable()
+            }
         }
     }
 }

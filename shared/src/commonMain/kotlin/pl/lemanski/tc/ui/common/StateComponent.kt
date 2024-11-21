@@ -10,6 +10,7 @@ sealed class StateComponent {
         val value: String,
         val type: Type,
         val hint: String,
+        val error: String? = null,
         val onValueChange: (String) -> Unit
     ) {
         enum class Type {
@@ -19,9 +20,9 @@ sealed class StateComponent {
     }
 
     data class SelectInput<T>(
-        val value: T,
+        val selected: Option<T>,
         val hint: String,
-        val onSelected: (T) -> Unit,
+        val onSelected: (Option<T>) -> Unit,
         val options: Set<Option<T>>
     ) {
         data class Option<T>(

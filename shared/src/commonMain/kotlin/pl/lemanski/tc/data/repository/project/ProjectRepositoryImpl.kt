@@ -30,4 +30,12 @@ internal class ProjectRepositoryImpl(
         database.saveFile(project.id, project.encodeToString())
         return project
     }
+
+    override fun deleteProject(id: UUID) {
+        try {
+            database.deleteFile(id)
+        } catch (ex: Exception) {
+            logger.error("Failed to delete project: $id", ex)
+        }
+    }
 }

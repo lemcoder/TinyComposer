@@ -1,18 +1,18 @@
 package pl.lemanski.tc.ui.projectCreate
 
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.model.project.Rhythm
-import pl.lemanski.tc.domain.repository.project.ProjectRepository
+import pl.lemanski.tc.domain.model.project.name
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.service.navigation.key
+import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCaseErrorHandler
+import pl.lemanski.tc.domain.useCase.createProject.createProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
@@ -22,7 +22,6 @@ import pl.lemanski.tc.utils.exception.NavigationStateException
 internal class ProjectCreateViewModel(
     private val i18n: I18n,
     private val navigationService: NavigationService,
-    private val projectRepository: ProjectRepository,
 ) : ProjectCreateContract.ViewModel() {
     private val logger = Logger(this::class)
 
@@ -43,7 +42,7 @@ internal class ProjectCreateViewModel(
                 onValueChange = ::onProjectBpmInputChange
             ),
             projectRhythm = StateComponent.SelectInput(
-                value = Rhythm.FOUR_FOURS,
+                selected = rhythmToInputOption(Rhythm.FOUR_FOURS),
                 onSelected = ::onProjectRhythmSelectChange,
                 hint = i18n.projectCreate.projectRhythm,
                 options = Rhythm.entries.map(::rhythmToInputOption).toSet()
@@ -88,12 +87,12 @@ internal class ProjectCreateViewModel(
         }
     }
 
-    override fun onProjectRhythmSelectChange(value: Rhythm) {
-        logger.debug("onProjectRhythmSelectChange: $value")
+    override fun onProjectRhythmSelectChange(selected: StateComponent.SelectInput.Option<Rhythm>) {
+        logger.debug("onProjectRhythmSelectChange: $selected")
 
         _stateFlow.update { state ->
             state.copy(
-                projectRhythm = state.projectRhythm.copy(value = value)
+                projectRhythm = state.projectRhythm.copy(selected = selected)
             )
         }
     }
@@ -101,20 +100,14 @@ internal class ProjectCreateViewModel(
     override fun onCreateProjectClick() {
         logger.debug("onCreateProjectClick")
 
+        clearErrors()
+
         val projectName = _stateFlow.value.projectName.value
-        val projectBpm = _stateFlow.value.projectBpm.value.toIntOrNull()
-        val projectRhythm = _stateFlow.value.projectRhythm.value
+        val projectBpm = _stateFlow.value.projectBpm.value.toIntOrNull() ?: 0
+        val projectRhythm = _stateFlow.value.projectRhythm.selected.value
 
-        if (projectName.isBlank() || projectBpm == null) {
-            logger.error("Project name or bpm is empty")
-            // TODO add error handling on UI
-            return
-        }
-
-        viewModelScope.launch {
-            logger.debug("Saving project")
-
-            val project = Project(
+        createProjectUseCase(CreateProjectErrorHandler()) {
+            Project(
                 id = UUID.random(),
                 name = projectName,
                 lengthInMeasures = 0,
@@ -122,18 +115,57 @@ internal class ProjectCreateViewModel(
                 rhythm = projectRhythm,
                 chords = listOf()
             )
+        } ?: return
 
-            projectRepository.saveProject(project)
+        navigationService.back()
+    }
 
-            navigationService.back()
+    override fun clearErrors() {
+        _stateFlow.update { state ->
+            state.copy(
+                projectName = state.projectName.copy(
+                    error = null
+                ),
+                projectBpm = state.projectBpm.copy(
+                    error = null
+                ),
+            )
         }
     }
 
     //
 
     private fun rhythmToInputOption(rhythm: Rhythm) = StateComponent.SelectInput.Option(
-        name = rhythm.name,
+        name = rhythm.name(i18n),
         value = rhythm
     )
+
+    //---
+
+    inner class CreateProjectErrorHandler : CreateProjectUseCaseErrorHandler {
+        override fun onInvalidProjectName() {
+            _stateFlow.update { state ->
+                state.copy(
+                    projectName = state.projectName.copy(
+                        error = i18n.projectCreate.invalidProjectName
+                    )
+                )
+            }
+        }
+
+        override fun onInvalidProjectBpm() {
+            _stateFlow.update { state ->
+                state.copy(
+                    projectBpm = state.projectBpm.copy(
+                        error = i18n.projectCreate.invalidProjectBpm
+                    )
+                )
+            }
+        }
+
+        override fun onProjectSaveError() {
+            // TODO add snack bar
+        }
+    }
 }
 

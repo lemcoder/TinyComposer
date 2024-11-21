@@ -9,8 +9,9 @@ internal interface ProjectCreateContract {
     abstract class ViewModel : TcViewModel<State>, LifecycleViewModel() {
         abstract fun onProjectNameInputChange(value: String)
         abstract fun onProjectBpmInputChange(value: String)
-        abstract fun onProjectRhythmSelectChange(value: Rhythm)
+        abstract fun onProjectRhythmSelectChange(selected: StateComponent.SelectInput.Option<Rhythm>)
         abstract fun onCreateProjectClick()
+        abstract fun clearErrors()
     }
 
     data class State(

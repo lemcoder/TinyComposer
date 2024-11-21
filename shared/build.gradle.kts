@@ -9,17 +9,18 @@ kotlin {
     jvmToolchain(17)
 
     androidTarget()
+    linuxX64() // just to not fail for android only stuff
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp" // TODO change this
-            isStatic = true
-        }
-    }
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach { iosTarget ->
+//        iosTarget.binaries.framework {
+//            baseName = "ComposeApp" // TODO change this
+//            isStatic = true
+//        }
+//    }
 
     sourceSets {
 
@@ -30,7 +31,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
 
@@ -44,6 +45,9 @@ kotlin {
             implementation(libs.koin.composeVM)
 
             implementation(libs.coroutines.core)
+
+            implementation(libs.mikrosoundfont.midi)
+            implementation(libs.mikrosoundfont.soundFont)
         }
 
         commonTest.dependencies {

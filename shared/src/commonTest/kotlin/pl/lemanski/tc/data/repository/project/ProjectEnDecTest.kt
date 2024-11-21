@@ -1,4 +1,4 @@
-package pl.lemanski.tc.data.project
+package pl.lemanski.tc.data.repository.project
 
 import pl.lemanski.tc.data.persistent.encoder.encodeToString
 import pl.lemanski.tc.data.persistent.decoder.tryParseProject

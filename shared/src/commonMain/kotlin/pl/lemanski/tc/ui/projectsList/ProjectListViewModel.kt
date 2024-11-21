@@ -14,6 +14,10 @@ import pl.lemanski.tc.domain.repository.project.ProjectRepository
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.goTo
 import pl.lemanski.tc.domain.service.navigation.key
+import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCaseErrorHandler
+import pl.lemanski.tc.domain.useCase.deleteProject.deleteProjectUseCase
+import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCaseErrorHandler
+import pl.lemanski.tc.domain.useCase.getProjectsList.getProjectsListUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
@@ -22,7 +26,6 @@ import pl.lemanski.tc.utils.exception.NavigationStateException
 
 internal class ProjectListViewModel(
     private val i18n: I18n,
-    private val projectRepository: ProjectRepository,
     private val navigationService: NavigationService
 ) : ProjectsListContract.ViewModel() {
 
@@ -49,13 +52,14 @@ internal class ProjectListViewModel(
             state.copy(isLoading = true)
         }
 
-        val projects = projectRepository.getProjects()
+        val projects = getProjectsListUseCase(errorHandler = GetProjectsErrorHandler())
         val projectCards = projects.map { project: Project ->
             ProjectsListContract.State.ProjectCard(
                 id = project.id,
                 name = project.name,
-                description = "BPM: ${project.bpm} \n ${i18n.projectList.duration}: ${(project.lengthInMeasures * project.bpm) / 60}s",
-                onClick = { onProjectClick(project.id) }
+                description = "BPM: ${project.bpm}\n${i18n.projectList.duration}: ${(project.lengthInMeasures * project.bpm) / 60}s",
+                onDelete = { },
+                onClick = ::onProjectClick
             )
         }
 
@@ -64,6 +68,12 @@ internal class ProjectListViewModel(
                 isLoading = false,
                 projectCards = projectCards
             )
+        }
+    }
+
+    override fun onProjectDelete(id: UUID) {
+        deleteProjectUseCase(DeleteProjectErrorHandler()) {
+            id
         }
     }
 
@@ -78,5 +88,19 @@ internal class ProjectListViewModel(
 
     override fun onAddButtonClick(): Job = viewModelScope.launch {
         navigationService.goTo(ProjectCreateDestination)
+    }
+
+    //---
+
+    inner class DeleteProjectErrorHandler : DeleteProjectUseCaseErrorHandler {
+        override fun handleDeleteProjectError() {
+            logger.error("Error while deleting project")
+        }
+    }
+
+    inner class GetProjectsErrorHandler : GetProjectsListUseCaseErrorHandler {
+        override fun onProjectsListLoadError() {
+            logger.error("Error while loading projects list")
+        }
     }
 }

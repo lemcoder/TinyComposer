@@ -7,11 +7,13 @@ import kotlinx.io.readString
 import kotlinx.io.writeString
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.UUID
+import pl.lemanski.tc.utils.exception.EntryNotFoundException
 
 internal interface TcDatabase {
     fun getFiles(): List<UUID>
     fun saveFile(id: UUID, data: String)
     fun loadFile(id: UUID): String
+    fun deleteFile(id: UUID)
 }
 
 internal class TcDatabaseImpl : TcDatabase {
@@ -43,10 +45,21 @@ internal class TcDatabaseImpl : TcDatabase {
         val path = Path(dbPath, "$id")
 
         if (!SystemFileSystem.exists(path)) {
-            throw Exception("File not found")
+            throw EntryNotFoundException("File not found")
         }
 
         return SystemFileSystem.source(path).buffered().readString()
+    }
+
+    override fun deleteFile(id: UUID) {
+        logger.debug("Delete file: $id")
+        val path = Path(dbPath, "$id")
+
+        if (!SystemFileSystem.exists(path)) {
+            throw EntryNotFoundException("File not found")
+        }
+
+        SystemFileSystem.delete(path)
     }
 }
 

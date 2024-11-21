@@ -9,6 +9,7 @@ import pl.lemanski.tc.utils.UUID
 internal interface ProjectsListContract {
     abstract class ViewModel : TcViewModel<State>, LifecycleViewModel() {
         abstract fun onProjectClick(id: UUID)
+        abstract fun onProjectDelete(id: UUID)
         abstract fun onProjectLongClick(id: UUID)
         abstract fun onAddButtonClick(): Job
     }
@@ -23,7 +24,8 @@ internal interface ProjectsListContract {
             val id: UUID,
             val name: String,
             val description: String,
-            val onClick: () -> Unit,
+            val onDelete: (UUID) -> Unit,
+            val onClick: (UUID) -> Unit,
         )
     }
 }

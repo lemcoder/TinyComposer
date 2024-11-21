@@ -1,4 +1,4 @@
-package pl.lemanski.tc.data.chord
+package pl.lemanski.tc.data.repository.chord
 
 import pl.lemanski.tc.data.persistent.encoder.codeName
 import pl.lemanski.tc.data.persistent.encoder.encodeToString

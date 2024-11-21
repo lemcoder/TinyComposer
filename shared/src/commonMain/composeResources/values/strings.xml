@@ -21,5 +21,11 @@
     <string name="project_create_project_name">Project name</string>
     <string name="project_create_project_bpm">Project tempo (BPM)</string>
     <string name="project_create_project_rhythm">Project rhythm</string>
+    <string name="project_create_invalid_project_name">Project name is too long</string>
+    <string name="project_create_invalid_project_bpm">Invalid tempo</string>
+    <string name="project_create_project_creation_error">Failed to create project</string>
+
+    <string name="rhythm_four_fours">Four fours</string>
+    <string name="rhythm_three_fours">Three fours</string>
 
 </resources>

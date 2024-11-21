@@ -5,6 +5,7 @@ internal interface I18n {
     val welcome: Welcome
     val projectList: ProjectList
     val projectCreate: ProjectCreate
+    val rhythm: Rhythm
 
     interface Common {
         val ok: String
@@ -33,8 +34,16 @@ internal interface I18n {
     interface ProjectCreate {
         val title: String
         val projectName: String
+        val invalidProjectName: String
         val projectBpm: String
+        val invalidProjectBpm: String
         val projectRhythm: String
         val createProjectButton: String
+        val projectCreationError: String
+    }
+
+    interface Rhythm {
+        val fourFours: String
+        val threeFours: String
     }
 }

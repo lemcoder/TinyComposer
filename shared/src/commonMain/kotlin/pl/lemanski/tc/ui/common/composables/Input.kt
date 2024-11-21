@@ -1,34 +1,67 @@
 package pl.lemanski.tc.ui.common.composables
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import pl.lemanski.tc.ui.common.StateComponent
 
 @Composable
-fun StateComponent.Input.toComposable() {
+fun StateComponent.Input.ToComposable() {
     when (type) {
         StateComponent.Input.Type.NUMBER -> {
-            TextField(
-                value = value,
-                onValueChange = { newValue ->
-                    if (newValue.all { it.isDigit() }) {
-                        onValueChange(newValue)
-                    }
-                },
-                label = { Text(hint) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = value,
+                    onValueChange = { newValue ->
+                        if (newValue.all { it.isDigit() }) {
+                            onValueChange(newValue)
+                        }
+                    },
+                    isError = error != null,
+                    label = { Text(hint) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+
+                error?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
         }
-        StateComponent.Input.Type.TEXT -> {
-            TextField(
-                value = value,
-                onValueChange = onValueChange,
-                label = { Text(hint) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-            )
+        StateComponent.Input.Type.TEXT   -> {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = value,
+                    onValueChange = onValueChange,
+                    label = { Text(hint) },
+                    isError = error != null,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                )
+
+                error?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
         }
     }
 }

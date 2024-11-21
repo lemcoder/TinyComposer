@@ -9,4 +9,6 @@ interface ProjectRepository {
     fun getProject(id: UUID): Project?
 
     fun saveProject(project: Project): Project
+
+    fun deleteProject(id: UUID)
 }
