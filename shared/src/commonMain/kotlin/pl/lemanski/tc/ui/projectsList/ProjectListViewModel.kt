@@ -52,7 +52,7 @@ internal class ProjectListViewModel(
             state.copy(isLoading = true)
         }
 
-        val projects = getProjectsListUseCase(errorHandler = GetProjectsErrorHandler())
+        val projects = getProjectsListUseCase()
         val projectCards = projects.map { project: Project ->
             ProjectsListContract.State.ProjectCard(
                 id = project.id,
@@ -95,12 +95,6 @@ internal class ProjectListViewModel(
     inner class DeleteProjectErrorHandler : DeleteProjectUseCaseErrorHandler {
         override fun handleDeleteProjectError() {
             logger.error("Error while deleting project")
-        }
-    }
-
-    inner class GetProjectsErrorHandler : GetProjectsListUseCaseErrorHandler {
-        override fun onProjectsListLoadError() {
-            logger.error("Error while loading projects list")
         }
     }
 }
