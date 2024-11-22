@@ -20,8 +20,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -33,9 +35,10 @@ internal fun ProjectListScreen(
     isLoading: Boolean,
     title: String,
     projectCards: List<ProjectsListContract.State.ProjectCard>,
-    addButton: StateComponent.Button
+    addButton: StateComponent.Button,
+    snackBar: StateComponent.SnackBar?
 ) {
-    LoaderScaffold(isLoading) {
+    LoaderScaffold(isLoading) { snackBarState ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,6 +78,19 @@ internal fun ProjectListScreen(
                 items(projectCards) { projectCard ->
                     projectCard.toComposable()
                 }
+            }
+        }
+
+        LaunchedEffect(snackBar) {
+            if (snackBar == null) {
+                snackBarState.currentSnackbarData?.dismiss()
+                return@LaunchedEffect
+            }
+
+            val result = snackBarState.showSnackbar(snackBar.message, snackBar.action, true)
+            when (result) {
+                SnackbarResult.Dismissed       -> { /* do nothing */ }
+                SnackbarResult.ActionPerformed -> snackBar.onAction?.invoke()
             }
         }
     }

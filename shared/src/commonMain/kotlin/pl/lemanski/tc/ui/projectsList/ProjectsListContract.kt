@@ -12,13 +12,16 @@ internal interface ProjectsListContract {
         abstract fun onProjectDelete(id: UUID)
         abstract fun onProjectLongClick(id: UUID)
         abstract fun onAddButtonClick(): Job
+        abstract fun showSnackBar(message: String, action: String? = null, onAction: (() -> Unit)? = null)
+        abstract fun hideSnackBar()
     }
 
     data class State(
         val isLoading: Boolean,
         val title: String,
         val projectCards: List<ProjectCard>,
-        val addButton: StateComponent.Button
+        val addButton: StateComponent.Button,
+        val snackBar: StateComponent.SnackBar?
     ) {
         data class ProjectCard(
             val id: UUID,

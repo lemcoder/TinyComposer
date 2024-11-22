@@ -31,13 +31,15 @@ internal class I18nImpl : I18n {
         override val add: String = stringResourceBlocking(Res.string.common_add)
         override val save: String = stringResourceBlocking(Res.string.common_save)
         override val reset: String = stringResourceBlocking(Res.string.common_reset)
-
+        override val undo: String = stringResourceBlocking(Res.string.common_undo)
     }
 
     private inner class ProjectList : I18n.ProjectList {
         override val title: String = stringResourceBlocking(Res.string.project_list_title)
         override val addProject: String = stringResourceBlocking(Res.string.project_list_add_project)
         override val duration: String = stringResourceBlocking(Res.string.project_list_duration)
+        override val projectDeleted: String = stringResourceBlocking(Res.string.project_list_project_deleted)
+        override val projectDeleteFailed: String = stringResourceBlocking(Res.string.project_list_project_delete_failed)
     }
 
     private inner class ProjectCreate : I18n.ProjectCreate {

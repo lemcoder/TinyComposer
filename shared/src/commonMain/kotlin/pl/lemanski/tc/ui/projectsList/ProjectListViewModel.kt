@@ -10,13 +10,13 @@ import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectsDestination
 import pl.lemanski.tc.domain.model.project.Project
-import pl.lemanski.tc.domain.repository.project.ProjectRepository
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.goTo
 import pl.lemanski.tc.domain.service.navigation.key
+import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCaseErrorHandler
+import pl.lemanski.tc.domain.useCase.createProject.createProjectUseCase
 import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCaseErrorHandler
 import pl.lemanski.tc.domain.useCase.deleteProject.deleteProjectUseCase
-import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCaseErrorHandler
 import pl.lemanski.tc.domain.useCase.getProjectsList.getProjectsListUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
@@ -38,7 +38,8 @@ internal class ProjectListViewModel(
             addButton = StateComponent.Button(
                 text = i18n.projectList.addProject,
                 onClick = ::onAddButtonClick
-            )
+            ),
+            snackBar = null
         )
     )
 
@@ -48,25 +49,18 @@ internal class ProjectListViewModel(
     override fun initialize() {
         logger.debug("Initialize")
 
+        hideSnackBar()
+
         _stateFlow.update { state ->
             state.copy(isLoading = true)
         }
 
         val projects = getProjectsListUseCase()
-        val projectCards = projects.map { project: Project ->
-            ProjectsListContract.State.ProjectCard(
-                id = project.id,
-                name = project.name,
-                description = "BPM: ${project.bpm}\n${i18n.projectList.duration}: ${(project.lengthInMeasures * project.bpm) / 60}s",
-                onDelete = ::onProjectDelete,
-                onClick = ::onProjectClick
-            )
-        }
 
         _stateFlow.update { state ->
             state.copy(
                 isLoading = false,
-                projectCards = projectCards
+                projectCards = projects.map(::mapProjectToProjectCard)
             )
         }
     }
@@ -75,22 +69,45 @@ internal class ProjectListViewModel(
         logger.debug("Project delete clicked: $id")
 
         _stateFlow.update { state ->
-            state.copy(isLoading = true)
+            state.copy(
+                isLoading = true,
+            )
         }
+
+        hideSnackBar()
 
         val project = deleteProjectUseCase(DeleteProjectErrorHandler()) {
             id
         }
 
-        if (project != null) {
+        if (project == null) {
+            showSnackBar(i18n.projectList.projectDeleteFailed)
+        } else {
             val projectCards = stateFlow.value.projectCards.filter { it.id != id }
 
             _stateFlow.update { state ->
                 state.copy(
-                    isLoading = false,
-                    projectCards = projectCards
+                    projectCards = projectCards,
                 )
             }
+
+            showSnackBar(i18n.projectList.projectDeleted, i18n.common.undo) {
+                createProjectUseCase(CreateProjectErrorHandler()) {
+                    project
+                }
+
+                _stateFlow.update { state ->
+                    state.copy(
+                        projectCards = state.projectCards + mapProjectToProjectCard(project)
+                    )
+                }
+            }
+        }
+
+        _stateFlow.update { state ->
+            state.copy(
+                isLoading = false
+            )
         }
     }
 
@@ -107,11 +124,51 @@ internal class ProjectListViewModel(
         navigationService.goTo(ProjectCreateDestination)
     }
 
+    override fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?) {
+        _stateFlow.update { state ->
+            state.copy(
+                snackBar = StateComponent.SnackBar(
+                    message = message,
+                    action = action,
+                    onAction = onAction
+                )
+            )
+        }
+    }
+
+    override fun hideSnackBar() {
+        _stateFlow.update { state ->
+            state.copy(
+                snackBar = null
+            )
+        }
+    }
+
+    internal fun mapProjectToProjectCard(project: Project): ProjectsListContract.State.ProjectCard = ProjectsListContract.State.ProjectCard(
+        id = project.id,
+        name = project.name,
+        description = "BPM: ${project.bpm}\n${i18n.projectList.duration}: ${(project.lengthInMeasures * project.bpm) / 60}s",
+        onDelete = ::onProjectDelete,
+        onClick = ::onProjectClick
+    )
+
     //---
 
     inner class DeleteProjectErrorHandler : DeleteProjectUseCaseErrorHandler {
         override fun handleDeleteProjectError() {
             logger.error("Error while deleting project")
+        }
+    }
+
+    //---
+
+    inner class CreateProjectErrorHandler : CreateProjectUseCaseErrorHandler {
+        override fun onInvalidProjectName() {}
+
+        override fun onInvalidProjectBpm() {}
+
+        override fun onProjectSaveError() {
+            logger.error("Error while saving project")
         }
     }
 }

@@ -30,4 +30,10 @@ sealed class StateComponent {
             val value: T
         )
     }
+
+    data class SnackBar(
+        val message: String,
+        val action: String?,
+        val onAction: (() -> Unit)?
+    ) : StateComponent()
 }
