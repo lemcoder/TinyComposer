@@ -58,7 +58,7 @@ internal class ProjectListViewModel(
                 id = project.id,
                 name = project.name,
                 description = "BPM: ${project.bpm}\n${i18n.projectList.duration}: ${(project.lengthInMeasures * project.bpm) / 60}s",
-                onDelete = { },
+                onDelete = ::onProjectDelete,
                 onClick = ::onProjectClick
             )
         }
@@ -72,8 +72,25 @@ internal class ProjectListViewModel(
     }
 
     override fun onProjectDelete(id: UUID) {
-        deleteProjectUseCase(DeleteProjectErrorHandler()) {
+        logger.debug("Project delete clicked: $id")
+
+        _stateFlow.update { state ->
+            state.copy(isLoading = true)
+        }
+
+        val project = deleteProjectUseCase(DeleteProjectErrorHandler()) {
             id
+        }
+
+        if (project != null) {
+            val projectCards = stateFlow.value.projectCards.filter { it.id != id }
+
+            _stateFlow.update { state ->
+                state.copy(
+                    isLoading = false,
+                    projectCards = projectCards
+                )
+            }
         }
     }
 

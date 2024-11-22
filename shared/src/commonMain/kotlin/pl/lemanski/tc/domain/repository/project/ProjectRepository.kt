@@ -10,5 +10,5 @@ interface ProjectRepository {
 
     fun saveProject(project: Project): Project
 
-    fun deleteProject(id: UUID)
+    fun deleteProject(id: UUID): Project?
 }

@@ -31,11 +31,22 @@ internal class ProjectRepositoryImpl(
         return project
     }
 
-    override fun deleteProject(id: UUID) {
+    override fun deleteProject(id: UUID): Project? {
         try {
+            val project = getProject(id)
+
+            if (project == null) {
+                logger.error("Project not found: $id")
+                return null
+            }
+
             database.deleteFile(id)
+
+            return project
         } catch (ex: Exception) {
             logger.error("Failed to delete project: $id", ex)
         }
+
+        return null
     }
 }
