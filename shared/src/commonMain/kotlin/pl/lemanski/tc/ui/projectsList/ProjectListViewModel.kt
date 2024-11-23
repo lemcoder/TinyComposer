@@ -83,6 +83,7 @@ internal class ProjectListViewModel(
         if (project == null) {
             showSnackBar(i18n.projectList.projectDeleteFailed)
         } else {
+            val projectPosition = stateFlow.value.projectCards.indexOfFirst { it.id == id }
             val projectCards = stateFlow.value.projectCards.filter { it.id != id }
 
             _stateFlow.update { state ->
@@ -91,14 +92,19 @@ internal class ProjectListViewModel(
                 )
             }
 
-            showSnackBar(i18n.projectList.projectDeleted, i18n.common.undo) {
+            showSnackBar(
+                message = i18n.projectList.projectDeleted,
+                action = i18n.common.undo
+            ) {
                 createProjectUseCase(CreateProjectErrorHandler()) {
                     project
                 }
 
                 _stateFlow.update { state ->
                     state.copy(
-                        projectCards = state.projectCards + mapProjectToProjectCard(project)
+                        projectCards = state.projectCards.toMutableList().apply {
+                            add(projectPosition, mapProjectToProjectCard(project))
+                        }
                     )
                 }
             }
