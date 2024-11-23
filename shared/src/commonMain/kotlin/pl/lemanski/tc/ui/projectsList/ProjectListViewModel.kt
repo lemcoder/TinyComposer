@@ -30,25 +30,27 @@ internal class ProjectListViewModel(
     private val navigationService: NavigationService
 ) : ProjectsListContract.ViewModel() {
 
-    private val logger = Logger(this::class)
-    private val _stateFlow = MutableStateFlow(
-        ProjectsListContract.State(
-            isLoading = true,
-            title = i18n.projectList.title,
-            projectCards = listOf(),
-            addButton = StateComponent.Button(
-                text = i18n.projectList.addProject,
-                onClick = ::onAddButtonClick
-            ),
-            snackBar = null
-        )
+    private val initialState = ProjectsListContract.State(
+        isLoading = true,
+        title = i18n.projectList.title,
+        projectCards = listOf(),
+        addButton = StateComponent.Button(
+            text = i18n.projectList.addProject,
+            onClick = ::onAddButtonClick
+        ),
+        snackBar = null
     )
+
+    private val logger = Logger(this::class)
+    private val _stateFlow = MutableStateFlow(initialState)
 
     override val key: ProjectsDestination = navigationService.key<ProjectsDestination>() ?: throw NavigationStateException("Key not found")
     override val stateFlow: StateFlow<ProjectsListContract.State> = _stateFlow.asStateFlow()
 
     override fun initialize() {
         logger.debug("Initialize")
+
+        _stateFlow.update { initialState }
 
         hideSnackBar()
 

@@ -24,43 +24,42 @@ internal class ProjectCreateViewModel(
     private val createProjectUseCase: CreateProjectUseCase
 ) : ProjectCreateContract.ViewModel() {
     private val logger = Logger(this::class)
-
-    private val _stateFlow = MutableStateFlow(
-        ProjectCreateContract.State(
-            isLoading = true,
-            title = i18n.projectCreate.title,
-            projectName = StateComponent.Input(
-                value = "",
-                type = StateComponent.Input.Type.TEXT,
-                hint = i18n.projectCreate.projectName,
-                onValueChange = ::onProjectNameInputChange
-            ),
-            projectBpm = StateComponent.Input(
-                value = "",
-                type = StateComponent.Input.Type.NUMBER,
-                hint = i18n.projectCreate.projectBpm,
-                onValueChange = ::onProjectBpmInputChange
-            ),
-            projectRhythm = StateComponent.SelectInput(
-                selected = rhythmToInputOption(Rhythm.FOUR_FOURS),
-                onSelected = ::onProjectRhythmSelectChange,
-                hint = i18n.projectCreate.projectRhythm,
-                options = Rhythm.entries.map(::rhythmToInputOption).toSet()
-            ),
-            createProjectButton = StateComponent.Button(
-                text = i18n.projectCreate.createProjectButton,
-                onClick = ::onCreateProjectClick
-            ),
-            errorSnackBar = null
-        )
+    private val initialState = ProjectCreateContract.State(
+        isLoading = true,
+        title = i18n.projectCreate.title,
+        projectName = StateComponent.Input(
+            value = "",
+            type = StateComponent.Input.Type.TEXT,
+            hint = i18n.projectCreate.projectName,
+            onValueChange = ::onProjectNameInputChange
+        ),
+        projectBpm = StateComponent.Input(
+            value = "",
+            type = StateComponent.Input.Type.NUMBER,
+            hint = i18n.projectCreate.projectBpm,
+            onValueChange = ::onProjectBpmInputChange
+        ),
+        projectRhythm = StateComponent.SelectInput(
+            selected = rhythmToInputOption(Rhythm.FOUR_FOURS),
+            onSelected = ::onProjectRhythmSelectChange,
+            hint = i18n.projectCreate.projectRhythm,
+            options = Rhythm.entries.map(::rhythmToInputOption).toSet()
+        ),
+        createProjectButton = StateComponent.Button(
+            text = i18n.projectCreate.createProjectButton,
+            onClick = ::onCreateProjectClick
+        ),
+        errorSnackBar = null
     )
+
+    private val _stateFlow = MutableStateFlow(initialState)
 
     override val key: ProjectCreateDestination = navigationService.key<ProjectCreateDestination>() ?: throw NavigationStateException("Key not found")
     override val stateFlow: StateFlow<ProjectCreateContract.State> = _stateFlow.asStateFlow()
 
 
     override fun initialize() {
-        logger.debug("Initialize")
+        _stateFlow.update { initialState }
 
         _stateFlow.update { state ->
             state.copy(isLoading = false)

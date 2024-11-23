@@ -32,4 +32,14 @@ class AudioService(
             loadMidiEvents(midiMessages)
         }.generate()
     }
+
+    //---
+
+    fun playAudio(data: FloatArray, sampleRate: Int) {
+        // TODO
+    }
+
+    fun stopAudio() {
+        // TODO
+    }
 }
