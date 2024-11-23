@@ -11,8 +11,7 @@ import pl.lemanski.tc.domain.model.project.name
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.service.navigation.key
-import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCaseErrorHandler
-import pl.lemanski.tc.domain.useCase.createProject.createProjectUseCase
+import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
@@ -22,6 +21,7 @@ import pl.lemanski.tc.utils.exception.NavigationStateException
 internal class ProjectCreateViewModel(
     private val i18n: I18n,
     private val navigationService: NavigationService,
+    private val createProjectUseCase: CreateProjectUseCase
 ) : ProjectCreateContract.ViewModel() {
     private val logger = Logger(this::class)
 
@@ -50,8 +50,8 @@ internal class ProjectCreateViewModel(
             createProjectButton = StateComponent.Button(
                 text = i18n.projectCreate.createProjectButton,
                 onClick = ::onCreateProjectClick
-            )
-
+            ),
+            errorSnackBar = null
         )
     )
 
@@ -106,8 +106,9 @@ internal class ProjectCreateViewModel(
         val projectBpm = _stateFlow.value.projectBpm.value.toIntOrNull() ?: 0
         val projectRhythm = _stateFlow.value.projectRhythm.selected.value
 
-        createProjectUseCase(CreateProjectErrorHandler()) {
-            Project(
+        createProjectUseCase(
+            errorHandler = CreateProjectErrorHandler(),
+            project = Project(
                 id = UUID.random(),
                 name = projectName,
                 lengthInMeasures = 0,
@@ -115,7 +116,7 @@ internal class ProjectCreateViewModel(
                 rhythm = projectRhythm,
                 chords = listOf()
             )
-        } ?: return
+        ) ?: return
 
         navigationService.back()
     }
@@ -133,6 +134,26 @@ internal class ProjectCreateViewModel(
         }
     }
 
+    override fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?) {
+        _stateFlow.update { state ->
+            state.copy(
+                errorSnackBar = StateComponent.SnackBar(
+                    message = message,
+                    action = action,
+                    onAction = onAction
+                )
+            )
+        }
+    }
+
+    override fun hideSnackBar() {
+        _stateFlow.update { state ->
+            state.copy(
+                errorSnackBar = null
+            )
+        }
+    }
+
     //
 
     private fun rhythmToInputOption(rhythm: Rhythm) = StateComponent.SelectInput.Option(
@@ -142,7 +163,7 @@ internal class ProjectCreateViewModel(
 
     //---
 
-    inner class CreateProjectErrorHandler : CreateProjectUseCaseErrorHandler {
+    inner class CreateProjectErrorHandler : CreateProjectUseCase.ErrorHandler {
         override fun onInvalidProjectName() {
             _stateFlow.update { state ->
                 state.copy(
@@ -164,7 +185,10 @@ internal class ProjectCreateViewModel(
         }
 
         override fun onProjectSaveError() {
-            // TODO add snack bar
+            hideSnackBar()
+            showSnackBar(i18n.projectCreate.projectCreationError, i18n.common.retry) {
+                onCreateProjectClick()
+            }
         }
     }
 }

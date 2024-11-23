@@ -13,11 +13,9 @@ import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.goTo
 import pl.lemanski.tc.domain.service.navigation.key
-import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCaseErrorHandler
-import pl.lemanski.tc.domain.useCase.createProject.createProjectUseCase
-import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCaseErrorHandler
-import pl.lemanski.tc.domain.useCase.deleteProject.deleteProjectUseCase
-import pl.lemanski.tc.domain.useCase.getProjectsList.getProjectsListUseCase
+import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCase
+import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCase
+import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
@@ -26,6 +24,9 @@ import pl.lemanski.tc.utils.exception.NavigationStateException
 
 internal class ProjectListViewModel(
     private val i18n: I18n,
+    private val createProjectUseCase: CreateProjectUseCase,
+    private val deleteProjectUseCase: DeleteProjectUseCase,
+    private val getProjectsListUseCase: GetProjectsListUseCase,
     private val navigationService: NavigationService
 ) : ProjectsListContract.ViewModel() {
 
@@ -76,9 +77,7 @@ internal class ProjectListViewModel(
 
         hideSnackBar()
 
-        val project = deleteProjectUseCase(DeleteProjectErrorHandler()) {
-            id
-        }
+        val project = deleteProjectUseCase(DeleteProjectErrorHandler(), id)
 
         if (project == null) {
             showSnackBar(i18n.projectList.projectDeleteFailed)
@@ -96,14 +95,16 @@ internal class ProjectListViewModel(
                 message = i18n.projectList.projectDeleted,
                 action = i18n.common.undo
             ) {
-                createProjectUseCase(CreateProjectErrorHandler()) {
-                    project
+                val recreatedProject = createProjectUseCase(CreateProjectErrorHandler(), project)
+                if (recreatedProject == null) {
+                    logger.error("Error while recreating project")
+                    return@showSnackBar
                 }
 
                 _stateFlow.update { state ->
                     state.copy(
                         projectCards = state.projectCards.toMutableList().apply {
-                            add(projectPosition, mapProjectToProjectCard(project))
+                            add(projectPosition, mapProjectToProjectCard(recreatedProject))
                         }
                     )
                 }
@@ -160,7 +161,7 @@ internal class ProjectListViewModel(
 
     //---
 
-    inner class DeleteProjectErrorHandler : DeleteProjectUseCaseErrorHandler {
+    inner class DeleteProjectErrorHandler : DeleteProjectUseCase.ErrorHandler {
         override fun handleDeleteProjectError() {
             logger.error("Error while deleting project")
         }
@@ -168,13 +169,16 @@ internal class ProjectListViewModel(
 
     //---
 
-    inner class CreateProjectErrorHandler : CreateProjectUseCaseErrorHandler {
+    inner class CreateProjectErrorHandler : CreateProjectUseCase.ErrorHandler {
         override fun onInvalidProjectName() {}
 
         override fun onInvalidProjectBpm() {}
 
         override fun onProjectSaveError() {
-            logger.error("Error while saving project")
+            hideSnackBar()
+            showSnackBar(i18n.projectCreate.projectCreationError, i18n.common.retry) {
+                onAddButtonClick()
+            }
         }
     }
 }

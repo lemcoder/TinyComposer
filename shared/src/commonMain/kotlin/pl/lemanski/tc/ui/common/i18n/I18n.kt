@@ -20,6 +20,7 @@ internal interface I18n {
         val save: String
         val reset: String
         val undo: String
+        val retry: String
     }
 
     interface Welcome {
@@ -32,6 +33,7 @@ internal interface I18n {
         val duration: String
         val projectDeleted: String
         val projectDeleteFailed: String
+        val projectRecreateFailed: String
     }
 
     interface ProjectCreate {

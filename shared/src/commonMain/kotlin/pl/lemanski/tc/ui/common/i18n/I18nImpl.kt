@@ -32,6 +32,7 @@ internal class I18nImpl : I18n {
         override val save: String = stringResourceBlocking(Res.string.common_save)
         override val reset: String = stringResourceBlocking(Res.string.common_reset)
         override val undo: String = stringResourceBlocking(Res.string.common_undo)
+        override val retry: String = stringResourceBlocking(Res.string.common_retry)
     }
 
     private inner class ProjectList : I18n.ProjectList {
@@ -40,6 +41,7 @@ internal class I18nImpl : I18n {
         override val duration: String = stringResourceBlocking(Res.string.project_list_duration)
         override val projectDeleted: String = stringResourceBlocking(Res.string.project_list_project_deleted)
         override val projectDeleteFailed: String = stringResourceBlocking(Res.string.project_list_project_delete_failed)
+        override val projectRecreateFailed: String = stringResourceBlocking(Res.string.project_list_project_recreate_failed)
     }
 
     private inner class ProjectCreate : I18n.ProjectCreate {

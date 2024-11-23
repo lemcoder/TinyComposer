@@ -12,6 +12,8 @@ internal interface ProjectCreateContract {
         abstract fun onProjectRhythmSelectChange(selected: StateComponent.SelectInput.Option<Rhythm>)
         abstract fun onCreateProjectClick()
         abstract fun clearErrors()
+        abstract fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?)
+        abstract fun hideSnackBar()
     }
 
     data class State(
@@ -20,6 +22,7 @@ internal interface ProjectCreateContract {
         val projectName: StateComponent.Input,
         val projectBpm: StateComponent.Input,
         val projectRhythm: StateComponent.SelectInput<Rhythm>,
-        val createProjectButton: StateComponent.Button
+        val createProjectButton: StateComponent.Button,
+        val errorSnackBar: StateComponent.SnackBar?
     )
 }

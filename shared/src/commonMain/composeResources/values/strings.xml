@@ -11,6 +11,7 @@
     <string name="common_save">Save</string>
     <string name="common_undo">Undo</string>
     <string name="common_reset">Reset</string>
+    <string name="common_retry">Retry</string>
 
     <string name="welcome_title">Tiny composer</string>
 
@@ -19,6 +20,7 @@
     <string name="project_list_duration">Duration</string>
     <string name="project_list_project_deleted">Project deleted</string>
     <string name="project_list_project_delete_failed">Failed to delete project</string>
+    <string name="project_list_project_recreate_failed">Failed to undo</string>
 
     <string name="project_create_title">Create project</string>
     <string name="project_create_project_name">Project name</string>
