@@ -4,7 +4,7 @@ import pl.lemanski.mikroSoundFont.midi.MidiMessage
 import pl.lemanski.mikroSoundFont.midi.MidiVoiceMessage
 import pl.lemanski.tc.domain.model.project.ChordBeats
 
-class AudioMapper {
+internal class AudioMapper {
     fun mapChordBeatsToMidiMessage(chordBeats: List<ChordBeats>, tempo: Int): List<MidiMessage> {
         var currentTime = 0
         val messages = mutableListOf<MidiMessage>()

@@ -3,10 +3,11 @@ package pl.lemanski.tc.ui.projectsList
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.ui.common.router
 
 @Composable
-fun ProjectListRouter() = router<ProjectsListContract.ViewModel> { viewModel ->
+fun ProjectListRouter() = router<ProjectsListContract.ViewModel, ProjectListDestination> { viewModel ->
     val state by viewModel.stateFlow.collectAsState()
 
     ProjectListScreen(

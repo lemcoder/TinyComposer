@@ -2,7 +2,7 @@ package pl.lemanski.tc.domain.useCase.createProject
 
 import pl.lemanski.tc.domain.model.project.Project
 
-interface CreateProjectUseCase {
+internal interface CreateProjectUseCase {
     interface ErrorHandler {
         fun onInvalidProjectName()
         fun onInvalidProjectBpm()

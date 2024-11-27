@@ -9,6 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.composables.LoaderScaffold
 import pl.lemanski.tc.ui.common.composables.ToComposable
@@ -24,15 +28,15 @@ import pl.lemanski.tc.ui.common.composables.ToComposable
 @Composable
 internal fun ProjectDetailsScreen(
     isLoading: Boolean,
-    title: String,
     projectName: String,
-    projectBpm: String,
     projectRhythm: String,
+    tempoInput: StateComponent.Input,
     chordsTextArea: StateComponent.Input,
     playButton: StateComponent.Button?,
     stopButton: StateComponent.Button?,
+    backButton: StateComponent.Button,
     aiGenerateButton: StateComponent.Button,
-    errorSnackBar: StateComponent.SnackBar?,
+    snackBar: StateComponent.SnackBar?,
 ) {
     LoaderScaffold(isLoading) {
         Column(
@@ -46,16 +50,57 @@ internal fun ProjectDetailsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(onClick = backButton.onClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+
                 Text(
-                    text = title,
+                    text = projectName,
                     style = MaterialTheme.typography.headlineMedium
                 )
-
-                IconButton({}) {}
             }
+
+            Text(
+                text = projectRhythm,
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            tempoInput.ToComposable()
+
+            chordsTextArea.ToComposable()
+
+            playButton?.let {
+                IconButton(
+                    onClick = it.onClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = "Play"
+                    )
+                }
+            }
+
+            stopButton?.let {
+                IconButton(
+                    onClick = it.onClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Stop"
+                    )
+                }
+            }
+
+            Text(
+                text = snackBar?.message ?: "",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }

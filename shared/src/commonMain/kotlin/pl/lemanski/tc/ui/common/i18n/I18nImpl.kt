@@ -12,6 +12,7 @@ internal class I18nImpl : I18n {
     override val common: I18n.Common by lazy { Common() }
     override val projectList: I18n.ProjectList by lazy { ProjectList() }
     override val projectCreate: I18n.ProjectCreate by lazy { ProjectCreate() }
+    override val projectDetails: I18n.ProjectDetails by lazy { ProjectDetails() }
     override val welcome: I18n.Welcome by lazy { Welcome() }
     override val rhythm: I18n.Rhythm by lazy { Rhythm() }
 
@@ -58,5 +59,13 @@ internal class I18nImpl : I18n {
     private inner class Rhythm : I18n.Rhythm {
         override val fourFours: String = stringResourceBlocking(Res.string.rhythm_four_fours)
         override val threeFours: String = stringResourceBlocking(Res.string.rhythm_three_fours)
+    }
+
+    private inner class ProjectDetails : I18n.ProjectDetails {
+        override val invalidTempo: String? = "invalid tempo"
+        override val tempo: String = " tempo"
+        override val invalidChordBeats: String? = " invalid chord beats"
+        override val controlStateError: String = " control state error"
+        override val title: String = " Project details"
     }
 }

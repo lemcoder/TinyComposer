@@ -23,7 +23,6 @@ kotlin {
 //    }
 
     sourceSets {
-
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
         }
@@ -48,6 +47,7 @@ kotlin {
 
             implementation(libs.mikrosoundfont.midi)
             implementation(libs.mikrosoundfont.soundFont)
+            implementation(libs.mikroaudio)
         }
 
         commonTest.dependencies {

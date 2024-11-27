@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
-import pl.lemanski.tc.domain.model.navigation.ProjectsDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.goTo
-import pl.lemanski.tc.domain.service.navigation.key
 import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCase
 import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCase
 import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCase
@@ -20,9 +20,9 @@ import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.UUID
-import pl.lemanski.tc.utils.exception.NavigationStateException
 
 internal class ProjectListViewModel(
+    override val key: ProjectListDestination,
     private val i18n: I18n,
     private val createProjectUseCase: CreateProjectUseCase,
     private val deleteProjectUseCase: DeleteProjectUseCase,
@@ -30,6 +30,7 @@ internal class ProjectListViewModel(
     private val navigationService: NavigationService
 ) : ProjectsListContract.ViewModel() {
 
+    private val logger = Logger(this::class)
     private val initialState = ProjectsListContract.State(
         isLoading = true,
         title = i18n.projectList.title,
@@ -41,18 +42,11 @@ internal class ProjectListViewModel(
         snackBar = null
     )
 
-    private val logger = Logger(this::class)
     private val _stateFlow = MutableStateFlow(initialState)
-
-    override val key: ProjectsDestination = navigationService.key<ProjectsDestination>() ?: throw NavigationStateException("Key not found")
     override val stateFlow: StateFlow<ProjectsListContract.State> = _stateFlow.asStateFlow()
 
-    override fun initialize() {
+    init {
         logger.debug("Initialize")
-
-        _stateFlow.update { initialState }
-
-        hideSnackBar()
 
         _stateFlow.update { state ->
             state.copy(isLoading = true)
@@ -66,6 +60,12 @@ internal class ProjectListViewModel(
                 projectCards = projects.map(::mapProjectToProjectCard)
             )
         }
+    }
+
+    override fun onAttached() {
+        logger.debug("Attached")
+
+        hideSnackBar()
     }
 
     override fun onProjectDelete(id: UUID) {
@@ -123,10 +123,7 @@ internal class ProjectListViewModel(
     override fun onProjectClick(id: UUID) {
         logger.debug("Project clicked: $id")
 
-    }
-
-    override fun onProjectLongClick(id: UUID) {
-        logger.debug("Project long clicked: $id")
+        navigationService.goTo(ProjectDetailsDestination(id))
     }
 
     override fun onAddButtonClick(): Job = viewModelScope.launch {

@@ -1,15 +1,12 @@
 package pl.lemanski.tc.domain.service.navigation
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
 import pl.lemanski.tc.utils.Logger
-import pl.lemanski.tc.utils.exception.NavigationStateException
 
 /**
  * Service that is responsible for navigation between [Destination]s
@@ -101,15 +98,4 @@ fun NavigationService.back(): Boolean = runBlocking {
     )
 
     return@runBlocking true
-}
-
-internal inline fun <reified T : Destination> NavigationService.key(): T? = runBlocking {
-    logger.debug("Key: ${T::class.simpleName}")
-
-    withContext(Dispatchers.Default) {
-        val history = history()
-        val entry: List<T> = history.filterIsInstance<T>()
-        if (entry.size > 1) throw NavigationStateException("More than one key of the same type on the stack: \n ${history.map { "- $it\n" }}")
-        return@withContext entry.firstOrNull()
-    }
 }

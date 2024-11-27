@@ -7,5 +7,5 @@ interface TcViewModel<STATE> {
     val key: Destination
     val stateFlow: StateFlow<STATE>
 
-    fun initialize()
+    fun onAttached()
 }

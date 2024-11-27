@@ -10,7 +10,6 @@ internal interface ProjectsListContract {
     abstract class ViewModel : TcViewModel<State>, LifecycleViewModel() {
         abstract fun onProjectClick(id: UUID)
         abstract fun onProjectDelete(id: UUID)
-        abstract fun onProjectLongClick(id: UUID)
         abstract fun onAddButtonClick(): Job
         abstract fun showSnackBar(message: String, action: String? = null, onAction: (() -> Unit)? = null)
         abstract fun hideSnackBar()

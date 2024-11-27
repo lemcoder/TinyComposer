@@ -10,15 +10,14 @@ import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.domain.model.project.name
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
-import pl.lemanski.tc.domain.service.navigation.key
 import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.UUID
-import pl.lemanski.tc.utils.exception.NavigationStateException
 
 internal class ProjectCreateViewModel(
+    override val key: ProjectCreateDestination,
     private val i18n: I18n,
     private val navigationService: NavigationService,
     private val createProjectUseCase: CreateProjectUseCase
@@ -53,14 +52,9 @@ internal class ProjectCreateViewModel(
     )
 
     private val _stateFlow = MutableStateFlow(initialState)
-
-    override val key: ProjectCreateDestination = navigationService.key<ProjectCreateDestination>() ?: throw NavigationStateException("Key not found")
     override val stateFlow: StateFlow<ProjectCreateContract.State> = _stateFlow.asStateFlow()
 
-
-    override fun initialize() {
-        _stateFlow.update { initialState }
-
+    override fun onAttached() {
         _stateFlow.update { state ->
             state.copy(isLoading = false)
         }

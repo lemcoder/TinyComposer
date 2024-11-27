@@ -3,7 +3,7 @@ package pl.lemanski.tc.domain.useCase.deleteProject
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.utils.UUID
 
-interface DeleteProjectUseCase {
+internal interface DeleteProjectUseCase {
     interface ErrorHandler {
         fun handleDeleteProjectError()
     }

@@ -7,6 +7,7 @@ import pl.lemanski.tc.utils.Logger
 internal class GetProjectsListUseCaseImpl(
     private val projectRepository: ProjectRepository,
 ) : GetProjectsListUseCase {
+
     private val logger = Logger(this::class)
 
     override operator fun invoke(): List<Project> {

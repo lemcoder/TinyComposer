@@ -1,13 +1,27 @@
 package pl.lemanski.tc.domain.model.navigation
 
-sealed interface Destination
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import pl.lemanski.tc.utils.UUID
 
-data object WelcomeDestination : Destination
+sealed interface Destination : ViewModelStoreOwner
 
-data object ProjectsDestination: Destination
+data object WelcomeDestination : Destination {
+    override val viewModelStore: ViewModelStore = ViewModelStore()
+}
 
-data class ProjectDetailsDestination(val projectId: String) : Destination
+data object ProjectListDestination : Destination {
+    override val viewModelStore: ViewModelStore = ViewModelStore()
+}
 
-data class AiGenerateDestination(val projectId: String) : Destination
+data class ProjectDetailsDestination(val projectId: UUID) : Destination {
+    override val viewModelStore: ViewModelStore = ViewModelStore()
+}
 
-data object ProjectCreateDestination : Destination
+data class AiGenerateDestination(val projectId: UUID) : Destination {
+    override val viewModelStore: ViewModelStore = ViewModelStore()
+}
+
+data object ProjectCreateDestination : Destination {
+    override val viewModelStore: ViewModelStore = ViewModelStore()
+}

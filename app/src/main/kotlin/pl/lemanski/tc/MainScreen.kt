@@ -9,7 +9,7 @@ import pl.lemanski.tc.domain.model.navigation.AiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
-import pl.lemanski.tc.domain.model.navigation.ProjectsDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsRouter
 import pl.lemanski.tc.ui.projectCreate.ProjectCreateRouter
@@ -25,9 +25,9 @@ fun MainScreen(
         modifier = Modifier.padding(paddingValues)
     ) {
         when (destination) {
-            WelcomeDestination           -> WelcomeRouter()
-            ProjectsDestination          -> ProjectListRouter()
-            ProjectCreateDestination     -> ProjectCreateRouter()
+            WelcomeDestination       -> WelcomeRouter()
+            ProjectListDestination   -> ProjectListRouter()
+            ProjectCreateDestination -> ProjectCreateRouter()
             is ProjectDetailsDestination -> ProjectDetailsRouter()
             is AiGenerateDestination     -> {}
         }

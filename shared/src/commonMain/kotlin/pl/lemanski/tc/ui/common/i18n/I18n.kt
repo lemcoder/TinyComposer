@@ -5,6 +5,7 @@ internal interface I18n {
     val welcome: Welcome
     val projectList: ProjectList
     val projectCreate: ProjectCreate
+    val projectDetails: ProjectDetails
     val rhythm: Rhythm
 
     interface Common {
@@ -50,5 +51,13 @@ internal interface I18n {
     interface Rhythm {
         val fourFours: String
         val threeFours: String
+    }
+
+    interface ProjectDetails {
+        val invalidTempo: String?
+        val tempo: String
+        val invalidChordBeats: String?
+        val controlStateError: String
+        val title: String
     }
 }

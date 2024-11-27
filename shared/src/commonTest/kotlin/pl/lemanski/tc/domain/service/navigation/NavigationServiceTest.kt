@@ -3,7 +3,7 @@ package pl.lemanski.tc.domain.service.navigation
 import kotlinx.coroutines.test.runTest
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
-import pl.lemanski.tc.domain.model.navigation.ProjectsDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
 import pl.lemanski.tc.utils.exception.NavigationStateException
 import kotlin.test.BeforeTest
@@ -45,7 +45,7 @@ class NavigationServiceTest {
     @Test
     fun `back should remove last destination and notify listener`() = runTest {
         val startDestination = WelcomeDestination
-        val projectsDestination = ProjectsDestination
+        val projectsDestination = ProjectListDestination
         navigationService.goTo(startDestination)
         navigationService.goTo(projectsDestination)
 
@@ -87,7 +87,7 @@ class NavigationServiceTest {
     @Test
     fun `key should throw exception if more than one destination of type exists`() = runTest {
         val homeDestination = WelcomeDestination
-        val projectsDestination = ProjectsDestination
+        val projectsDestination = ProjectListDestination
         navigationService.goTo(homeDestination)
         navigationService.goTo(projectsDestination)
         navigationService.goTo(homeDestination)
