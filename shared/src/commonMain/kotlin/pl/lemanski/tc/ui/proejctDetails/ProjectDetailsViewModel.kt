@@ -145,8 +145,6 @@ internal class ProjectDetailsViewModel(
         navigationService.back()
     }
 
-    //---
-
     override fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?) {
         _stateFlow.update { state ->
             state.copy(
@@ -165,6 +163,11 @@ internal class ProjectDetailsViewModel(
                 snackBar = null
             )
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        logger.debug("Cleared")
     }
 
     //---

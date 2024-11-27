@@ -4,7 +4,6 @@ import pl.lemanski.tc.data.persistent.encoder.codeName
 import pl.lemanski.tc.data.persistent.encoder.encodeToString
 import pl.lemanski.tc.data.persistent.decoder.toChord
 import pl.lemanski.tc.data.persistent.decoder.tryDecodeChordBeats
-import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.core.Note
 import pl.lemanski.tc.domain.model.core.buildMajorSeventh
 import pl.lemanski.tc.domain.model.core.buildMajorTriad

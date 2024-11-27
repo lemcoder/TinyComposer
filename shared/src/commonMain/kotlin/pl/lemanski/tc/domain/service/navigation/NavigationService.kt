@@ -84,7 +84,8 @@ fun NavigationService.back(): Boolean = runBlocking {
         }
 
         val newHistory = history.toMutableList()
-        newHistory.removeLast()
+        val removed = newHistory.removeAt(newHistory.size - 1)
+        removed.viewModelStore.clear()
         newHistory.toSet()
     }
 

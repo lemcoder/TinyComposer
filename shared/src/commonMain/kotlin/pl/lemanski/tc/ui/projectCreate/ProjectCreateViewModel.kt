@@ -54,7 +54,13 @@ internal class ProjectCreateViewModel(
     private val _stateFlow = MutableStateFlow(initialState)
     override val stateFlow: StateFlow<ProjectCreateContract.State> = _stateFlow.asStateFlow()
 
+    init {
+        logger.debug("Initialize")
+    }
+
     override fun onAttached() {
+        logger.debug("Attached")
+
         _stateFlow.update { state ->
             state.copy(isLoading = false)
         }
@@ -145,6 +151,11 @@ internal class ProjectCreateViewModel(
                 errorSnackBar = null
             )
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        logger.debug("Cleared")
     }
 
     //

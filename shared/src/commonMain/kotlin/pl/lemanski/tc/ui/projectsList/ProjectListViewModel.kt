@@ -47,7 +47,10 @@ internal class ProjectListViewModel(
 
     init {
         logger.debug("Initialize")
+    }
 
+    override fun onAttached() {
+        logger.debug("Attached")
         _stateFlow.update { state ->
             state.copy(isLoading = true)
         }
@@ -60,10 +63,6 @@ internal class ProjectListViewModel(
                 projectCards = projects.map(::mapProjectToProjectCard)
             )
         }
-    }
-
-    override fun onAttached() {
-        logger.debug("Attached")
 
         hideSnackBar()
     }
@@ -149,6 +148,13 @@ internal class ProjectListViewModel(
             )
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        logger.debug("Cleared")
+    }
+
+    //---
 
     internal fun mapProjectToProjectCard(project: Project): ProjectsListContract.State.ProjectCard = ProjectsListContract.State.ProjectCard(
         id = project.id,
