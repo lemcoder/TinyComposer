@@ -1,8 +1,12 @@
 package pl.lemanski.tc.domain.service.navigation
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
@@ -13,7 +17,9 @@ import pl.lemanski.tc.utils.Logger
  * This implementation is based on single callback so it is easy to apply to platform navigation
  * on each supported platform
  */
-class NavigationService {
+class NavigationService(
+    val dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate
+) {
     // TODO logger should be injected (maybe use context receiver here?)
     internal val logger = Logger(this::class)
 
@@ -57,7 +63,7 @@ class NavigationService {
     }
 }
 
-fun NavigationService.goTo(destination: Destination) = runBlocking {
+suspend fun NavigationService.goTo(destination: Destination) = withContext(dispatcher) {
     logger.debug("Go to: $destination")
 
     updateHistory { history ->
@@ -74,12 +80,14 @@ fun NavigationService.goTo(destination: Destination) = runBlocking {
     )
 }
 
-fun NavigationService.back(): Boolean = runBlocking {
+suspend fun NavigationService.back(): Boolean = withContext(dispatcher) {
     logger.debug("Back")
+    var result = true
 
     updateHistory { history ->
         if (history.size <= 1) {
             logger.debug("Back: No more destinations")
+            result = false
             return@updateHistory history
         }
 
@@ -87,6 +95,10 @@ fun NavigationService.back(): Boolean = runBlocking {
         val removed = newHistory.removeAt(newHistory.size - 1)
         removed.viewModelStore.clear()
         newHistory.toSet()
+    }
+
+    if (!result) {
+        return@withContext result
     }
 
     val newHistory = history()
@@ -98,5 +110,5 @@ fun NavigationService.back(): Boolean = runBlocking {
         )
     )
 
-    return@runBlocking true
+    return@withContext result
 }

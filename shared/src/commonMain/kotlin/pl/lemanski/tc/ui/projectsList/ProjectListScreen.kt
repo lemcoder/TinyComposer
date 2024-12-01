@@ -105,7 +105,7 @@ internal fun ProjectListScreen(
                     key = { it.id.hashCode() },
                     contentType = { it::class }
                 ) { projectCard ->
-                    projectCard.toComposable(Modifier.animateItem())
+                    projectCard.toComposable(Modifier)
                 }
             }
         }
@@ -132,125 +132,125 @@ private fun ProjectsListContract.State.ProjectCard.toComposable(modifier: Modifi
     val colors = OutlinedTextFieldDefaults.colors()
     val scope = rememberCoroutineScope()
 
-    AnchoredDragBox(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onClick(id) },
-        endContentWidth = 64.dp,
-        endContent = { anchoredDraggableState, _ ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable {
-                        scope.launch {
-                            onDelete(id)
-                            anchoredDraggableState.animateTo(DragAnchors.Center)
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    Icons.Outlined.Delete,
-                    contentDescription = "Delete",
-                    modifier = Modifier
-                )
-            }
-        }
-    ) { _, _ ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = colors.unfocusedIndicatorColor,
-                    shape = OutlinedTextFieldDefaults.shape
-                )
-                .padding(8.dp),
-        ) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.headlineSmall,
-            )
-
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyLarge,
-                color = colors.unfocusedIndicatorColor,
-            )
-        }
-    }
+//    AnchoredDragBox(
+//        modifier = modifier
+//            .fillMaxWidth()
+//            .clickable { onClick(id) },
+//        endContentWidth = 64.dp,
+//        endContent = { anchoredDraggableState, _ ->
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .clickable {
+//                        scope.launch {
+//                            onDelete(id)
+//                            anchoredDraggableState.animateTo(DragAnchors.Center)
+//                        }
+//                    },
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Icon(
+//                    Icons.Outlined.Delete,
+//                    contentDescription = "Delete",
+//                    modifier = Modifier
+//                )
+//            }
+//        }
+//    ) { _, _ ->
+//
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .border(
+//                    width = 1.dp,
+//                    color = colors.unfocusedIndicatorColor,
+//                    shape = OutlinedTextFieldDefaults.shape
+//                )
+//                .padding(8.dp),
+//        ) {
+//            Text(
+//                text = name,
+//                style = MaterialTheme.typography.headlineSmall,
+//            )
+//
+//            Text(
+//                text = description,
+//                style = MaterialTheme.typography.bodyLarge,
+//                color = colors.unfocusedIndicatorColor,
+//            )
+//        }
+//    }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun AnchoredDragBox(
-    modifier: Modifier = Modifier,
-    state: AnchoredDraggableState<DragAnchors> = rememberAnchoredDraggableState(),
-    endContentWidth: Dp = 0.dp,
-    endContent: @Composable (RowScope.(anchoredDraggableState: AnchoredDraggableState<DragAnchors>, endSwipeProgress: Float) -> Unit)? = null,
-    content: @Composable BoxScope.(anchoredDraggableState: AnchoredDraggableState<DragAnchors>, endSwipeProgress: Float) -> Unit,
-) {
-    val endWidthPx = with(LocalDensity.current) { endContentWidth.toPx() }
-
-    val draggableAnchors: DraggableAnchors<DragAnchors> = DraggableAnchors {
-        DragAnchors.Center at 0f
-        DragAnchors.End at -endWidthPx
-    }
-
-    state.updateAnchors(draggableAnchors)
-
-    val offsetRange = Float.NEGATIVE_INFINITY..0f
-
-    val endSwipeProgress = if (state.requireOffset() < 0f) {
-        (state.requireOffset() / endWidthPx).absoluteValue
-    } else 0f
-    val endContentLiveWidth = endContentWidth * endSwipeProgress
-
-    Box(
-        modifier = modifier.clipToBounds()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .matchParentSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            Row(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .width(endContentLiveWidth)
-                    .clipToBounds()
-            ) {
-                endContent?.invoke(this, state, endSwipeProgress)
-            }
-        }
-
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .offset {
-                IntOffset(
-                    state
-                        .requireOffset()
-                        .coerceIn(offsetRange)
-                        .roundToInt(), 0
-                )
-            }
-            .anchoredDraggable(
-                state,
-                Orientation.Horizontal
-            )
-        ) {
-            content(state, endSwipeProgress)
-        }
-    }
-}
-enum class DragAnchors {
-    Center,
-    End,
-}
+//@OptIn(ExperimentalFoundationApi::class)
+//@Composable
+//fun AnchoredDragBox(
+//    modifier: Modifier = Modifier,
+//    state: AnchoredDraggableState<DragAnchors> = rememberAnchoredDraggableState(),
+//    endContentWidth: Dp = 0.dp,
+//    endContent: @Composable (RowScope.(anchoredDraggableState: AnchoredDraggableState<DragAnchors>, endSwipeProgress: Float) -> Unit)? = null,
+//    content: @Composable BoxScope.(anchoredDraggableState: AnchoredDraggableState<DragAnchors>, endSwipeProgress: Float) -> Unit,
+//) {
+//    val endWidthPx = with(LocalDensity.current) { endContentWidth.toPx() }
+//
+//    val draggableAnchors: DraggableAnchors<DragAnchors> = DraggableAnchors {
+//        DragAnchors.Center at 0f
+//        DragAnchors.End at -endWidthPx
+//    }
+//
+//    state.updateAnchors(draggableAnchors)
+//
+//    val offsetRange = Float.NEGATIVE_INFINITY..0f
+//
+//    val endSwipeProgress = if (state.requireOffset() < 0f) {
+//        (state.requireOffset() / endWidthPx).absoluteValue
+//    } else 0f
+//    val endContentLiveWidth = endContentWidth * endSwipeProgress
+//
+//    Box(
+//        modifier = modifier.clipToBounds()
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .matchParentSize(),
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.End
+//        ) {
+//            Row(
+//                modifier = Modifier
+//                    .wrapContentHeight()
+//                    .width(endContentLiveWidth)
+//                    .clipToBounds()
+//            ) {
+//                endContent?.invoke(this, state, endSwipeProgress)
+//            }
+//        }
+//
+//        Box(modifier = Modifier
+//            .fillMaxWidth()
+//            .wrapContentHeight()
+//            .offset {
+//                IntOffset(
+//                    state
+//                        .requireOffset()
+//                        .coerceIn(offsetRange)
+//                        .roundToInt(), 0
+//                )
+//            }
+//            .anchoredDraggable(
+//                state,
+//                Orientation.Horizontal
+//            )
+//        ) {
+//            content(state, endSwipeProgress)
+//        }
+//    }
+//}
+//enum class DragAnchors {
+//    Center,
+//    End,
+//}
 
 /**
  * Create and [remember] a [AnchoredDraggableState] with the default animation clock.
@@ -266,24 +266,24 @@ enum class DragAnchors {
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  */
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun rememberAnchoredDraggableState(
-    initialValue: DragAnchors = DragAnchors.Center,
-    positionalThreshold: (distance: Float) -> Float = { distance -> distance * 0.5f },
-    velocityThreshold: Dp = 100.dp,
-    animationSpec: SpringSpec<Float> = SpringSpec(),
-    confirmValueChange: (DragAnchors) -> Boolean = { true }
-): AnchoredDraggableState<DragAnchors> {
-    val density = LocalDensity.current
-    return remember {
-        AnchoredDraggableState(
-            initialValue = initialValue,
-            positionalThreshold = positionalThreshold,
-            velocityThreshold = { with(density) { velocityThreshold.toPx() } },
-            snapAnimationSpec = animationSpec,
-            decayAnimationSpec = exponentialDecay(),
-            confirmValueChange = confirmValueChange
-        )
-    }
-}
+//@OptIn(ExperimentalFoundationApi::class)
+//@Composable
+//fun rememberAnchoredDraggableState(
+//    initialValue: DragAnchors = DragAnchors.Center,
+//    positionalThreshold: (distance: Float) -> Float = { distance -> distance * 0.5f },
+//    velocityThreshold: Dp = 100.dp,
+//    animationSpec: SpringSpec<Float> = SpringSpec(),
+//    confirmValueChange: (DragAnchors) -> Boolean = { true }
+//): AnchoredDraggableState<DragAnchors> {
+//    val density = LocalDensity.current
+//    return remember {
+//        AnchoredDraggableState(
+//            initialValue = initialValue,
+//            positionalThreshold = positionalThreshold,
+//            velocityThreshold = { with(density) { velocityThreshold.toPx() } },
+//            snapAnimationSpec = animationSpec,
+//            decayAnimationSpec = exponentialDecay(),
+//            confirmValueChange = confirmValueChange
+//        )
+//    }
+//}

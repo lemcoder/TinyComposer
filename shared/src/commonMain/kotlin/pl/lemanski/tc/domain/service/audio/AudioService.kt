@@ -3,7 +3,6 @@ package pl.lemanski.tc.domain.service.audio
 import io.github.lemcoder.mikrosoundfont.MikroSoundFont
 import io.github.lemcoder.mikrosoundfont.midi.MidiSequencer
 import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
-import pl.lemanski.mikroaudio.MikroAudio
 import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.model.soundFont.SoundFontHolder
 import pl.lemanski.tc.domain.repository.soundFont.SoundFontRepository
@@ -13,8 +12,6 @@ internal class AudioService(
     private val soundFontRepository: SoundFontRepository,
     private val audioMapper: AudioMapper
 ) {
-    private val mikroAudio = MikroAudio()
-
     fun isSoundFontLoaded(): Boolean = soundFontRepository.currentSoundFont() != null
 
     fun currentSoundFont(): SoundFontHolder? = soundFontRepository.currentSoundFont()

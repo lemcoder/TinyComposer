@@ -142,7 +142,10 @@ internal class ProjectDetailsViewModel(
     }
 
     override fun back() {
-        navigationService.back()
+        // FIXME run synchronously
+        viewModelScope.launch {
+            navigationService.back()
+        }
     }
 
     override fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?) {

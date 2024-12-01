@@ -9,18 +9,17 @@ kotlin {
     jvmToolchain(17)
 
     androidTarget()
-    // linuxX64() // just to not fail for android only stuff
 
-//    listOf(
-//        iosX64(),
-//        iosArm64(),
-//        iosSimulatorArm64()
-//    ).forEach { iosTarget ->
-//        iosTarget.binaries.framework {
-//            baseName = "ComposeApp" // TODO change this
-//            isStatic = true
-//        }
-//    }
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
 
     sourceSets {
         androidMain.dependencies {
@@ -47,7 +46,6 @@ kotlin {
 
             implementation(libs.mikrosoundfont.midi)
             implementation(libs.mikrosoundfont.soundFont)
-            implementation(libs.mikroaudio)
         }
 
         commonTest.dependencies {

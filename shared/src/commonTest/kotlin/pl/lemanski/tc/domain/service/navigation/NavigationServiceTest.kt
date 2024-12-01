@@ -1,10 +1,13 @@
 package pl.lemanski.tc.domain.service.navigation
 
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
 import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
+import pl.lemanski.tc.ui.common.key
 import pl.lemanski.tc.utils.exception.NavigationStateException
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -16,6 +19,7 @@ import kotlin.test.assertTrue
 
 class NavigationServiceTest {
 
+    lateinit var scope: TestScope
     private var callCounter: Int = 0
     private lateinit var navigationService: NavigationService
 
@@ -27,13 +31,14 @@ class NavigationServiceTest {
 
     @BeforeTest
     fun setup() = runTest {
+        scope = TestScope(StandardTestDispatcher())
         callCounter = 0
         navigationService = NavigationService()
         navigationService.setOnNavigateListener(mockListener)
     }
 
     @Test
-    fun `goTo should add destination to stack and notify listener`() = runTest {
+    fun `goTo should add destination to stack and notify listener`() = scope.runTest {
         val destination = WelcomeDestination
         navigationService.goTo(destination)
 
@@ -43,7 +48,7 @@ class NavigationServiceTest {
     }
 
     @Test
-    fun `back should remove last destination and notify listener`() = runTest {
+    fun `back should remove last destination and notify listener`() = scope.runTest {
         val startDestination = WelcomeDestination
         val projectsDestination = ProjectListDestination
         navigationService.goTo(startDestination)
@@ -58,7 +63,7 @@ class NavigationServiceTest {
     }
 
     @Test
-    fun `back should return false if only one destination in stack`() = runTest {
+    fun `back should return false if only one destination in stack`() = scope.runTest {
         val destination = WelcomeDestination
         navigationService.goTo(destination)
 
@@ -70,7 +75,7 @@ class NavigationServiceTest {
     }
 
     @Test
-    fun `key should return destination of the correct type`() = runTest {
+    fun `key should return destination of the correct type`() = scope.runTest {
         val homeDestination = WelcomeDestination
         navigationService.goTo(homeDestination)
 
@@ -80,12 +85,12 @@ class NavigationServiceTest {
 
     @Test
     fun `key should return null if no destination of type exists`() = runTest {
-        val result: Destination? = navigationService.key<Destination>()
+        val result: Destination? = navigationService.key<ProjectListDestination>()
         assertNull(result)
     }
 
     @Test
-    fun `key should throw exception if more than one destination of type exists`() = runTest {
+    fun `key should throw exception if more than one destination of type exists`() = scope.runTest {
         val homeDestination = WelcomeDestination
         val projectsDestination = ProjectListDestination
         navigationService.goTo(homeDestination)

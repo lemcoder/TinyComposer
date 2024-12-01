@@ -3,7 +3,6 @@ package pl.lemanski.tc.ui.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -20,7 +19,7 @@ internal inline fun <reified T : Destination> NavigationContext(crossinline cont
 
 }
 
-private inline fun <reified T : Destination> NavigationService.key(): T? = runBlocking {
+internal inline fun <reified T : Destination> NavigationService.key(): T? = runBlocking {
     logger.debug("Key: ${T::class.simpleName}")
 
     withContext(Dispatchers.Default) {
@@ -31,22 +30,31 @@ private inline fun <reified T : Destination> NavigationService.key(): T? = runBl
     }
 }
 
-
+// FIXME ugly workaround for iOS
 @Composable
-internal inline fun <reified VM, reified K : Destination> router(crossinline block: @Composable (VM) -> Unit) where VM : TcViewModel<*>, VM : ViewModel {
+internal inline fun <reified VM : TcViewModel<*>, reified K : Destination> router(
+    viewModel: VM? = null,
+    crossinline block: @Composable (VM) -> Unit
+) {
     KoinContext {
-        val navigationService = koinInject<NavigationService>()
-        val key = remember { navigationService.key<K>() }
+        if (viewModel == null) {
+            // Handle Android
+            val navigationService = koinInject<NavigationService>()
+            val key = remember { navigationService.key<K>() }
 
-        val viewModel = koinViewModel<VM>(
-            viewModelStoreOwner = key ?: throw NavigationStateException("Key not found in the navigation stack"),
-            parameters = { parametersOf(key) }
-        )
+            val vm = koinViewModel<VM>(
+                viewModelStoreOwner = key ?: throw NavigationStateException("Key not found in the navigation stack"),
+                parameters = { parametersOf(key) }
+            )
 
-        block(viewModel)
+            block(vm)
 
-        LaunchedEffect(Unit) {
-            viewModel.onAttached()
+            LaunchedEffect(Unit) {
+                vm.onAttached()
+            }
+        } else {
+            // Handle iOS
+            block(viewModel)
         }
     }
 }

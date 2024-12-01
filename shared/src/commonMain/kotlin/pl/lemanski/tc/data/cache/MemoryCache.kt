@@ -10,7 +10,7 @@ internal class MemoryCache {
     fun <T : Any> set(key: String, value: T) {
         when (value) {
             is Int       -> set(key, Int::class, value.toByteArray())
-            is String    -> set(key, String::class, value.toByteArray())
+            is String    -> set(key, String::class, value.encodeToByteArray())
             is ByteArray -> set(key, ByteArray::class, value)
             else         -> throw IllegalArgumentException("Unsupported type")
         }
@@ -21,7 +21,7 @@ internal class MemoryCache {
 
         return when (T::class) {
             Int::class       -> value.toInt() as T
-            String::class    -> value.toString(Charsets.UTF_8) as T
+            String::class    -> value.decodeToString() as T
             ByteArray::class -> value as T
             else             -> null
         }

@@ -1,12 +1,11 @@
 package pl.lemanski.tc.ui.proejctDetails
 
 import kotlinx.coroutines.Job
-import pl.lemanski.tc.ui.common.LifecycleViewModel
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.TcViewModel
 
 internal interface ProjectDetailsContract {
-    abstract class ViewModel : TcViewModel<State>, LifecycleViewModel() {
+    abstract class ViewModel : TcViewModel<State>() {
         abstract fun onPlayButtonClicked(): Job
         abstract fun onStopButtonClicked(): Job
         abstract fun onAiGenerateButtonClicked()

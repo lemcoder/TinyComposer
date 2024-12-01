@@ -1,14 +1,13 @@
 package pl.lemanski.tc.ui.projectsList
 
 import kotlinx.coroutines.Job
-import pl.lemanski.tc.ui.common.LifecycleViewModel
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.TcViewModel
 import pl.lemanski.tc.utils.UUID
 
 internal interface ProjectsListContract {
-    abstract class ViewModel : TcViewModel<State>, LifecycleViewModel() {
-        abstract fun onProjectClick(id: UUID)
+    abstract class ViewModel : TcViewModel<State>() {
+        abstract fun onProjectClick(id: UUID): Job
         abstract fun onProjectDelete(id: UUID)
         abstract fun onAddButtonClick(): Job
         abstract fun showSnackBar(message: String, action: String? = null, onAction: (() -> Unit)? = null)

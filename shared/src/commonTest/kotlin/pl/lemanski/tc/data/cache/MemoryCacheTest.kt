@@ -22,6 +22,7 @@ class MemoryCacheTest {
     fun set_and_get_string() {
         cache.set("key2", "Hello, World!")
         val value: String? = cache.get("key2")
+        println(value)
         assertNotNull(value)
         assertEquals("Hello, World!", value)
     }
