@@ -1,9 +1,9 @@
 [versions]
 
 ### KMP
-kotlin = "2.0.21"
+kotlin = "2.1.0"
 androidx-lifecycle = "2.8.3"
-compose-multiplatform = "1.7.0"
+compose-multiplatform = "1.7.1"
 kotlinx-io = "0.5.4"
 koin = "4.0.0"
 coroutines = "1.9.0"
@@ -15,7 +15,7 @@ android-targetSdk = "35"
 agp = "8.7.2"
 androidx-activityCompose = "1.9.3"
 material3Android = "1.3.1"
-mikrosoundfont = "0.1.3"
+mikrosoundfont = "0.1.6"
 mikroaudio = "0.0.3"
 
 [libraries]
@@ -30,8 +30,8 @@ koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-composeVM = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-mikrosoundfont-midi = { module = "pl.lemanski.mikrosoundfont:midi", version.ref = "mikrosoundfont" }
-mikrosoundfont-soundFont = { module = "pl.lemanski.mikrosoundfont:soundFont", version.ref = "mikrosoundfont" }
+mikrosoundfont-midi = { module = "io.github.lemcoder.mikrosoundfont:midi", version.ref = "mikrosoundfont" }
+mikrosoundfont-soundFont = { module = "io.github.lemcoder.mikrosoundfont:soundfont", version.ref = "mikrosoundfont" }
 mikroaudio = { module = "pl.lemanski.mikroaudio:core", version.ref = "mikroaudio" }
 
 ### Android

@@ -1,7 +1,7 @@
 package pl.lemanski.tc.domain.service.audio
 
-import pl.lemanski.mikroSoundFont.midi.MidiMessage
-import pl.lemanski.mikroSoundFont.midi.MidiVoiceMessage
+import io.github.lemcoder.mikrosoundfont.midi.MidiMessage
+import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
 import pl.lemanski.tc.domain.model.project.ChordBeats
 
 internal class AudioMapper {

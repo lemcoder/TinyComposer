@@ -1,9 +1,8 @@
 package pl.lemanski.tc.domain.service.audio
 
-import pl.lemanski.mikroSoundFont.MikroSoundFont
-import pl.lemanski.mikroSoundFont.io.toByteArrayLittleEndian
-import pl.lemanski.mikroSoundFont.midi.MidiSequencer
-import pl.lemanski.mikroSoundFont.midi.MidiVoiceMessage
+import io.github.lemcoder.mikrosoundfont.MikroSoundFont
+import io.github.lemcoder.mikrosoundfont.midi.MidiSequencer
+import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
 import pl.lemanski.mikroaudio.MikroAudio
 import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.model.soundFont.SoundFontHolder
@@ -44,11 +43,7 @@ internal class AudioService(
 
     //---
 
-    fun playAudio(data: FloatArray, sampleRate: Int) {
-        mikroAudio.playback(data.toByteArrayLittleEndian())
-    }
 
-    fun stopAudio() {
-        mikroAudio.stopPlayback()
-    }
 }
+
+internal expect suspend fun playAudio(data: FloatArray, sampleRate: Int)

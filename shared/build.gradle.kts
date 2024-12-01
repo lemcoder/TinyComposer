@@ -9,7 +9,7 @@ kotlin {
     jvmToolchain(17)
 
     androidTarget()
-    linuxX64() // just to not fail for android only stuff
+    // linuxX64() // just to not fail for android only stuff
 
 //    listOf(
 //        iosX64(),
