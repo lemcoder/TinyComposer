@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun MaterialThemeWrapper(
+internal fun MaterialThemeWrapper(
     block: @Composable (PaddingValues) -> Unit
 ) {
     val isDarkTheme = isSystemInDarkTheme()

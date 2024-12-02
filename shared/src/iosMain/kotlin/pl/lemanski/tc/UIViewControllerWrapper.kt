@@ -5,17 +5,14 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
 import kotlinx.coroutines.runBlocking
 import pl.lemanski.tc.domain.service.navigation.NavigationService
-import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.service.navigation.silentBack
 import pl.lemanski.tc.ui.common.TcViewModel
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.provide
 import platform.Foundation.NSLog
-import platform.Foundation.NSSelectorFromString
 import platform.UIKit.UIGestureRecognizer
 import platform.UIKit.UIGestureRecognizerDelegateProtocol
 import platform.UIKit.UISwipeGestureRecognizer
-import platform.UIKit.UISwipeGestureRecognizerDirectionRight
 import platform.UIKit.UIViewController
 import platform.UIKit.addChildViewController
 import platform.UIKit.didMoveToParentViewController
@@ -57,33 +54,18 @@ class UIViewControllerWrapper(
      * Sets the delegate for the interactive pop gesture recognizer and adds swipe gesture recognizers
      * for left and right swipe directions.
      */
-    @OptIn(ExperimentalForeignApi::class)
     override fun viewDidLoad() {
         super.viewDidLoad()
-        logger.debug("View did load -------------- ")
-        logger.error(viewModel.hashCode().toString())
-        viewModel.onAttached()
-
-        navigationItem.hidesBackButton = true
+        navigationItem.hidesBackButton = false
 
         controller.navigationController?.interactivePopGestureRecognizer?.enabled = true
-        controller.navigationController?.interactivePopGestureRecognizer?.delaysTouchesBegan = true
         controller.navigationController?.interactivePopGestureRecognizer?.delegate = this
-//        controller.navigationController?.interactivePopGestureRecognizer?.let { popRecognizer ->
-//            popRecognizer.getAllGestureRecognizers(controller.view).filter {
-//                NSStringFromClass(it.`class`()!!) == "CMPGestureRecognizer"
-//            }.forEach {
-//                it.requireGestureRecognizerToFail(popRecognizer)
-//            }
-//        }
+    }
 
-        val gesture = UISwipeGestureRecognizer(
-            target = UISwipeGestureRecognizerDirectionRight,
-            action = NSSelectorFromString("handleSwipe:")
-        )
-        gesture.direction = UISwipeGestureRecognizerDirectionRight
-        gesture.delegate = this
-        this.view.addGestureRecognizer(gesture)
+    override fun viewDidAppear(animated: Boolean) {
+        super.viewDidAppear(animated)
+        logger.debug("ViewDidAppear")
+        viewModel.onAttached()
     }
 
     /**
@@ -95,12 +77,6 @@ class UIViewControllerWrapper(
     @OptIn(BetaInteropApi::class)
     @ObjCAction
     fun handleSwipe(sender: UISwipeGestureRecognizer) {
-        if (sender.direction == UISwipeGestureRecognizerDirectionRight) {
-            runBlocking {
-                navigationService.back()
-            }
-        }
-
         NSLog("Swipe detected: ${sender.direction}")
     }
 
