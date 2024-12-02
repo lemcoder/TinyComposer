@@ -6,12 +6,12 @@ import kotlinx.cinterop.ObjCAction
 import kotlinx.coroutines.runBlocking
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
+import pl.lemanski.tc.domain.service.navigation.silentBack
 import pl.lemanski.tc.ui.common.TcViewModel
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.provide
 import platform.Foundation.NSLog
 import platform.Foundation.NSSelectorFromString
-import platform.Foundation.NSStringFromClass
 import platform.UIKit.UIGestureRecognizer
 import platform.UIKit.UIGestureRecognizerDelegateProtocol
 import platform.UIKit.UISwipeGestureRecognizer
@@ -32,8 +32,7 @@ import platform.UIKit.willMoveToParentViewController
 class UIViewControllerWrapper(
     private val viewModel: TcViewModel<*>,
     private val controller: UIViewController,
-) : UIViewController(null, null),
-    UIGestureRecognizerDelegateProtocol {
+) : UIViewController(null, null), UIGestureRecognizerDelegateProtocol {
 
     private val logger = Logger(this::class)
     private val navigationService: NavigationService = provide()
@@ -129,5 +128,14 @@ class UIViewControllerWrapper(
         shouldBeRequiredToFailByGestureRecognizer: UIGestureRecognizer
     ): Boolean {
         return true
+    }
+
+    override fun viewDidDisappear(animated: Boolean) {
+        super.viewDidDisappear(animated)
+        if (isMovingFromParentViewController()) {
+            runBlocking {
+                navigationService.silentBack()
+            }
+        }
     }
 }

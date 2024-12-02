@@ -6,7 +6,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
@@ -80,35 +79,38 @@ suspend fun NavigationService.goTo(destination: Destination) = withContext(dispa
     )
 }
 
-suspend fun NavigationService.back(): Boolean = withContext(dispatcher) {
-    logger.debug("Back")
-    var result = true
+suspend fun NavigationService.replace(destination: Destination) = withContext(dispatcher) {
+    logger.debug("Replace with: $destination")
 
     updateHistory { history ->
-        if (history.size <= 1) {
-            logger.debug("Back: No more destinations")
-            result = false
-            return@updateHistory history
-        }
-
         val newHistory = history.toMutableList()
-        val removed = newHistory.removeAt(newHistory.size - 1)
-        removed.viewModelStore.clear()
+        newHistory.removeAt(newHistory.size - 1)
+        newHistory.add(destination)
         newHistory.toSet()
     }
 
-    if (!result) {
-        return@withContext result
-    }
+    getOnNavigateListener()?.onNavigate(
+        NavigationEvent(
+            destination = history().last(),
+            direction = NavigationEvent.Direction.FORWARD
+        )
+    )
+}
 
-    val newHistory = history()
+suspend fun NavigationService.replaceAll(destination: Destination) = withContext(dispatcher) {
+    logger.debug("Replace all with: $destination")
+
+    updateHistory { _ ->
+        val newHistory = setOf(destination)
+        newHistory
+    }
 
     getOnNavigateListener()?.onNavigate(
         NavigationEvent(
-            destination = newHistory.last(),
-            direction = NavigationEvent.Direction.BACKWARD
+            destination = history().last(),
+            direction = NavigationEvent.Direction.FORWARD
         )
     )
-
-    return@withContext result
 }
+
+expect suspend fun NavigationService.back(): Boolean

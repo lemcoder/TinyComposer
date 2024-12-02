@@ -3,6 +3,7 @@ package pl.lemanski.tc.ui.common
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -13,11 +14,6 @@ import org.koin.core.parameter.parametersOf
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.utils.exception.NavigationStateException
-
-@Composable
-internal inline fun <reified T : Destination> NavigationContext(crossinline content: @Composable (key: T) -> Unit) {
-
-}
 
 internal inline fun <reified T : Destination> NavigationService.key(): T? = runBlocking {
     logger.debug("Key: ${T::class.simpleName}")
@@ -30,31 +26,12 @@ internal inline fun <reified T : Destination> NavigationService.key(): T? = runB
     }
 }
 
-// FIXME ugly workaround for iOS
-@Composable
-internal inline fun <reified VM : TcViewModel<*>, reified K : Destination> router(
-    viewModel: VM? = null,
-    crossinline block: @Composable (VM) -> Unit
-) {
-    KoinContext {
-        if (viewModel == null) {
-            // Handle Android
-            val navigationService = koinInject<NavigationService>()
-            val key = remember { navigationService.key<K>() }
-
-            val vm = koinViewModel<VM>(
-                viewModelStoreOwner = key ?: throw NavigationStateException("Key not found in the navigation stack"),
-                parameters = { parametersOf(key) }
-            )
-
-            block(vm)
-
-            LaunchedEffect(Unit) {
-                vm.onAttached()
-            }
-        } else {
-            // Handle iOS
-            block(viewModel)
-        }
-    }
+val localViewModel = staticCompositionLocalOf<TcViewModel<*>> {
+    error("No ViewModel provided")
 }
+
+@Composable
+internal expect inline fun <reified VM : TcViewModel<*>, reified K : Destination> router(
+    crossinline block: @Composable () -> Unit
+)
+

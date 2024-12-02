@@ -1,8 +1,10 @@
 package pl.lemanski.tc
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.window.ComposeUIViewController
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import pl.lemanski.tc.TCViewController.start
 import pl.lemanski.tc.domain.model.navigation.AiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
@@ -11,6 +13,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
+import pl.lemanski.tc.ui.common.localViewModel
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsRouter
 import pl.lemanski.tc.ui.projectCreate.ProjectCreateContract
@@ -20,6 +23,7 @@ import pl.lemanski.tc.ui.projectsList.ProjectsListContract
 import pl.lemanski.tc.ui.welcome.WelcomeContract
 import pl.lemanski.tc.ui.welcome.WelcomeRouter
 import pl.lemanski.tc.utils.Logger
+import pl.lemanski.tc.utils.MaterialThemeWrapper
 import pl.lemanski.tc.utils.provide
 import platform.UIKit.UIApplication
 import platform.UIKit.UINavigationController
@@ -83,42 +87,80 @@ object TCViewController : KoinComponent {
         }
     }
 
-    private fun welcomeViewController(viewModel: WelcomeContract.ViewModel) = UIViewControllerWrapper(
-        viewModel = viewModel,
-        controller = ComposeUIViewController {
-            WelcomeRouter()
-        }
-    )
+    private fun welcomeViewController(viewModel: WelcomeContract.ViewModel) =
+        UIViewControllerWrapper(
+            viewModel = viewModel,
+            controller = ComposeUIViewController {
+                MaterialThemeWrapper {
+                    CompositionLocalProvider(
+                        localViewModel provides viewModel
+                    ) {
+                        WelcomeRouter()
+                    }
+                }
+            }
+        )
 
-    private fun projectListViewController(viewModel: ProjectsListContract.ViewModel) = UIViewControllerWrapper(
-        viewModel = viewModel,
-        controller = ComposeUIViewController {
-            ProjectListRouter()
-        }
-    )
+    private fun projectListViewController(viewModel: ProjectsListContract.ViewModel) =
+        UIViewControllerWrapper(
+            viewModel = viewModel,
+            controller = ComposeUIViewController {
+                MaterialThemeWrapper {
+                    CompositionLocalProvider(
+                        localViewModel provides viewModel
+                    ) {
+                        ProjectListRouter()
+                    }
+                }
+            }
+        )
 
-    private fun projectCreateViewController(viewModel: ProjectCreateContract.ViewModel) = UIViewControllerWrapper(
-        viewModel = viewModel,
-        controller = ComposeUIViewController {
-            ProjectCreateRouter()
-        }
-    )
+    private fun projectCreateViewController(viewModel: ProjectCreateContract.ViewModel) =
+        UIViewControllerWrapper(
+            viewModel = viewModel,
+            controller = ComposeUIViewController {
+                MaterialThemeWrapper {
+                    CompositionLocalProvider(
+                        localViewModel provides viewModel
+                    ) {
+                        ProjectCreateRouter()
+                    }
+                }
+            }
+        )
 
-    private fun projectDetailsViewController(viewModel: ProjectDetailsContract.ViewModel) = UIViewControllerWrapper(
-        viewModel = viewModel,
-        controller = ComposeUIViewController {
-            ProjectDetailsRouter()
-        }
-    )
+    private fun projectDetailsViewController(viewModel: ProjectDetailsContract.ViewModel) =
+        UIViewControllerWrapper(
+            viewModel = viewModel,
+            controller = ComposeUIViewController {
+                MaterialThemeWrapper {
+                    CompositionLocalProvider(
+                        localViewModel provides viewModel
+                    ) {
+                        ProjectDetailsRouter()
+                    }
+                }
+            }
+        )
 
     // TODO use Koin to provide the view models
-    fun Destination.getViewController(): UIViewController {
+    private fun Destination.getViewController(): UIViewController {
         return when (this) {
             is AiGenerateDestination     -> TODO()
-            ProjectCreateDestination     -> projectCreateViewController(provide<ProjectCreateContract.ViewModel>(this))
-            is ProjectDetailsDestination -> projectDetailsViewController(provide<ProjectDetailsContract.ViewModel>(this))
-            ProjectListDestination       -> projectListViewController(provide<ProjectsListContract.ViewModel>(this))
-            WelcomeDestination           -> welcomeViewController(provide<WelcomeContract.ViewModel>(this))
+            ProjectCreateDestination     -> projectCreateViewController(
+                provide<ProjectCreateContract.ViewModel>(this)
+            )
+            is ProjectDetailsDestination -> projectDetailsViewController(
+                provide<ProjectDetailsContract.ViewModel>(this)
+            )
+            ProjectListDestination       -> projectListViewController(
+                provide<ProjectsListContract.ViewModel>(this)
+            )
+            WelcomeDestination           -> welcomeViewController(
+                provide<WelcomeContract.ViewModel>(
+                    this
+                )
+            )
         }
     }
 }
@@ -126,7 +168,8 @@ object TCViewController : KoinComponent {
 fun getNavigationController(): UINavigationController? {
     val topVc = getTopViewController()
     return topVc?.let { topViewController ->
-        topViewController as? UINavigationController ?: topViewController.navigationController
+        topViewController as? UINavigationController
+            ?: topViewController.navigationController
     }
 }
 
@@ -141,15 +184,19 @@ fun getTopViewController(base: UIViewController? = UIApplication.sharedApplicati
         base is UINavigationController                -> {
             return getTopViewController(base = base.visibleViewController)
         }
+
         base is UITabBarController                    -> {
             return getTopViewController(base = base.selectedViewController)
         }
+
         base?.presentedViewController != null         -> {
             return getTopViewController(base = base.presentedViewController)
         }
+
         base.toString().contains("HostingController") -> return getTopViewController(
             base = base?.childViewControllers()?.first() as UIViewController
         )
+
         else                                          -> {
             return base
         }
