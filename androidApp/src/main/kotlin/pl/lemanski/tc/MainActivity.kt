@@ -34,7 +34,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        TCApp.koinInstance.androidContext(this@MainActivity)
         navigationService.setOnNavigateListener { event ->
             navigationState.value = event.destination
         }
