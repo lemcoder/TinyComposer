@@ -21,7 +21,7 @@ import pl.lemanski.tc.domain.useCase.playbackControlUseCase.PlaybackControlUseCa
 
 internal object DomainModule {
     fun provide() = module {
-        singleOf(::NavigationService)
+        single <NavigationService> { NavigationService() }
         singleOf(::AudioMapper)
         singleOf(::AudioService)
 

@@ -1,11 +1,12 @@
 package pl.lemanski.tc.ui.common
 
+import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.StateFlow
 import pl.lemanski.tc.domain.model.navigation.Destination
 
-interface TcViewModel<STATE> {
-    val key: Destination
-    val stateFlow: StateFlow<STATE>
+abstract class TcViewModel<STATE>: ViewModel() {
+    abstract val key: Destination
+    abstract val stateFlow: StateFlow<STATE>
 
-    fun onAttached()
+    abstract fun onAttached()
 }

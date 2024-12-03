@@ -1,7 +1,6 @@
 package pl.lemanski.tc.ui.projectsList
 
 import androidx.compose.animation.core.SpringSpec
-import androidx.compose.animation.core.exponentialDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,22 +9,11 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
@@ -35,10 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -52,6 +37,7 @@ import pl.lemanski.tc.ui.common.composables.LoaderScaffold
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ProjectListScreen(
     isLoading: Boolean,
@@ -64,48 +50,39 @@ internal fun ProjectListScreen(
 
     LoaderScaffold(isLoading) { snackBarState ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .safeContentPadding(),
+            modifier = Modifier.fillMaxSize().safeContentPadding(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .padding(bottom = 24.dp), // 16 + 8 (label padding on create screen) -> 20
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineMedium
+                    text = title, style = MaterialTheme.typography.headlineMedium
                 )
 
                 IconButton(
-                    onClick = addButton.onClick,
-                    modifier = Modifier.border(
+                    onClick = addButton.onClick, modifier = Modifier.border(
                         width = 1.dp,
                         color = OutlinedTextFieldDefaults.colors().unfocusedIndicatorColor,
                         shape = CircleShape
                     )
                 ) {
                     Icon(
-                        Icons.Default.Add,
-                        contentDescription = "Create project"
+                        Icons.Default.Add, contentDescription = "Create project"
                     )
                 }
             }
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(
-                    items = projectCards,
+                items(items = projectCards,
                     key = { it.id.hashCode() },
-                    contentType = { it::class }
-                ) { projectCard ->
-                    projectCard.toComposable(Modifier.animateItem())
+                    contentType = { it::class }) { projectCard ->
+                    projectCard.toComposable(Modifier.animateItemPlacement())
                 }
             }
         }
@@ -120,6 +97,7 @@ internal fun ProjectListScreen(
             when (result) {
                 SnackbarResult.Dismissed -> { /* do nothing */
                 }
+
                 SnackbarResult.ActionPerformed -> snackBar.onAction?.invoke()
             }
         }
@@ -205,67 +183,44 @@ fun AnchoredDragBox(
     val endSwipeProgress = if (state.requireOffset() < 0f) {
         (state.requireOffset() / endWidthPx).absoluteValue
     } else 0f
-    val endContentLiveWidth = endContentWidth * endSwipeProgress
 
+    val endContentLiveWidth = endContentWidth * endSwipeProgress
     Box(
         modifier = modifier.clipToBounds()
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .matchParentSize(),
+            modifier = Modifier.fillMaxWidth().matchParentSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
             Row(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .width(endContentLiveWidth)
+                modifier = Modifier.wrapContentHeight().width(endContentLiveWidth)
                     .clipToBounds()
             ) {
-                endContent?.invoke(this, state, endSwipeProgress)
+                if (endContent != null) {
+                    endContent(state, endSwipeProgress)
+                }
             }
         }
 
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .offset {
+        Box(
+            modifier = Modifier.fillMaxWidth().wrapContentHeight().offset {
                 IntOffset(
-                    state
-                        .requireOffset()
-                        .coerceIn(offsetRange)
-                        .roundToInt(), 0
+                    state.requireOffset().coerceIn(offsetRange).roundToInt(), 0
                 )
-            }
-            .anchoredDraggable(
-                state,
-                Orientation.Horizontal
+            }.anchoredDraggable(
+                state, Orientation.Horizontal
             )
         ) {
             content(state, endSwipeProgress)
         }
     }
 }
+
 enum class DragAnchors {
-    Center,
-    End,
+    Start, Center, End,
 }
 
-/**
- * Create and [remember] a [AnchoredDraggableState] with the default animation clock.
- *
- * @param initialValue The initial value of the state.
- * @param positionalThreshold The positional threshold, in px, to be used when calculating the
- * target state while a drag is in progress and when settling after the drag ends. This is the
- * distance from the start of a transition. It will be, depending on the direction of the
- * interaction, added or subtracted from/to the origin offset. It should always be a positive value.
- * @param velocityThreshold The velocity threshold (in px per second) that the end velocity has to
- * exceed in order to animate to the next state, even if the [positionalThreshold] has not been
- * reached.
- * @param animationSpec The default animation that will be used to animate to a new state.
- * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
- */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun rememberAnchoredDraggableState(
@@ -273,7 +228,6 @@ fun rememberAnchoredDraggableState(
     positionalThreshold: (distance: Float) -> Float = { distance -> distance * 0.5f },
     velocityThreshold: Dp = 100.dp,
     animationSpec: SpringSpec<Float> = SpringSpec(),
-    confirmValueChange: (DragAnchors) -> Boolean = { true }
 ): AnchoredDraggableState<DragAnchors> {
     val density = LocalDensity.current
     return remember {
@@ -281,9 +235,7 @@ fun rememberAnchoredDraggableState(
             initialValue = initialValue,
             positionalThreshold = positionalThreshold,
             velocityThreshold = { with(density) { velocityThreshold.toPx() } },
-            snapAnimationSpec = animationSpec,
-            decayAnimationSpec = exponentialDecay(),
-            confirmValueChange = confirmValueChange
+            animationSpec = animationSpec
         )
     }
 }

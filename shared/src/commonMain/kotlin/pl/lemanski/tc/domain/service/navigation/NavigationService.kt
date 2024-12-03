@@ -1,8 +1,11 @@
 package pl.lemanski.tc.domain.service.navigation
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
@@ -13,7 +16,9 @@ import pl.lemanski.tc.utils.Logger
  * This implementation is based on single callback so it is easy to apply to platform navigation
  * on each supported platform
  */
-class NavigationService {
+class NavigationService(
+    val dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate
+) {
     // TODO logger should be injected (maybe use context receiver here?)
     internal val logger = Logger(this::class)
 
@@ -57,7 +62,7 @@ class NavigationService {
     }
 }
 
-fun NavigationService.goTo(destination: Destination) = runBlocking {
+suspend fun NavigationService.goTo(destination: Destination) = withContext(dispatcher) {
     logger.debug("Go to: $destination")
 
     updateHistory { history ->
@@ -74,29 +79,38 @@ fun NavigationService.goTo(destination: Destination) = runBlocking {
     )
 }
 
-fun NavigationService.back(): Boolean = runBlocking {
-    logger.debug("Back")
+suspend fun NavigationService.replace(destination: Destination) = withContext(dispatcher) {
+    logger.debug("Replace with: $destination")
 
     updateHistory { history ->
-        if (history.size <= 1) {
-            logger.debug("Back: No more destinations")
-            return@updateHistory history
-        }
-
         val newHistory = history.toMutableList()
-        val removed = newHistory.removeAt(newHistory.size - 1)
-        removed.viewModelStore.clear()
+        newHistory.removeAt(newHistory.size - 1)
+        newHistory.add(destination)
         newHistory.toSet()
     }
 
-    val newHistory = history()
+    getOnNavigateListener()?.onNavigate(
+        NavigationEvent(
+            destination = history().last(),
+            direction = NavigationEvent.Direction.FORWARD
+        )
+    )
+}
+
+suspend fun NavigationService.replaceAll(destination: Destination) = withContext(dispatcher) {
+    logger.debug("Replace all with: $destination")
+
+    updateHistory { _ ->
+        val newHistory = setOf(destination)
+        newHistory
+    }
 
     getOnNavigateListener()?.onNavigate(
         NavigationEvent(
-            destination = newHistory.last(),
-            direction = NavigationEvent.Direction.BACKWARD
+            destination = history().last(),
+            direction = NavigationEvent.Direction.FORWARD
         )
     )
-
-    return@runBlocking true
 }
+
+expect suspend fun NavigationService.back(): Boolean

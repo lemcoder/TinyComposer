@@ -119,7 +119,7 @@ internal class ProjectListViewModel(
         }
     }
 
-    override fun onProjectClick(id: UUID) {
+    override fun onProjectClick(id: UUID) = viewModelScope.launch {
         logger.debug("Project clicked: $id")
 
         navigationService.goTo(ProjectDetailsDestination(id))

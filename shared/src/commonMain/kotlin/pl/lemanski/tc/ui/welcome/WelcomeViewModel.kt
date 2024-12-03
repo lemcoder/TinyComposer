@@ -10,6 +10,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.goTo
+import pl.lemanski.tc.domain.service.navigation.replaceAll
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
 
@@ -34,6 +35,6 @@ internal class WelcomeViewModel(
 
     override fun goToProjectsList(): Job = viewModelScope.launch {
         logger.debug("Go to projects list")
-        navigationService.goTo(ProjectListDestination)
+        navigationService.replaceAll(ProjectListDestination)
     }
 }

@@ -4,10 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
+import pl.lemanski.tc.ui.common.localViewModel
 import pl.lemanski.tc.ui.common.router
 
 @Composable
-fun ProjectCreateRouter() = router<ProjectCreateContract.ViewModel, ProjectCreateDestination> { viewModel ->
+fun ProjectCreateRouter() = router<ProjectCreateContract.ViewModel, ProjectCreateDestination> {
+    val viewModel= localViewModel.current as ProjectCreateContract.ViewModel
     val state by viewModel.stateFlow.collectAsState()
 
     ProjectCreateScreen(

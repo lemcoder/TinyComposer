@@ -4,9 +4,15 @@ data class SoundFontHolder(
     val name: String, // TODO check if can be obtained from the soundFont file
     val soundFont: ByteArray,
 ) {
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + soundFont.contentHashCode()
+        return result
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as SoundFontHolder
 
@@ -14,11 +20,5 @@ data class SoundFontHolder(
         if (!soundFont.contentEquals(other.soundFont)) return false
 
         return true
-    }
-
-    override fun hashCode(): Int {
-        var result = name.hashCode()
-        result = 31 * result + soundFont.contentHashCode()
-        return result
     }
 }
