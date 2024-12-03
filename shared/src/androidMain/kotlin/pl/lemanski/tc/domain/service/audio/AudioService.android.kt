@@ -5,10 +5,12 @@ import android.media.AudioManager
 import android.media.AudioTrack
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.yield
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.exception.ApplicationStateException
 import kotlin.coroutines.resume
@@ -51,7 +53,7 @@ actual suspend fun playAudio(data: FloatArray, sampleRate: Int) = suspendCancell
         }
     })
 
-    val playbackJob = playbackScope.launch {
+    playbackScope.launch {
         var offset = 0
         while (offset < convertedData.size) {
             if (!this@launch.isActive) {
@@ -71,11 +73,9 @@ actual suspend fun playAudio(data: FloatArray, sampleRate: Int) = suspendCancell
 
     continuation.invokeOnCancellation {
         logger.debug("Audio playback cancelled")
-        playbackScope.launch {
-            playbackJob.cancelAndJoin()
-            audioTrack.stop()
-            audioTrack.release()
-        }
+        playbackScope.cancel()
+        audioTrack.stop()
+        audioTrack.release()
     }
 }
 

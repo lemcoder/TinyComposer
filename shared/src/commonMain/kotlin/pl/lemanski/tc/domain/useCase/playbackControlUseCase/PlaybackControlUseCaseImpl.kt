@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.service.audio.playAudio
@@ -13,7 +14,7 @@ internal class PlaybackControlUseCaseImpl : PlaybackControlUseCase {
     private val logger = Logger(this::class)
     private var isPlaying = false
     private var playbackJob: Job? = null
-    private val playbackScope = CoroutineScope(Job() + Dispatchers.IO)
+    private val playbackScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun play(errorHandler: PlaybackControlUseCase.ErrorHandler, audioData: FloatArray) {
         logger.debug("Play audio")
