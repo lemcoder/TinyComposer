@@ -42,12 +42,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import pl.lemanski.tc.ui.common.StateComponent
+import pl.lemanski.tc.ui.common.ToComposable
 import pl.lemanski.tc.ui.common.composables.LoaderScaffold
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -61,8 +64,6 @@ internal fun ProjectListScreen(
     addButton: StateComponent.Button,
     snackBar: StateComponent.SnackBar?
 ) {
-    val scope = rememberCoroutineScope()
-
     LoaderScaffold(isLoading) { snackBarState ->
         Column(
             modifier = Modifier.fillMaxSize().safeContentPadding(),
@@ -102,20 +103,7 @@ internal fun ProjectListScreen(
             }
         }
 
-        LaunchedEffect(snackBar) {
-            if (snackBar == null) {
-                snackBarState.currentSnackbarData?.dismiss()
-                return@LaunchedEffect
-            }
-
-            val result = snackBarState.showSnackbar(snackBar.message, snackBar.action, true)
-            when (result) {
-                SnackbarResult.Dismissed -> { /* do nothing */
-                }
-
-                SnackbarResult.ActionPerformed -> snackBar.onAction?.invoke()
-            }
-        }
+        snackBar.ToComposable(snackBarState)
     }
 }
 
@@ -124,6 +112,7 @@ internal fun ProjectListScreen(
 private fun ProjectsListContract.State.ProjectCard.toComposable(modifier: Modifier) {
     val colors = OutlinedTextFieldDefaults.colors()
     val scope = rememberCoroutineScope()
+    val hapticFeedback = LocalHapticFeedback.current
 
     AnchoredDragBox(
         modifier = modifier
@@ -136,6 +125,7 @@ private fun ProjectsListContract.State.ProjectCard.toComposable(modifier: Modifi
                     .fillMaxSize()
                     .clickable {
                         scope.launch {
+                            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                             onDelete(id)
                             anchoredDraggableState.animateTo(DragAnchors.Center)
                         }

@@ -20,13 +20,13 @@ class ChordBeatEnDecTest {
             ChordBeats(buildMajorSeventh(Note(15)), 3)
         )
 
-        val expectedEncoding = "12|min:1;15|maj7:3"
+        val expectedEncoding = "12.min:1;15.maj7:3"
         assertEquals(expectedEncoding, chordBeatsList.encodeToString())
     }
 
     @Test
     fun tryDecodeChordBeats_should_return_correct_ChordBeats_list_from_encoded_string() {
-        val encodedString = "12|min:1;15|maj7:3"
+        val encodedString = "12.min:1;15.maj7:3"
 
         val expectedChordBeatsList = listOf(
             ChordBeats(buildMinorTriad(Note(12)), 1),
@@ -47,7 +47,7 @@ class ChordBeatEnDecTest {
 
     @Test
     fun toChord_should_correctly_decode_single_chord_from_string() {
-        val encodedChord = "12|min"
+        val encodedChord = "12.min"
         val expectedChord = buildMinorTriad(Note(12))
 
         assertEquals(expectedChord, encodedChord.toChord())
@@ -56,7 +56,7 @@ class ChordBeatEnDecTest {
     @Test
     fun codeName_should_return_correct_encoded_name_for_Chord() {
         val chord = buildMajorTriad(Note(12))
-        val expectedCodeName = "12|maj"
+        val expectedCodeName = "12.maj"
 
         assertEquals(expectedCodeName, chord.codeName())
     }

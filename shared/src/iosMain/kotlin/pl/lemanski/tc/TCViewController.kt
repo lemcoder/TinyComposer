@@ -5,7 +5,7 @@ import androidx.compose.ui.window.ComposeUIViewController
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import pl.lemanski.tc.TCViewController.start
-import pl.lemanski.tc.domain.model.navigation.AiGenerateDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
@@ -146,8 +146,8 @@ object TCViewController : KoinComponent {
     // TODO use Koin to provide the view models
     private fun Destination.getViewController(): UIViewController {
         return when (this) {
-            is AiGenerateDestination     -> TODO()
-            ProjectCreateDestination     -> projectCreateViewController(
+            is ProjectAiGenerateDestination -> TODO()
+            ProjectCreateDestination        -> projectCreateViewController(
                 provide<ProjectCreateContract.ViewModel>(this)
             )
             is ProjectDetailsDestination -> projectDetailsViewController(

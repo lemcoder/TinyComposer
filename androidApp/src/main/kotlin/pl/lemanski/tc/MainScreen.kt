@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import pl.lemanski.tc.domain.model.navigation.AiGenerateDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
@@ -28,8 +28,8 @@ fun MainScreen(
             WelcomeDestination       -> WelcomeRouter()
             ProjectListDestination   -> ProjectListRouter()
             ProjectCreateDestination -> ProjectCreateRouter()
-            is ProjectDetailsDestination -> ProjectDetailsRouter()
-            is AiGenerateDestination     -> {}
+            is ProjectDetailsDestination    -> ProjectDetailsRouter()
+            is ProjectAiGenerateDestination -> {}
         }
     }
 }

@@ -16,17 +16,17 @@ internal fun String.tryParseProject(): Project {
 
     val id = UUID(data[0].trim())
     val name = data[1].trim()
-    val length = data[2].trim().toInt()
-    val bpm = data[3].trim().toInt()
-    val rhythm = Rhythm.entries.find { it.name == data[4].trim() }!!
-    val chords = data[5].trim().tryDecodeChordBeats()
+    val bpm = data[2].trim().toInt()
+    val rhythm = Rhythm.entries.find { it.name == data[3].trim() }!!
+    val chords = data[4].trim().tryDecodeChordBeats()
+    val melody = data[5].trim().tryDecodeNoteBeats()
 
     return Project(
         id = id,
         name = name,
-        lengthInMeasures = length,
         bpm = bpm,
         rhythm = rhythm,
-        chords = chords
+        chords = chords,
+        melody = melody
     )
 }

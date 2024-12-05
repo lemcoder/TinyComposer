@@ -18,7 +18,7 @@ data class ProjectDetailsDestination(val projectId: UUID) : Destination {
     override val viewModelStore: ViewModelStore = ViewModelStore()
 }
 
-data class AiGenerateDestination(val projectId: UUID) : Destination {
+data class ProjectAiGenerateDestination(val projectId: UUID) : Destination {
     override val viewModelStore: ViewModelStore = ViewModelStore()
 }
 

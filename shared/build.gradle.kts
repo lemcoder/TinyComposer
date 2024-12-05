@@ -46,6 +46,8 @@ kotlin {
 
             implementation(libs.mikrosoundfont.midi)
             implementation(libs.mikrosoundfont.soundFont)
+
+            implementation(libs.generative.ai)
         }
 
         commonTest.dependencies {
@@ -73,5 +75,9 @@ android {
         getByName("release") {
             isMinifyEnabled = false
         }
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
     }
 }

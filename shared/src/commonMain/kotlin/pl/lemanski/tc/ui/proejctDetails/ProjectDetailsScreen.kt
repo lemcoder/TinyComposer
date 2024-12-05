@@ -22,11 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import pl.lemanski.tc.ui.common.StateComponent
+import pl.lemanski.tc.ui.common.ToComposable
 import pl.lemanski.tc.ui.common.composables.LoaderScaffold
 import pl.lemanski.tc.ui.common.composables.ToComposable
 
 @Composable
-internal fun ProjectDetailsScreen(
+fun ProjectDetailsScreen(
     isLoading: Boolean,
     projectName: String,
     projectRhythm: String,
@@ -38,7 +39,7 @@ internal fun ProjectDetailsScreen(
     aiGenerateButton: StateComponent.Button,
     snackBar: StateComponent.SnackBar?,
 ) {
-    LoaderScaffold(isLoading) {
+    LoaderScaffold(isLoading) { snackbarHostState ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -97,10 +98,7 @@ internal fun ProjectDetailsScreen(
                 }
             }
 
-            Text(
-                text = snackBar?.message ?: "",
-                style = MaterialTheme.typography.bodyLarge
-            )
+            snackBar?.ToComposable(snackbarHostState)
         }
     }
 }

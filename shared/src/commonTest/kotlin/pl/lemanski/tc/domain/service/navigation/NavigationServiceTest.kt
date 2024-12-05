@@ -18,68 +18,67 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class NavigationServiceTest {
-
-    lateinit var scope: TestScope
     private var callCounter: Int = 0
-    private lateinit var navigationService: NavigationService
+    private var mockListener: OnNavigateListener = OnNavigateListener { callCounter++ }
 
-    private var mockListener: OnNavigateListener = object : OnNavigateListener {
-        override fun onNavigate(event: NavigationEvent) {
-            callCounter++
+    private val TestScope.navigationService: NavigationService
+        get() = NavigationService(StandardTestDispatcher(testScheduler)).apply {
+            setOnNavigateListener(mockListener)
         }
-    }
 
     @BeforeTest
     fun setup() = runTest {
-        scope = TestScope(StandardTestDispatcher())
         callCounter = 0
-        navigationService = NavigationService()
-        navigationService.setOnNavigateListener(mockListener)
     }
 
     @Test
-    fun `goTo should add destination to stack and notify listener`() = scope.runTest {
+    fun `goTo should add destination to stack and notify listener`() = runTest {
+        val service = navigationService
         val destination = WelcomeDestination
-        navigationService.goTo(destination)
+        service.goTo(destination)
 
-        assertEquals(1, navigationService.history().size)
-        assertEquals(destination, navigationService.history().last())
+        assertEquals(1, service.history().size)
+        assertEquals(destination, service.history().last())
         assertEquals(1, callCounter)
     }
 
     @Test
-    fun `back should remove last destination and notify listener`() = scope.runTest {
+    fun `back should remove last destination and notify listener`() = runTest {
+        val service = navigationService
         val startDestination = WelcomeDestination
         val projectsDestination = ProjectListDestination
-        navigationService.goTo(startDestination)
-        navigationService.goTo(projectsDestination)
+        service.goTo(startDestination)
+        service.goTo(projectsDestination)
 
-        val result = navigationService.back()
+        val result = service.back()
 
         assertTrue(result)
-        assertEquals(1, navigationService.history().size)
-        assertEquals(startDestination, navigationService.history().last())
+        assertEquals(1, service.history().size)
+        assertEquals(startDestination, service.history().last())
         assertEquals(3, callCounter)
     }
 
     @Test
-    fun `back should return false if only one destination in stack`() = scope.runTest {
+    fun `back should return false if only one destination in stack`() = runTest {
+        val service = navigationService
         val destination = WelcomeDestination
-        navigationService.goTo(destination)
+        service.goTo(destination)
 
-        val result = navigationService.back()
+        val result = service.back()
 
         assertFalse { result }
-        assertEquals(1, navigationService.history().size)
+        assertEquals(1, service.history().size)
         assertEquals(1, callCounter)
     }
 
     @Test
-    fun `key should return destination of the correct type`() = scope.runTest {
-        val homeDestination = WelcomeDestination
-        navigationService.goTo(homeDestination)
+    fun `key should return destination of the correct type`() = runTest {
+        val service = navigationService
 
-        val result: Destination? = navigationService.key<Destination>()
+        val homeDestination = WelcomeDestination
+        service.goTo(homeDestination)
+
+        val result: Destination? = service.key<Destination>()
         assertEquals(homeDestination, result)
     }
 
@@ -90,15 +89,16 @@ class NavigationServiceTest {
     }
 
     @Test
-    fun `key should throw exception if more than one destination of type exists`() = scope.runTest {
+    fun `key should throw exception if more than one destination of type exists`() = runTest {
+        val service = navigationService
         val homeDestination = WelcomeDestination
         val projectsDestination = ProjectListDestination
-        navigationService.goTo(homeDestination)
-        navigationService.goTo(projectsDestination)
-        navigationService.goTo(homeDestination)
+        service.goTo(homeDestination)
+        service.goTo(projectsDestination)
+        service.goTo(homeDestination)
 
         val exception = assertFailsWith<NavigationStateException> {
-            navigationService.key<Destination>()
+            service.key<Destination>()
         }
 
         assertTrue(exception.message.contains("More than one key of the same type on the stack"))

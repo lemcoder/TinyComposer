@@ -112,10 +112,10 @@ internal class ProjectCreateViewModel(
             project = Project(
                 id = UUID.random(),
                 name = projectName,
-                lengthInMeasures = 0,
                 bpm = projectBpm,
                 rhythm = projectRhythm,
-                chords = listOf()
+                chords = listOf(),
+                melody = listOf()
             )
         ) ?: return
 

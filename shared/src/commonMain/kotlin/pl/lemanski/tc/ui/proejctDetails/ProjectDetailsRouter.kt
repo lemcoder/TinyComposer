@@ -16,13 +16,13 @@ fun ProjectDetailsRouter() = router<ProjectDetailsContract.ViewModel, ProjectDet
     ProjectDetailsScreen(
         isLoading = state.isLoading,
         projectName = state.projectName,
-        projectRhythm = state.projectRhythm,
         tempoInput = state.tempoInput,
         chordsTextArea = state.chordsTextArea,
         playButton = state.playButton,
         stopButton = state.stopButton,
         backButton = state.backButton,
         aiGenerateButton = state.aiGenerateButton,
+        projectRhythm = state.projectRhythm,
         snackBar = state.snackBar
     )
 }
