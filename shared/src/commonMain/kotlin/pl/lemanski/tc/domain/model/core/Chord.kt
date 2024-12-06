@@ -25,6 +25,25 @@ data class Chord(
         MINOR_SIXTH("min6"),
         MAJOR_SIXTH("maj6"),
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Chord) return false
+
+        if (type != other.type) return false
+        for (i in notes.indices) {
+            if (notes[i] != other.notes[i]) return false
+        }
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + notes.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
+    }
 }
 
 internal fun Chord.Type.build(baseNote: Note): Chord {
