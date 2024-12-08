@@ -5,9 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -26,20 +24,13 @@ import pl.lemanski.tc.ui.common.composables.MultiRowLayout
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.State.ChordBeatsComponent
 
 @Composable
-internal fun ColumnScope.ChordsTab(
+internal fun ChordsTab(
     chordBeatsComponents: List<ChordBeatsComponent>,
+    maxWidth: Dp,
 ) {
-    BoxWithConstraints(
-        modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth()
-    ) {
-        MultiRowLayout(
-            modifier = Modifier
-        ) {
-            chordBeatsComponents.forEach {
-                it.ChordBeatItem(itemWidth = this@BoxWithConstraints.maxWidth / 5)
-            }
+    MultiRowLayout {
+        chordBeatsComponents.forEach {
+            it.ChordBeatItem(itemWidth = maxWidth / 5)
         }
     }
 }

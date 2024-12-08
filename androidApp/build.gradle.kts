@@ -40,7 +40,4 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.koin.android)
     implementation(libs.androidx.material3.android)
-
-    debugImplementation(compose.preview)
-    debugImplementation(compose.uiTooling)
 }

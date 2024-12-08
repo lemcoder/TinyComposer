@@ -56,8 +56,11 @@ internal interface I18n {
     interface ProjectDetails {
         val invalidTempo: String?
         val tempo: String
-        val invalidChordBeats: String?
+        val invalidChordBeats: String
+        val invalidNoteBeats: String
         val controlStateError: String
+        val chordsTab: String
+        val melodyTab: String
         val title: String
     }
 }

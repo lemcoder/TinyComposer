@@ -3,6 +3,7 @@ package pl.lemanski.tc.domain.service.audio
 import io.github.lemcoder.mikrosoundfont.midi.MidiMessage
 import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
 import pl.lemanski.tc.domain.model.project.ChordBeats
+import pl.lemanski.tc.domain.model.project.NoteBeats
 
 internal class AudioMapper {
     fun mapChordBeatsToMidiMessage(chordBeats: List<ChordBeats>, tempo: Int): List<MidiMessage> {
@@ -25,6 +26,27 @@ internal class AudioMapper {
             }
 
             messages.addAll(midiNoteOffMessages)
+        }
+
+        return messages
+    }
+
+    fun mapNoteBeatsToMidiMessage(noteBeats: List<NoteBeats>, tempo: Int): List<MidiMessage> {
+        var currentTime = 0
+        val messages = mutableListOf<MidiMessage>()
+
+        for (noteBeat in noteBeats) {
+            val (note, beats) = noteBeat
+
+            val midiNoteOnMessage = MidiVoiceMessage.NoteOn(currentTime, 0, note.value, 127)
+            messages.add(midiNoteOnMessage)
+
+            val durationMillis = (beats * 60_000 / tempo)
+            currentTime += durationMillis
+
+            val midiNoteOffMessage = MidiVoiceMessage.NoteOff(currentTime, 0, note.value, 0)
+
+            messages.add(midiNoteOffMessage)
         }
 
         return messages

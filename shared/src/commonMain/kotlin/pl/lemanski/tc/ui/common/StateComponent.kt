@@ -36,4 +36,20 @@ sealed class StateComponent {
         val action: String?,
         val onAction: (() -> Unit)?
     ) : StateComponent()
+
+    data class ValuePicker(
+        val value: Int,
+        val onValueChange: (Int) -> Unit
+    ) : StateComponent()
+
+    data class TabComponent<T>(
+        val selected: Tab<T>,
+        val options: Set<Tab<T>>,
+        val onTabSelected: (T) -> Unit
+    ): StateComponent() {
+        data class Tab<T>(
+            val name: String,
+            val value: T
+        )
+    }
 }

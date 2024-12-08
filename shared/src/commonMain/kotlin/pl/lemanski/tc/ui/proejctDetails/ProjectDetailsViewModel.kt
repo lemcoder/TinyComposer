@@ -7,11 +7,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pl.lemanski.tc.data.persistent.decoder.tryDecodeChordBeats
+import pl.lemanski.tc.domain.model.core.Chord
+import pl.lemanski.tc.domain.model.core.Note
+import pl.lemanski.tc.domain.model.core.build
+import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
-import pl.lemanski.tc.domain.model.project.name
+import pl.lemanski.tc.domain.model.project.ChordBeats
+import pl.lemanski.tc.domain.model.project.NoteBeats
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
+import pl.lemanski.tc.domain.service.navigation.goTo
 import pl.lemanski.tc.domain.useCase.generateAudioUseCase.GenerateAudioUseCase
 import pl.lemanski.tc.domain.useCase.getProject.GetProjectUseCase
 import pl.lemanski.tc.domain.useCase.playbackControlUseCase.PlaybackControlUseCase
@@ -29,34 +34,38 @@ internal class ProjectDetailsViewModel(
     private val generateAudioUseCase: GenerateAudioUseCase
 ) : ProjectDetailsContract.ViewModel() {
 
+    private val tabOptions = ProjectDetailsContract.Tab.entries.map { tabToOption(it) }.toSet()
     private val logger = Logger(this::class)
     private var project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
     private val initialState = ProjectDetailsContract.State(
         isLoading = true,
         projectName = project.name,
-        projectRhythm = project.rhythm.name(i18n),
-        chordsTextArea = StateComponent.Input(
-            value = "",
-            type = StateComponent.Input.Type.TEXT,
-            hint = "",
-            error = null,
-            onValueChange = ::onChordsTextAreaChanged
-        ),
         playButton = StateComponent.Button(
             text = "",
             onClick = ::onPlayButtonClicked
         ),
         stopButton = null,
-        aiGenerateButton = StateComponent.Button(text = "", onClick = ::onAiGenerateButtonClicked),
-        snackBar = null,
-        tempoInput = StateComponent.Input(
-            value = project.bpm.toString(),
-            type = StateComponent.Input.Type.NUMBER,
-            hint = i18n.projectDetails.tempo,
-            error = null,
-            onValueChange = ::onTempoInputChanged
+        backButton = StateComponent.Button(
+            text = "",
+            onClick = ::back
         ),
-        backButton = StateComponent.Button(text = "", onClick = ::back),
+        aiGenerateButton = StateComponent.Button(
+            text = "",
+            onClick = ::onAiGenerateButtonClicked
+        ),
+        snackBar = null,
+        wheelPicker = null,
+        addButton = StateComponent.Button(
+            text = "",
+            onClick = ::onAddButtonClicked
+        ),
+        noteBeats = listOf(),
+        chordBeats = listOf(),
+        tabComponent = StateComponent.TabComponent(
+            selected = tabOptions.first(),
+            options = tabOptions,
+            onTabSelected = ::onTabSelected
+        ),
     )
 
     private val _stateFlow = MutableStateFlow(initialState)
@@ -70,30 +79,24 @@ internal class ProjectDetailsViewModel(
         logger.debug("Attached")
 
         _stateFlow.update { state ->
-            state.copy(isLoading = false)
+            state.copy(
+                isLoading = false,
+            )
         }
     }
 
     override fun onPlayButtonClicked(): Job = viewModelScope.launch {
-        val tempo = _stateFlow.value.tempoInput.value.toIntOrNull() ?: run {
-            _stateFlow.update { state ->
-                state.copy(
-                    tempoInput = state.tempoInput.copy(
-                        error = i18n.projectDetails.invalidTempo
-                    )
-                )
-            }
-            return@launch
-        }
-
         _stateFlow.update {
             it.copy(
                 playButton = null,
-                stopButton = StateComponent.Button(text = "", onClick = ::onStopButtonClicked)
+                stopButton = StateComponent.Button(
+                    text = "",
+                    onClick = ::onStopButtonClicked
+                )
             )
         }
 
-        val audioData = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, tempo)
+        val audioData = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, project.melody, project.bpm)
         playbackControlUseCase.play(PlaybackControlErrorHandler(), audioData)
     }
 
@@ -109,34 +112,82 @@ internal class ProjectDetailsViewModel(
     }
 
     override fun onAiGenerateButtonClicked() {
-        logger.debug("AI generate button clicked")
+        viewModelScope.launch { // FIXME run synchronously
+            navigationService.goTo(ProjectAiGenerateDestination(key.projectId))
+        }
     }
 
-    override fun onChordsTextAreaChanged(text: String) {
+    override fun onAddButtonClicked(): Job = viewModelScope.launch {
         _stateFlow.update { state ->
             state.copy(
-                chordsTextArea = state.chordsTextArea.copy(
-                    value = text,
-                    error = null
+                wheelPicker = ProjectDetailsContract.State.WheelPicker(
+                    values = getWheelPickerValues(),
+                    selectedValue = getWheelPickerValues().first(),
+                    onValueSelected = ::onWheelPickerValueSelected
                 )
             )
         }
 
-        runCatching {
-            val chords = text.tryDecodeChordBeats()
-            project = project.copy(chords = chords)
+    }
+
+    override fun onWheelPickerValueSelected(value: String) {
+        _stateFlow.update { state ->
+            state.copy(
+                wheelPicker = state.wheelPicker?.copy(
+                    selectedValue = value
+                )
+            )
+        }
+
+        val note = Note.fromString(value) ?: run {
+            showSnackBar(i18n.projectDetails.invalidNoteBeats, null, null)
+            return
+        }
+
+        when (_stateFlow.value.tabComponent.selected.value) {
+            ProjectDetailsContract.Tab.CHORDS -> {
+                val chord = Chord.Type.MAJOR.build(note)
+                project = project.copy(chords = project.chords + ChordBeats(chord, 1))
+
+                _stateFlow.update { state ->
+                    state.copy(
+                        wheelPicker = null,
+                        chordBeats = state.chordBeats + ProjectDetailsContract.State.ChordBeatsComponent(
+                            id = state.chordBeats.size + 1,
+                            chordBeats = ChordBeats(chord, 1),
+                            onChordClick = {},
+                            onChordDoubleClick = {},
+                            onChordLongClick = {}
+                        )
+                    )
+                }
+            }
+            ProjectDetailsContract.Tab.MELODY -> {
+                project = project.copy(melody = project.melody + NoteBeats(note, 1))
+
+                _stateFlow.update { state ->
+                    state.copy(
+                        wheelPicker = null,
+                        noteBeats = state.noteBeats + ProjectDetailsContract.State.NoteBeatsComponent(
+                            id = state.noteBeats.size + 1,
+                            noteBeats = NoteBeats(note, 1),
+                            onNoteClick = {},
+                            onNoteDoubleClick = {},
+                            onNoteLongClick = {}
+                        )
+                    )
+                }
+            }
         }
     }
 
-    override fun onTempoInputChanged(tempo: String) {
-        tempo.toIntOrNull() ?: return
-
+    override fun onTabSelected(tab: ProjectDetailsContract.Tab) {
         _stateFlow.update { state ->
             state.copy(
-                tempoInput = state.tempoInput.copy(
-                    value = tempo,
-                    error = null
-                )
+                tabComponent = state.tabComponent.copy(
+                    selected = tabToOption(tab),
+                ),
+                wheelPicker = null
             )
         }
     }
@@ -173,6 +224,16 @@ internal class ProjectDetailsViewModel(
         logger.debug("Cleared")
     }
 
+    private fun tabToOption(tab: ProjectDetailsContract.Tab): StateComponent.TabComponent.Tab<ProjectDetailsContract.Tab> = StateComponent.TabComponent.Tab(
+        name = when (tab) {
+            ProjectDetailsContract.Tab.CHORDS -> i18n.projectDetails.chordsTab
+            ProjectDetailsContract.Tab.MELODY -> i18n.projectDetails.melodyTab
+        },
+        value = tab
+    )
+
+    private fun getWheelPickerValues(): Set<String> = setOf("D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D") // FIXME
+
     //---
 
     inner class PlaybackControlErrorHandler : PlaybackControlUseCase.ErrorHandler {
@@ -192,8 +253,22 @@ internal class ProjectDetailsViewModel(
         override fun onInvalidChordBeats() {
             _stateFlow.update { state ->
                 state.copy(
-                    chordsTextArea = state.chordsTextArea.copy(
-                        error = i18n.projectDetails.invalidChordBeats
+                    snackBar = StateComponent.SnackBar(
+                        message = i18n.projectDetails.invalidChordBeats,
+                        action = null,
+                        onAction = null
+                    )
+                )
+            }
+        }
+
+        override fun onInvalidNoteBeats() {
+            _stateFlow.update { state ->
+                state.copy(
+                    snackBar = StateComponent.SnackBar(
+                        message = i18n.projectDetails.invalidNoteBeats,
+                        action = null,
+                        onAction = null
                     )
                 )
             }

@@ -13,12 +13,25 @@ class Note(val value: Int) {
         }
     }
 
-    private val noteLookupTable = NoteLookupTable()
-
     val name: String
-        get() = noteLookupTable.note(value % 12) ?: throw InvalidNoteException("Invalid note $value")
+        get() = (noteLookupTable.note(value % 12) ?: throw InvalidNoteException("Invalid note $value")) + octave.toString()
     val octave: Int
         get() = value / 11
+
+    companion object {
+        private val noteLookupTable = NoteLookupTable()
+
+        fun fromString(note: String): Note? {
+            for (i in 0..11) {
+                if (noteLookupTable.note(i) == note) {
+                    return Note(i + 60)
+                }
+            }
+
+            return null
+        }
+    }
+
 
     // ---
 
@@ -34,30 +47,11 @@ class Note(val value: Int) {
 
     // ---
 
-    private inner class NoteLookupTable {
-
-        private var notation: Notation = Notation.STANDARD
+    private class NoteLookupTable {
+        private val notes = listOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 
         // TODO add flats notation
-        fun note(value: Int): String? = when (value) {
-            0    -> if (notation == Notation.STANDARD) "C" else "Do"
-            1    -> if (notation == Notation.STANDARD) "C#" else "Di"
-            2    -> if (notation == Notation.STANDARD) "D" else "Re"
-            3    -> if (notation == Notation.STANDARD) "D#" else "Ri"
-            4    -> if (notation == Notation.STANDARD) "E" else "Mi"
-            5    -> if (notation == Notation.STANDARD) "F" else "Fa"
-            6    -> if (notation == Notation.STANDARD) "F#" else "Fi"
-            7    -> if (notation == Notation.STANDARD) "G" else "Sol"
-            8    -> if (notation == Notation.STANDARD) "G#" else "Si"
-            9    -> if (notation == Notation.STANDARD) "A" else "La"
-            10   -> if (notation == Notation.STANDARD) "A#" else "Li"
-            11   -> if (notation == Notation.STANDARD) "B" else "Ti"
-            else -> null
-        }
-
-        fun setNotation(notation: Notation) {
-            this.notation = notation
-        }
+        fun note(value: Int): String? = notes.getOrNull(value)
     }
 }
 

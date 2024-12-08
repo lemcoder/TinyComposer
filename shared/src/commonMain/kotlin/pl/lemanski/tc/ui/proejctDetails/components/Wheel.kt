@@ -21,7 +21,7 @@ import kotlin.math.sin
 @Composable
 fun Wheel(
     selected: String,
-    options: List<String>,
+    options: Set<String>,
     onNoteSelected: (String) -> Unit,
     size: DpSize,
     modifier: Modifier = Modifier

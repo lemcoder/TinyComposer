@@ -1,11 +1,13 @@
 package pl.lemanski.tc.ui.proejctDetails
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -13,47 +15,38 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.ToComposable
 import pl.lemanski.tc.ui.common.composables.LoaderScaffold
-import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.State.ChordBeatsComponent
-import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.State.NoteBeatsComponent
+import pl.lemanski.tc.ui.common.composables.ToComposable
+import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.Tab
 import pl.lemanski.tc.ui.proejctDetails.components.BottomBar
+import pl.lemanski.tc.ui.proejctDetails.components.Wheel
 import pl.lemanski.tc.ui.proejctDetails.components.chords.ChordsTab
 import pl.lemanski.tc.ui.proejctDetails.components.melody.MelodyTab
-
-private enum class Tab {
-    CHORDS,
-    MELODY
-}
 
 @Composable
 internal fun ProjectDetailsScreen(
     isLoading: Boolean,
     projectName: String,
+    tabComponent: StateComponent.TabComponent<Tab>,
     playButton: StateComponent.Button?,
     stopButton: StateComponent.Button?,
     backButton: StateComponent.Button,
+    addButton: StateComponent.Button,
     aiGenerateButton: StateComponent.Button,
+    noteBeats: List<ProjectDetailsContract.State.NoteBeatsComponent>,
+    chordBeats: List<ProjectDetailsContract.State.ChordBeatsComponent>,
+    wheelPicker: ProjectDetailsContract.State.WheelPicker?,
     snackBar: StateComponent.SnackBar?,
-    noteBeats: List<NoteBeatsComponent>,
-    addNoteButton: StateComponent.Button,
-    chordBeats: List<ChordBeatsComponent>,
-    addChordButton: StateComponent.Button,
 ) {
     LoaderScaffold(isLoading) { snackbarHostState ->
-        var selectedTab by remember { mutableStateOf(Tab.CHORDS) }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,7 +72,7 @@ internal fun ProjectDetailsScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
-                    onClick = { },
+                    onClick = { }, // TODO go to project details
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.List,
@@ -88,32 +81,45 @@ internal fun ProjectDetailsScreen(
                 }
             }
 
-            TabRow(
-                selectedTabIndex = Tab.entries.indexOf(selectedTab),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Tab.entries.map {
-                    Tab(
-                        text = { Text(it.name) },
-                        selected = selectedTab == it,
-                        onClick = { selectedTab = it }
-                    )
-                }
-            }
+            tabComponent.ToComposable()
 
-            when (selectedTab) {
-                Tab.CHORDS -> ChordsTab(chordBeatsComponents = chordBeats)
-                Tab.MELODY -> MelodyTab(noteBeatsComponents = noteBeats)
+            BoxWithConstraints(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                contentAlignment = if (wheelPicker != null) Alignment.Center else Alignment.TopCenter
+            ) {
+                if (wheelPicker != null) {
+                    Wheel(
+                        selected = wheelPicker.selectedValue,
+                        options = wheelPicker.values,
+                        onNoteSelected = wheelPicker.onValueSelected,
+                        size = DpSize(this@BoxWithConstraints.maxWidth, this@BoxWithConstraints.maxWidth)
+                    )
+                } else {
+                    when (tabComponent.selected.value) {
+                        Tab.MELODY -> MelodyTab(noteBeats, maxWidth) // TODO
+                        Tab.CHORDS -> ChordsTab(chordBeats, maxWidth) // TODO
+                    }
+                }
             }
 
             BottomBar(
                 playButton = playButton,
                 pauseButton = stopButton,
-                addButton = if (selectedTab == Tab.MELODY) addNoteButton else addChordButton,
+                addButton = addButton,
                 aiGenerateButton = aiGenerateButton
             )
-
-            snackBar?.ToComposable(snackbarHostState)
         }
+
+        snackBar?.ToComposable(snackbarHostState)
     }
 }
+
+//    bottomSheet?.let {
+//        when (it) {
+//            is ProjectDetailsContract.State.BottomSheet.NoteBottomSheet  ->
+//            is ProjectDetailsContract.State.BottomSheet.ChordBottomSheet ->
+//        }
+//    }

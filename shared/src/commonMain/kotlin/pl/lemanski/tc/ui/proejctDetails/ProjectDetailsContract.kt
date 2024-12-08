@@ -7,12 +7,18 @@ import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.TcViewModel
 
 internal interface ProjectDetailsContract {
+    enum class Tab {
+        CHORDS,
+        MELODY
+    }
+
     abstract class ViewModel : TcViewModel<State>() {
         abstract fun onPlayButtonClicked(): Job
         abstract fun onStopButtonClicked(): Job
         abstract fun onAiGenerateButtonClicked()
-        abstract fun onChordsTextAreaChanged(text: String)
-        abstract fun onTempoInputChanged(tempo: String)
+        abstract fun onAddButtonClicked(): Job
+        abstract fun onWheelPickerValueSelected(value: String)
+        abstract fun onTabSelected(tab: Tab)
         abstract fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?)
         abstract fun hideSnackBar()
         abstract fun back()
@@ -21,16 +27,23 @@ internal interface ProjectDetailsContract {
     data class State(
         val isLoading: Boolean,
         val projectName: String,
+        val tabComponent: StateComponent.TabComponent<Tab>,
         val playButton: StateComponent.Button?,
         val stopButton: StateComponent.Button?,
         val backButton: StateComponent.Button,
+        val addButton: StateComponent.Button,
         val aiGenerateButton: StateComponent.Button,
-        val snackBar: StateComponent.SnackBar?,
+        val wheelPicker: WheelPicker?,
         val noteBeats: List<NoteBeatsComponent>,
-        val addNoteButton: StateComponent.Button,
         val chordBeats: List<ChordBeatsComponent>,
-        val addChordButton: StateComponent.Button,
+        val snackBar: StateComponent.SnackBar?,
     ) {
+        data class WheelPicker(
+            val values: Set<String>,
+            val selectedValue: String,
+            val onValueSelected: (String) -> Unit,
+        )
+
         data class ChordBeatsComponent(
             val id: Int,
             val chordBeats: ChordBeats,
@@ -46,5 +59,19 @@ internal interface ProjectDetailsContract {
             val onNoteDoubleClick: (Int) -> Unit,
             val onNoteLongClick: (Int) -> Unit,
         )
+
+        sealed interface BottomSheet {
+            data class NoteBottomSheet(
+                val noteBeatId: Int,
+                val durationValuePicker: StateComponent.ValuePicker,
+                val velocityValuePicker: StateComponent.ValuePicker,
+            ) : BottomSheet
+
+            data class ChordBottomSheet(
+                val chordBeatId: Int,
+                val durationValuePicker: StateComponent.ValuePicker,
+                val velocityValuePicker: StateComponent.ValuePicker,
+            ) : BottomSheet
+        }
     }
 }

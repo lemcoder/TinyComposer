@@ -21,6 +21,10 @@ fun MultiRowLayout(
             measurable.measure(Constraints(maxHeight = constraints.maxHeight))
         }
 
+        if (mainPlaceableList.isEmpty()) {
+            return@SubcomposeLayout layout(constraints.maxWidth, constraints.maxHeight) {}
+        }
+
         val width = mainPlaceableList.sumOf { it.width }
         val maxHeight = mainPlaceableList.maxOf { it.height }
         val height = (constraints.maxWidth / width) * maxHeight

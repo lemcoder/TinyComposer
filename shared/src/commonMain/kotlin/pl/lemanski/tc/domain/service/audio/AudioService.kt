@@ -1,6 +1,7 @@
 package pl.lemanski.tc.domain.service.audio
 
 import io.github.lemcoder.mikrosoundfont.MikroSoundFont
+import io.github.lemcoder.mikrosoundfont.midi.MidiMessage
 import io.github.lemcoder.mikrosoundfont.midi.MidiSequencer
 import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
 import pl.lemanski.tc.domain.model.project.ChordBeats
@@ -20,12 +21,7 @@ internal class AudioService(
         soundFontRepository.setSoundFont("default", soundFont)
     }
 
-    fun generateAudioData(chordBeats: List<ChordBeats>, sampleRate: Int, bpm: Int): FloatArray {
-        val midiMessages = listOf(
-            MidiVoiceMessage.ProgramChange(0, 0, 0),
-            *audioMapper.mapChordBeatsToMidiMessage(chordBeats, bpm).toTypedArray()
-        )
-
+    fun generateAudioData(midiMessages: List<MidiMessage>, sampleRate: Int, bpm: Int): FloatArray {
         if (!isSoundFontLoaded()) {
             throw ApplicationStateException("SoundFont not loaded")
         }

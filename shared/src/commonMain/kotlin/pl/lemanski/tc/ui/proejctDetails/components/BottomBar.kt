@@ -24,9 +24,10 @@ fun BottomBar(
     pauseButton: StateComponent.Button?,
     addButton: StateComponent.Button,
     aiGenerateButton: StateComponent.Button,
+    modifier: Modifier = Modifier
 ) {
     Box {
-        HorizontalDivider(modifier = Modifier.fillMaxWidth())
+        HorizontalDivider(modifier = modifier.fillMaxWidth())
 
         Row(
             modifier = Modifier.fillMaxWidth(),

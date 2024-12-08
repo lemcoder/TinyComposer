@@ -3,7 +3,36 @@ package pl.lemanski.tc.ui.common.i18n
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
-import tinycomposer.shared.generated.resources.*
+import tinycomposer.shared.generated.resources.Res
+import tinycomposer.shared.generated.resources.common_add
+import tinycomposer.shared.generated.resources.common_cancel
+import tinycomposer.shared.generated.resources.common_close
+import tinycomposer.shared.generated.resources.common_confirm
+import tinycomposer.shared.generated.resources.common_delete
+import tinycomposer.shared.generated.resources.common_edit
+import tinycomposer.shared.generated.resources.common_no
+import tinycomposer.shared.generated.resources.common_ok
+import tinycomposer.shared.generated.resources.common_reset
+import tinycomposer.shared.generated.resources.common_retry
+import tinycomposer.shared.generated.resources.common_save
+import tinycomposer.shared.generated.resources.common_undo
+import tinycomposer.shared.generated.resources.common_yes
+import tinycomposer.shared.generated.resources.project_create_invalid_project_bpm
+import tinycomposer.shared.generated.resources.project_create_invalid_project_name
+import tinycomposer.shared.generated.resources.project_create_project_bpm
+import tinycomposer.shared.generated.resources.project_create_project_creation_error
+import tinycomposer.shared.generated.resources.project_create_project_name
+import tinycomposer.shared.generated.resources.project_create_project_rhythm
+import tinycomposer.shared.generated.resources.project_create_title
+import tinycomposer.shared.generated.resources.project_list_add_project
+import tinycomposer.shared.generated.resources.project_list_duration
+import tinycomposer.shared.generated.resources.project_list_project_delete_failed
+import tinycomposer.shared.generated.resources.project_list_project_deleted
+import tinycomposer.shared.generated.resources.project_list_project_recreate_failed
+import tinycomposer.shared.generated.resources.project_list_title
+import tinycomposer.shared.generated.resources.rhythm_four_fours
+import tinycomposer.shared.generated.resources.rhythm_three_fours
+import tinycomposer.shared.generated.resources.welcome_title
 
 internal class I18nImpl : I18n {
 
@@ -62,10 +91,13 @@ internal class I18nImpl : I18n {
     }
 
     private inner class ProjectDetails : I18n.ProjectDetails {
-        override val invalidTempo: String? = "invalid tempo"
+        override val invalidTempo: String = "invalid tempo"
         override val tempo: String = " tempo"
-        override val invalidChordBeats: String? = " invalid chord beats"
+        override val invalidChordBeats: String = "invalid chord beats"
+        override val invalidNoteBeats: String = "invalid note beats"
         override val controlStateError: String = " control state error"
+        override val chordsTab: String = "Chords"
+        override val melodyTab: String = "Melody"
         override val title: String = " Project details"
     }
 }
