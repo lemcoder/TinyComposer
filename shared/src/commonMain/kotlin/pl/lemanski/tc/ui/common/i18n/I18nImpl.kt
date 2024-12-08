@@ -44,6 +44,7 @@ internal class I18nImpl : I18n {
     override val projectDetails: I18n.ProjectDetails by lazy { ProjectDetails() }
     override val welcome: I18n.Welcome by lazy { Welcome() }
     override val rhythm: I18n.Rhythm by lazy { Rhythm() }
+    override val projectOptions: I18n.ProjectOptions by lazy { ProjectOptions() }
 
     private inner class Welcome : I18n.Welcome {
         override val title: String = stringResourceBlocking(Res.string.welcome_title)
@@ -104,5 +105,12 @@ internal class I18nImpl : I18n {
         override val chordType: String = "chord type"
         override val velocity: String = "velocity"
         override val title: String = " Project details"
+    }
+
+    private inner class ProjectOptions : I18n.ProjectOptions {
+        override val export: String = "Export"
+        override val melodyPreset: String = "Melody preset"
+        override val chordsPreset: String = "Chords preset"
+        override val tempo: String = "Tempo"
     }
 }

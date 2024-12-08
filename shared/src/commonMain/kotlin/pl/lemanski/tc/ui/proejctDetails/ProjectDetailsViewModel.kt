@@ -19,9 +19,10 @@ import pl.lemanski.tc.domain.model.project.NoteBeats
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.service.navigation.goTo
-import pl.lemanski.tc.domain.useCase.generateAudioUseCase.GenerateAudioUseCase
+import pl.lemanski.tc.domain.useCase.generateAudio.GenerateAudioUseCase
 import pl.lemanski.tc.domain.useCase.getProject.GetProjectUseCase
-import pl.lemanski.tc.domain.useCase.playbackControlUseCase.PlaybackControlUseCase
+import pl.lemanski.tc.domain.useCase.playbackControl.PlaybackControlUseCase
+import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
@@ -36,7 +37,8 @@ internal class ProjectDetailsViewModel(
     private val getProjectUseCase: GetProjectUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val playbackControlUseCase: PlaybackControlUseCase,
-    private val generateAudioUseCase: GenerateAudioUseCase
+    private val generateAudioUseCase: GenerateAudioUseCase,
+    private val presetsControlUseCase: PresetsControlUseCase
 ) : ProjectDetailsContract.ViewModel() {
 
     private val logger = Logger(this::class)
@@ -106,7 +108,8 @@ internal class ProjectDetailsViewModel(
             )
         }
 
-        val audioData = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, project.melody, project.bpm)
+        val (chordPreset, notePreset) = presetsControlUseCase.getPresets(project.id)
+        val audioData = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, chordPreset, project.melody, notePreset, project.bpm)
         playbackJob = launch { playbackControlUseCase.play(PlaybackControlErrorHandler(), audioData) }
         playbackJob?.invokeOnCompletion {
             _stateFlow.update {

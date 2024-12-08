@@ -1,4 +1,4 @@
-package pl.lemanski.tc.domain.useCase.aiGenerateUseCase
+package pl.lemanski.tc.domain.useCase.aiGenerate
 
 import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.model.project.NoteBeats

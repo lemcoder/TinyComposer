@@ -1,5 +1,6 @@
 package pl.lemanski.tc.data.repository.soundFont
 
+import io.github.lemcoder.mikrosoundfont.MikroSoundFont
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -26,7 +27,7 @@ internal class SoundFontRepositoryImpl(
     override fun setSoundFont(name: String, soundFont: ByteArray) {
         cacheMemory.remove(name)
         lastSoundFontName = name
-        cacheMemory.set(name, soundFont)
+        cacheMemory.put(name, soundFont)
     }
 
     override fun currentSoundFont(): SoundFontHolder? {
@@ -37,5 +38,16 @@ internal class SoundFontRepositoryImpl(
             name = ln,
             soundFont = soundFont
         )
+    }
+
+    override fun getSoundFontPresets(): List<Pair<Int, String>> {
+        val soundFont = currentSoundFont()?.soundFont ?: return emptyList()
+
+        // FIXME do not load here
+        MikroSoundFont.load(soundFont).let { sf ->
+            return (0 until sf.getPresetsCount()).map { index ->
+                index to sf.getPresetName(index)
+            }
+        }
     }
 }

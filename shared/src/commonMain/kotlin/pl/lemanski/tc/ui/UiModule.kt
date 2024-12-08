@@ -29,7 +29,7 @@ internal object UiModule {
         viewModel<WelcomeContract.ViewModel> { (key: WelcomeDestination) -> WelcomeViewModel(key, get(), get()) }
         viewModel<ProjectCreateContract.ViewModel> { (key: ProjectCreateDestination) -> ProjectCreateViewModel(key, get(), get(), get()) }
         viewModel<ProjectsListContract.ViewModel> { (key: ProjectListDestination) -> ProjectListViewModel(key, get(), get(), get(), get(), get()) }
-        viewModel<ProjectDetailsContract.ViewModel> { (key: ProjectDetailsDestination) -> ProjectDetailsViewModel(key, get(), get(), get(), get(), get(), get()) }
-        viewModel<ProjectOptionsContract.ViewModel> { (key: ProjectOptionsDestination) -> ProjectOptionsViewModel(key, get(), get(), get()) }
+        viewModel<ProjectDetailsContract.ViewModel> { (key: ProjectDetailsDestination) -> ProjectDetailsViewModel(key, get(), get(), get(), get(), get(), get(), get()) }
+        viewModel<ProjectOptionsContract.ViewModel> { (key: ProjectOptionsDestination) -> ProjectOptionsViewModel(key, get(), get(), get(), get(), get()) }
     }
 }

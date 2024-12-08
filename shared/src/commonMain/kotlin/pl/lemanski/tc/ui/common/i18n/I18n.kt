@@ -7,6 +7,7 @@ internal interface I18n {
     val projectCreate: ProjectCreate
     val projectDetails: ProjectDetails
     val rhythm: Rhythm
+    val projectOptions: ProjectOptions
 
     interface Common {
         val ok: String
@@ -67,5 +68,12 @@ internal interface I18n {
         val chordType: String
         val velocity: String
         val title: String
+    }
+
+    interface ProjectOptions {
+        val tempo: String
+        val export: String
+        val melodyPreset: String
+        val chordsPreset: String
     }
 }

@@ -1,4 +1,4 @@
-package pl.lemanski.tc.domain.useCase.playbackControlUseCase
+package pl.lemanski.tc.domain.useCase.playbackControl
 
 import kotlinx.coroutines.coroutineScope
 import pl.lemanski.tc.domain.service.audio.playAudio

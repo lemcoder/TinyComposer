@@ -7,11 +7,11 @@ import kotlin.reflect.KClass
 internal class MemoryCache {
     private val keyValueStore: MutableMap<String, Pair<KClass<*>, ByteArray>> = mutableMapOf()
 
-    fun <T : Any> set(key: String, value: T) {
+    fun <T : Any> put(key: String, value: T) {
         when (value) {
-            is Int       -> set(key, Int::class, value.toByteArray())
-            is String    -> set(key, String::class, value.encodeToByteArray())
-            is ByteArray -> set(key, ByteArray::class, value)
+            is Int       -> put(key, Int::class, value.toByteArray())
+            is String    -> put(key, String::class, value.encodeToByteArray())
+            is ByteArray -> put(key, ByteArray::class, value)
             else         -> throw IllegalArgumentException("Unsupported type")
         }
     }
@@ -37,7 +37,7 @@ internal class MemoryCache {
 
     // ---
 
-    private fun set(name: String, type: KClass<*>, data: ByteArray) {
+    private fun put(name: String, type: KClass<*>, data: ByteArray) {
         keyValueStore[name] = type to data
     }
 

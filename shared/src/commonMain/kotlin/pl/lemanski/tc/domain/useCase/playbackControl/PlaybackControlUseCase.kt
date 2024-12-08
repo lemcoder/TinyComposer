@@ -1,6 +1,4 @@
-package pl.lemanski.tc.domain.useCase.playbackControlUseCase
-
-import kotlinx.coroutines.Job
+package pl.lemanski.tc.domain.useCase.playbackControl
 
 internal interface PlaybackControlUseCase {
     interface ErrorHandler {

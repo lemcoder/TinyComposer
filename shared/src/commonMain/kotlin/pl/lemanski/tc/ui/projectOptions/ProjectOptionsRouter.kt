@@ -17,5 +17,9 @@ fun ProjectOptionsRouter() = router<ProjectOptionsContract.ViewModel, ProjectOpt
         projectName = state.projectName,
         backButton = state.backButton,
         snackBar = state.snackBar,
+        tempoInput = state.tempoInput,
+        chordsPresetSelect = state.chordsPresetSelect,
+        notesPresetSelect = state.notesPresetSelect,
+        exportButton = state.exportButton,
     )
 }

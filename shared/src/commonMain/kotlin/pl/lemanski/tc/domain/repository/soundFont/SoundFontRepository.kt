@@ -7,4 +7,5 @@ interface SoundFontRepository {
     fun loadSoundFont(path: String): ByteArray
     fun setSoundFont(name: String, soundFont: ByteArray)
     fun currentSoundFont(): SoundFontHolder?
+    fun getSoundFontPresets(): List<Pair<Int, String>>  // TODO create some structure for preset (maybe in library?)
 }

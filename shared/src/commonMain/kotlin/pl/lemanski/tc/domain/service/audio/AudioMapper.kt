@@ -13,8 +13,9 @@ internal class AudioMapper {
         for (chordBeat in chordBeats) {
             val (chord, beats) = chordBeat
 
-            val midiNoteOnMessages = chord.notes.map { note ->
-                MidiVoiceMessage.NoteOn(currentTime, channel, note.value, chord.velocity)
+            val midiNoteOnMessages = chord.notes.mapIndexed { index, note ->
+                // humanize the notes by adding a small delay between each note
+                MidiVoiceMessage.NoteOn(currentTime + (index * 7), channel, note.value, chord.velocity)
             }
             messages.addAll(midiNoteOnMessages)
 
@@ -22,7 +23,8 @@ internal class AudioMapper {
             currentTime += durationMillis
 
             val midiNoteOffMessages = chord.notes.map { note ->
-                MidiVoiceMessage.NoteOff(currentTime - 100, channel, note.value, chord.velocity)
+                // humanize the notes by adding a small delay between each chord
+                MidiVoiceMessage.NoteOff(currentTime - 80, channel, note.value, chord.velocity)
             }
 
             messages.addAll(midiNoteOffMessages)

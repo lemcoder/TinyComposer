@@ -1,7 +1,6 @@
-package pl.lemanski.tc.domain.useCase.generateAudioUseCase
+package pl.lemanski.tc.domain.useCase.generateAudio
 
 import io.github.lemcoder.mikrosoundfont.midi.MidiMetaMessage
-import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.model.project.NoteBeats
@@ -18,7 +17,9 @@ internal class GenerateAudioUseCaseImpl(
     override suspend operator fun invoke(
         errorHandler: GenerateAudioUseCase.ErrorHandler,
         chordBeats: List<ChordBeats>,
+        chordsPreset: Int,
         noteBeats: List<NoteBeats>,
+        notesPreset: Int,
         tempo: Int
     ): FloatArray {
         if (!audioService.isSoundFontLoaded()) {
@@ -31,8 +32,8 @@ internal class GenerateAudioUseCaseImpl(
 
         val chordMidiMessages = try {
             listOf(
-                MidiVoiceMessage.ProgramChange(0, 0, 0),
-                *audioMapper.mapChordBeatsToMidiMessage(chordBeats, tempo, 0).toTypedArray()
+                // MidiVoiceMessage.ProgramChange(0, 0, 0),
+                *audioMapper.mapChordBeatsToMidiMessage(chordBeats, tempo, chordsPreset).toTypedArray()
             )
         } catch (ex: Exception) {
             errorHandler.onInvalidChordBeats()
@@ -41,8 +42,8 @@ internal class GenerateAudioUseCaseImpl(
 
         val noteMidiMessages = try {
             listOf(
-                MidiVoiceMessage.ProgramChange(0, 1, 8),
-                *audioMapper.mapNoteBeatsToMidiMessage(noteBeats, tempo, 1).toTypedArray()
+                // MidiVoiceMessage.ProgramChange(0, 1, 8),
+                *audioMapper.mapNoteBeatsToMidiMessage(noteBeats, tempo, notesPreset).toTypedArray()
             )
         } catch (ex: Exception) {
             errorHandler.onInvalidNoteBeats()
