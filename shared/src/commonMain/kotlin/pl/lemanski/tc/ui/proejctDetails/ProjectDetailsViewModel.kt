@@ -16,6 +16,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
 import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.model.project.NoteBeats
+import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.service.navigation.goTo
@@ -42,8 +43,8 @@ internal class ProjectDetailsViewModel(
 ) : ProjectDetailsContract.ViewModel() {
 
     private val logger = Logger(this::class)
+    private var project: Project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
     private var playbackJob: Job? = null
-    private var project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
     private val initialState = ProjectDetailsContract.State(
         isLoading = true,
         projectName = project.name,
@@ -87,9 +88,11 @@ internal class ProjectDetailsViewModel(
         logger.debug("Init")
     }
 
+
     override fun onAttached() {
         logger.debug("Attached")
 
+        project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
         _stateFlow.update { state ->
             state.copy(
                 isLoading = false,
@@ -138,7 +141,7 @@ internal class ProjectDetailsViewModel(
     override fun onAiGenerateButtonClicked() {
         viewModelScope.launch { // FIXME run synchronously
 
-            updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project)?.run {
+            updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project, project.id)?.run {
                 navigationService.goTo(ProjectAiGenerateDestination(key.projectId))
             }
         }
@@ -314,7 +317,7 @@ internal class ProjectDetailsViewModel(
 
     override fun onProjectOptionsButtonClicked() {
         viewModelScope.launch {
-            updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project)?.run {
+            updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project, project.id)?.run {
                 navigationService.goTo(ProjectOptionsDestination(project.id))
             }
         }
@@ -323,7 +326,7 @@ internal class ProjectDetailsViewModel(
     override fun onCleared() {
         super.onCleared()
         logger.debug("Cleared")
-        updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project)
+        updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project, project.id)
     }
 
     //---

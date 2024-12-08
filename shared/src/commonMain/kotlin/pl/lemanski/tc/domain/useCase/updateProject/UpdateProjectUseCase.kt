@@ -1,6 +1,7 @@
 package pl.lemanski.tc.domain.useCase.updateProject
 
 import pl.lemanski.tc.domain.model.project.Project
+import pl.lemanski.tc.utils.UUID
 
 interface UpdateProjectUseCase {
     interface ErrorHandler {
@@ -11,6 +12,7 @@ interface UpdateProjectUseCase {
 
     operator fun invoke(
         errorHandler: ErrorHandler,
-        project: Project
+        project: Project,
+        projectId: UUID
     ): Project?
 }

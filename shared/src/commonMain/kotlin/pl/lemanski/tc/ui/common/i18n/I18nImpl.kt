@@ -112,5 +112,7 @@ internal class I18nImpl : I18n {
         override val melodyPreset: String = "Melody preset"
         override val chordsPreset: String = "Chords preset"
         override val tempo: String = "Tempo"
+        override val tempoError: String = "Bad tempo"
+        override val saveError: String = "Save error"
     }
 }

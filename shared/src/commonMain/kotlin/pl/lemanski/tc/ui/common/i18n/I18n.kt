@@ -72,6 +72,8 @@ internal interface I18n {
 
     interface ProjectOptions {
         val tempo: String
+        val tempoError: String
+        val saveError: String
         val export: String
         val melodyPreset: String
         val chordsPreset: String
