@@ -47,7 +47,7 @@ class ProjectEnDecTest {
         val projectId = UUID.random()
         val projectString = """
             id, name, bpm, rhythm, chords, melody
-            $projectId, Test Project, 100, FOUR_FOURS, 12.min:4;15.maj7:2, 12:4;15:2
+            $projectId, Test Project, 100, FOUR_FOURS, 12.minV60:4;15.maj7V60:2, 12:4;15:2
         """.trimIndent()
 
         val expectedProject = Project(
@@ -72,7 +72,7 @@ class ProjectEnDecTest {
     fun tryParseProject_should_throw_exception_for_invalid_header() {
         val invalidHeaderString = """
             incorrect, header, format
-            ${UUID.random()}, Test Project, 120, 100, SWING, 12.min:4;15.maj7:2
+            ${UUID.random()}, Test Project, 120, 100, SWING, 12.minV60:4;15.maj7V60:2
         """.trimIndent()
 
         assertFailsWith<IllegalArgumentException> {

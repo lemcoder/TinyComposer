@@ -3,6 +3,7 @@ package pl.lemanski.tc.data.persistent.decoder
 import pl.lemanski.tc.data.persistent.encoder.BEAT_DELIMITER
 import pl.lemanski.tc.data.persistent.encoder.CHORD_DELIMITER
 import pl.lemanski.tc.data.persistent.encoder.SEPARATOR
+import pl.lemanski.tc.data.persistent.encoder.VELOCITY_DELIMITER
 import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.core.Chord.Type
 import pl.lemanski.tc.domain.model.core.Note
@@ -19,7 +20,8 @@ internal fun String.tryDecodeChordBeats(): List<ChordBeats> = when {
 
 
 internal fun String.toChord(): Chord {
-    val (baseNote, typeNotation) = split(CHORD_DELIMITER, limit = 2)
+    val (baseNote, typeAndVelocity) = split(CHORD_DELIMITER, limit = 2)
+    val (typeNotation, velocity) = typeAndVelocity.split(VELOCITY_DELIMITER)
     val type = Type.entries.first { it.notation == typeNotation }
-    return type.build(Note(baseNote.toInt()))
+    return type.build(Note(baseNote.toInt(), velocity.toInt()))
 }

@@ -73,7 +73,7 @@ private fun NoteBeatsComponent.NoteBeatItem(
         contentAlignment = Alignment.CenterStart
     ) {
         Text(
-            text = note.name,
+            text = note.nameWithOctave,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 4.dp)
         )

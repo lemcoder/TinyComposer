@@ -14,20 +14,20 @@ class NoteBeatDecEncTest {
     @Test
     fun testEncodeToString() {
         val noteBeatsList = listOf(
-            NoteBeats(Note(1), 2),
-            NoteBeats(Note(3), 4)
+            NoteBeats(Note(1, 60), 2),
+            NoteBeats(Note(3, 40), 4)
         )
         val encodedString = noteBeatsList.encodeToString()
-        assertEquals("1:2;3:4", encodedString)
+        assertEquals("1V60:2;3V40:4", encodedString)
     }
 
     @Test
     fun testTryDecodeNoteBeats() {
-        val encodedString = "1:2;3:4"
+        val encodedString = "1V60:2;3V70:4"
         val decodedList = encodedString.tryDecodeNoteBeats()
         val expectedList = listOf(
-            NoteBeats(Note(1), 2),
-            NoteBeats(Note(3), 4)
+            NoteBeats(Note(1, 60), 2),
+            NoteBeats(Note(3, 70), 4)
         )
         assertEquals(expectedList, decodedList)
     }
@@ -41,7 +41,7 @@ class NoteBeatDecEncTest {
 
     @Test
     fun testTryDecodeNoteBeatsInvalidFormat() {
-        val encodedString = "invalid:string"
+        val encodedString = "invalidV50:string"
         assertFailsWith<NumberFormatException> {
             encodedString.tryDecodeNoteBeats()
         }

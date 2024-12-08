@@ -6,7 +6,7 @@ import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.model.project.NoteBeats
 
 internal class AudioMapper {
-    fun mapChordBeatsToMidiMessage(chordBeats: List<ChordBeats>, tempo: Int): List<MidiMessage> {
+    fun mapChordBeatsToMidiMessage(chordBeats: List<ChordBeats>, tempo: Int, channel: Int): List<MidiMessage> {
         var currentTime = 0
         val messages = mutableListOf<MidiMessage>()
 
@@ -14,15 +14,15 @@ internal class AudioMapper {
             val (chord, beats) = chordBeat
 
             val midiNoteOnMessages = chord.notes.map { note ->
-                MidiVoiceMessage.NoteOn(currentTime, 0, note.value, 127)
+                MidiVoiceMessage.NoteOn(currentTime, channel, note.value, chord.velocity)
             }
             messages.addAll(midiNoteOnMessages)
 
-            val durationMillis = (beats * 60_000 / tempo)
+            val durationMillis = (beats * (60_000 / tempo))
             currentTime += durationMillis
 
             val midiNoteOffMessages = chord.notes.map { note ->
-                MidiVoiceMessage.NoteOff(currentTime, 0, note.value, 0)
+                MidiVoiceMessage.NoteOff(currentTime - 100, channel, note.value, chord.velocity)
             }
 
             messages.addAll(midiNoteOffMessages)
@@ -31,20 +31,20 @@ internal class AudioMapper {
         return messages
     }
 
-    fun mapNoteBeatsToMidiMessage(noteBeats: List<NoteBeats>, tempo: Int): List<MidiMessage> {
+    fun mapNoteBeatsToMidiMessage(noteBeats: List<NoteBeats>, tempo: Int, channel: Int): List<MidiMessage> {
         var currentTime = 0
         val messages = mutableListOf<MidiMessage>()
 
         for (noteBeat in noteBeats) {
             val (note, beats) = noteBeat
 
-            val midiNoteOnMessage = MidiVoiceMessage.NoteOn(currentTime, 0, note.value, 127)
+            val midiNoteOnMessage = MidiVoiceMessage.NoteOn(currentTime, channel, note.value, note.velocity)
             messages.add(midiNoteOnMessage)
 
-            val durationMillis = (beats * 60_000 / tempo)
+            val durationMillis = (beats * (60_000 / tempo))
             currentTime += durationMillis
 
-            val midiNoteOffMessage = MidiVoiceMessage.NoteOff(currentTime, 0, note.value, 0)
+            val midiNoteOffMessage = MidiVoiceMessage.NoteOff(currentTime, channel, note.value, note.velocity)
 
             messages.add(midiNoteOffMessage)
         }

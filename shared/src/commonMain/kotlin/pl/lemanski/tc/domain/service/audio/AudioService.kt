@@ -1,6 +1,7 @@
 package pl.lemanski.tc.domain.service.audio
 
 import io.github.lemcoder.mikrosoundfont.MikroSoundFont
+import io.github.lemcoder.mikrosoundfont.SoundFont
 import io.github.lemcoder.mikrosoundfont.midi.MidiMessage
 import io.github.lemcoder.mikrosoundfont.midi.MidiSequencer
 import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
@@ -11,7 +12,6 @@ import pl.lemanski.tc.utils.exception.ApplicationStateException
 
 internal class AudioService(
     private val soundFontRepository: SoundFontRepository,
-    private val audioMapper: AudioMapper
 ) {
     fun isSoundFontLoaded(): Boolean = soundFontRepository.currentSoundFont() != null
 
@@ -21,15 +21,16 @@ internal class AudioService(
         soundFontRepository.setSoundFont("default", soundFont)
     }
 
-    fun generateAudioData(midiMessages: List<MidiMessage>, sampleRate: Int, bpm: Int): FloatArray {
+    fun generateAudioData(midiMessages: List<MidiMessage>, sampleRate: Int): FloatArray {
         if (!isSoundFontLoaded()) {
             throw ApplicationStateException("SoundFont not loaded")
         }
 
         val holder = soundFontRepository.currentSoundFont()!!
         val soundFont = MikroSoundFont.load(holder.soundFont)
+        soundFont.setOutput(SoundFont.OutputMode.TSF_MONO, sampleRate, 1.0f)
 
-        return MidiSequencer(soundFont, sampleRate).apply {
+        return MidiSequencer(soundFont, sampleRate, 1).apply {
             loadMidiEvents(midiMessages)
         }.generate()
     }

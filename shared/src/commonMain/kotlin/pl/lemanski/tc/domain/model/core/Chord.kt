@@ -8,8 +8,9 @@ package pl.lemanski.tc.domain.model.core
 data class Chord(
     val type: Type,
     val notes: List<Note>,
-    val velocity: Int = 127,
+    val octave: Int,
 ) {
+    val velocity: Int = notes.first().velocity
     val name = "${notes.first().name}${type.notation}"
 
     enum class Type(val notation: String) {
@@ -69,6 +70,7 @@ internal fun Chord.Type.build(baseNote: Note): Chord {
 
 internal fun buildMinorTriad(baseNote: Note): Chord = Chord(
     type = Chord.Type.MINOR,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.minorThird(),
@@ -78,6 +80,7 @@ internal fun buildMinorTriad(baseNote: Note): Chord = Chord(
 
 internal fun buildMajorTriad(baseNote: Note): Chord = Chord(
     type = Chord.Type.MAJOR,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.majorThird(),
@@ -87,6 +90,7 @@ internal fun buildMajorTriad(baseNote: Note): Chord = Chord(
 
 internal fun buildDiminishedTriad(baseNote: Note): Chord = Chord(
     type = Chord.Type.DIMINISHED,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.minorThird(),
@@ -96,6 +100,7 @@ internal fun buildDiminishedTriad(baseNote: Note): Chord = Chord(
 
 internal fun buildAugmentedTriad(baseNote: Note): Chord = Chord(
     type = Chord.Type.AUGMENTED,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.majorThird(),
@@ -107,6 +112,7 @@ internal fun buildAugmentedTriad(baseNote: Note): Chord = Chord(
 
 internal fun buildMinorSixth(baseNote: Note): Chord = Chord(
     type = Chord.Type.MINOR_SIXTH,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.minorThird(),
@@ -117,6 +123,7 @@ internal fun buildMinorSixth(baseNote: Note): Chord = Chord(
 
 internal fun buildMajorSixth(baseNote: Note): Chord = Chord(
     type = Chord.Type.MAJOR_SIXTH,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.majorThird(),
@@ -129,6 +136,7 @@ internal fun buildMajorSixth(baseNote: Note): Chord = Chord(
 
 internal fun buildMinorSeventh(baseNote: Note): Chord = Chord(
     type = Chord.Type.MINOR_SEVENTH,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.minorThird(),
@@ -139,6 +147,7 @@ internal fun buildMinorSeventh(baseNote: Note): Chord = Chord(
 
 internal fun buildMajorSeventh(baseNote: Note): Chord = Chord(
     type = Chord.Type.MAJOR_SEVENTH,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.majorThird(),
@@ -149,6 +158,7 @@ internal fun buildMajorSeventh(baseNote: Note): Chord = Chord(
 
 internal fun buildDominantSeventh(baseNote: Note): Chord = Chord(
     type = Chord.Type.DOMINANT_SEVENTH,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.majorThird(),
@@ -159,6 +169,7 @@ internal fun buildDominantSeventh(baseNote: Note): Chord = Chord(
 
 internal fun buildAugmentedSeventh(baseNote: Note): Chord = Chord(
     type = Chord.Type.AUGMENTED_SEVENTH,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.majorThird(),
@@ -169,6 +180,7 @@ internal fun buildAugmentedSeventh(baseNote: Note): Chord = Chord(
 
 internal fun buildHalfDiminishedSeventh(baseNote: Note): Chord = Chord(
     type = Chord.Type.HALF_DIMINISHED_SEVENTH,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.minorThird(),
@@ -179,6 +191,7 @@ internal fun buildHalfDiminishedSeventh(baseNote: Note): Chord = Chord(
 
 internal fun buildDiminishedSeventh(baseNote: Note): Chord = Chord(
     type = Chord.Type.DIMINISHED_SEVENTH,
+    octave = baseNote.octave,
     notes = listOf(
         baseNote,
         baseNote.minorThird(),

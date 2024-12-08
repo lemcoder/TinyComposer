@@ -1,5 +1,6 @@
 package pl.lemanski.tc.domain.useCase.generateAudioUseCase
 
+import io.github.lemcoder.mikrosoundfont.midi.MidiMetaMessage
 import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import pl.lemanski.tc.domain.model.project.ChordBeats
@@ -26,10 +27,12 @@ internal class GenerateAudioUseCaseImpl(
             }
         }
 
+        val tempoMessage = MidiMetaMessage.SetTempo(0, tempo)
+
         val chordMidiMessages = try {
             listOf(
                 MidiVoiceMessage.ProgramChange(0, 0, 0),
-                *audioMapper.mapChordBeatsToMidiMessage(chordBeats, tempo).toTypedArray()
+                *audioMapper.mapChordBeatsToMidiMessage(chordBeats, tempo, 0).toTypedArray()
             )
         } catch (ex: Exception) {
             errorHandler.onInvalidChordBeats()
@@ -38,16 +41,16 @@ internal class GenerateAudioUseCaseImpl(
 
         val noteMidiMessages = try {
             listOf(
-                MidiVoiceMessage.ProgramChange(0, 0, 0),
-                *audioMapper.mapNoteBeatsToMidiMessage(noteBeats, tempo).toTypedArray()
+                MidiVoiceMessage.ProgramChange(0, 1, 8),
+                *audioMapper.mapNoteBeatsToMidiMessage(noteBeats, tempo, 1).toTypedArray()
             )
         } catch (ex: Exception) {
             errorHandler.onInvalidNoteBeats()
             return floatArrayOf()
         }
 
-        val midiMessages = (chordMidiMessages + noteMidiMessages).sortedBy { it.time }
+        val midiMessages = (listOf(tempoMessage) + chordMidiMessages + noteMidiMessages).sortedBy { it.time }
 
-        return audioService.generateAudioData(midiMessages, 44_100, tempo)
+        return audioService.generateAudioData(midiMessages, 44_100)
     }
 }

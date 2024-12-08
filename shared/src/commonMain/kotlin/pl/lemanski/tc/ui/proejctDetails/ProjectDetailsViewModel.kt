@@ -285,9 +285,7 @@ internal class ProjectDetailsViewModel(
     override fun back() {
         // FIXME run synchronously
         viewModelScope.launch {
-            updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project)?.run {
-                navigationService.back()
-            }
+            navigationService.back()
         }
     }
 
@@ -322,6 +320,7 @@ internal class ProjectDetailsViewModel(
     override fun onCleared() {
         super.onCleared()
         logger.debug("Cleared")
+        updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project)
     }
 
     //---
@@ -534,7 +533,9 @@ internal class ProjectDetailsViewModel(
         fun onVelocityValueChange(value: Int) {
             val (chord, duration) = project.chords[id]
             val newChords = project.chords.toMutableList()
-            val newChord = chord.copy(velocity = value)
+            val newChord = chord.copy(
+                notes = chord.notes.map { it.copy(velocity = value) }
+            )
 
             newChords[id] = ChordBeats(newChord, duration)
 

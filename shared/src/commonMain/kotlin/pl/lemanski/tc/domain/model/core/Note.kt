@@ -16,8 +16,10 @@ data class Note(
         }
     }
 
-    val name: String
+    val nameWithOctave: String
         get() = (noteLookupTable.note(value % 12) ?: throw InvalidNoteException("Invalid note $value")) + octave.toString()
+    val name: String
+        get() = noteLookupTable.note(value % 12) ?: throw InvalidNoteException("Invalid note $value")
     val octave: Int
         get() = value / 11
 
