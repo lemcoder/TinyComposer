@@ -59,10 +59,12 @@ internal interface I18n {
         val invalidChordBeats: String
         val invalidNoteBeats: String
         val controlStateError: String
+        val projectSaveError: String
         val chordsTab: String
         val melodyTab: String
         val duration: String
         val octave: String
+        val chordType: String
         val velocity: String
         val title: String
     }

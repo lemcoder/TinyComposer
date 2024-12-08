@@ -26,6 +26,7 @@ fun ProjectDetailsRouter() = router<ProjectDetailsContract.ViewModel, ProjectDet
         noteBeats = state.noteBeats,
         chordBeats = state.chordBeats,
         snackBar = state.snackBar,
+        projectDetailsButton = state.projectDetailsButton,
         bottomSheet = state.bottomSheet,
     )
 }

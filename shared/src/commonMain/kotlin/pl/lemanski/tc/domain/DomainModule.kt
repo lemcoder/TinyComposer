@@ -18,6 +18,8 @@ import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCase
 import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCaseImpl
 import pl.lemanski.tc.domain.useCase.playbackControlUseCase.PlaybackControlUseCase
 import pl.lemanski.tc.domain.useCase.playbackControlUseCase.PlaybackControlUseCaseImpl
+import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
+import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCaseImpl
 
 internal object DomainModule {
     fun provide() = module {
@@ -33,5 +35,6 @@ internal object DomainModule {
         singleOf(::GenerateAudioUseCaseImpl) bind GenerateAudioUseCase::class
         singleOf(::GetProjectUseCaseImpl) bind GetProjectUseCase::class
         singleOf(::PlaybackControlUseCaseImpl) bind PlaybackControlUseCase::class
+        singleOf(::UpdateProjectUseCaseImpl) bind UpdateProjectUseCase::class
     }
 }

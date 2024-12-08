@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -18,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import pl.lemanski.tc.ui.common.composables.MultiRowLayout
@@ -40,6 +41,7 @@ internal fun MelodyTab(
 private fun NoteBeatsComponent.NoteBeatItem(
     itemWidth: Dp
 ) {
+    val haptic = LocalHapticFeedback.current
     val (note, beats) = noteBeats
     val color = remember(note.value) {
         Color(
@@ -60,7 +62,10 @@ private fun NoteBeatsComponent.NoteBeatItem(
             .combinedClickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onLongClick = { onNoteLongClick(id) },
+                onLongClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onNoteLongClick(id)
+                },
                 onDoubleClick = { onNoteDoubleClick(id) },
             ) {
                 onNoteClick(id)

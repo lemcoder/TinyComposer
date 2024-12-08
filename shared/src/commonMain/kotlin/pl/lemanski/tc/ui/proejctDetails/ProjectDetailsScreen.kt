@@ -43,6 +43,7 @@ internal fun ProjectDetailsScreen(
     backButton: StateComponent.Button,
     addButton: StateComponent.Button,
     aiGenerateButton: StateComponent.Button,
+    projectDetailsButton: StateComponent.Button,
     noteBeats: List<ProjectDetailsContract.State.NoteBeatsComponent>,
     chordBeats: List<ProjectDetailsContract.State.ChordBeatsComponent>,
     wheelPicker: ProjectDetailsContract.State.WheelPicker?,
@@ -75,7 +76,7 @@ internal fun ProjectDetailsScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
-                    onClick = { }, // TODO go to project details
+                    onClick = projectDetailsButton.onClick,
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.List,

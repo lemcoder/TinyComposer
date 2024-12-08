@@ -1,6 +1,7 @@
 package pl.lemanski.tc.ui.proejctDetails
 
 import kotlinx.coroutines.Job
+import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.model.project.NoteBeats
 import pl.lemanski.tc.ui.common.StateComponent
@@ -21,6 +22,7 @@ internal interface ProjectDetailsContract {
         abstract fun onTabSelected(tab: Tab)
         abstract fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?)
         abstract fun hideSnackBar()
+        abstract fun onProjectOptionsButtonClicked()
         abstract fun onBeatComponentClick(id: Int)
         abstract fun onBeatComponentLongClick(id: Int)
         abstract fun onBeatComponentDoubleClick(id: Int)
@@ -35,6 +37,7 @@ internal interface ProjectDetailsContract {
         val stopButton: StateComponent.Button?,
         val backButton: StateComponent.Button,
         val addButton: StateComponent.Button,
+        val projectDetailsButton: StateComponent.Button,
         val aiGenerateButton: StateComponent.Button,
         val wheelPicker: WheelPicker?,
         val noteBeats: List<NoteBeatsComponent>,
@@ -76,6 +79,9 @@ internal interface ProjectDetailsContract {
             data class ChordBottomSheet(
                 val chordBeatId: Int,
                 val durationValuePicker: StateComponent.ValuePicker,
+                val chordTypeSelect: StateComponent.SelectInput<Chord.Type>,
+                val octaveValuePicker: StateComponent.ValuePicker,
+                val velocityValuePicker: StateComponent.ValuePicker,
                 val onDismiss: () -> Unit
             ) : BottomSheet
         }

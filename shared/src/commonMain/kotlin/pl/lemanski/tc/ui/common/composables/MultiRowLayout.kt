@@ -43,20 +43,20 @@ fun MultiRowLayout(
                     subPlaceable.placeRelative(x = xPosition, y = yPoint)
                     remainder -= subPlaceable.width
 
-                    do {
-                        xPosition = 0
+                    xPosition = 0 // place in new line
+
+                    while (remainder >= constraints.maxWidth) {
                         yPoint += maxHeight + verticalSpacing.roundToPx()
                         val remainderPlaceable = subcompose(UUID.random(), content)[index].measure(constraints.copy(maxWidth = minOf(remainder, constraints.maxWidth)))
                         remainderPlaceable.placeRelative(x = xPosition, y = yPoint)
                         remainder -= remainderPlaceable.width
-                    } while (remainder >= constraints.maxWidth)
+                    }
 
                     if (remainder > 0) {
-                        xPosition = 0
                         yPoint += maxHeight + verticalSpacing.roundToPx()
                         val remainderPlaceable = subcompose(UUID.random(), content)[index].measure(constraints.copy(maxWidth = minOf(remainder, constraints.maxWidth)))
                         remainderPlaceable.placeRelative(x = xPosition, y = yPoint)
-                        xPosition += remainderPlaceable.width
+                        xPosition += remainder
                     }
 
                     return@forEachIndexed

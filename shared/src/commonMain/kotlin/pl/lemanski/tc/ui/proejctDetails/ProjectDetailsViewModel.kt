@@ -13,6 +13,7 @@ import pl.lemanski.tc.domain.model.core.build
 import pl.lemanski.tc.domain.model.core.changeOctave
 import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
 import pl.lemanski.tc.domain.model.project.ChordBeats
 import pl.lemanski.tc.domain.model.project.NoteBeats
 import pl.lemanski.tc.domain.service.navigation.NavigationService
@@ -21,6 +22,7 @@ import pl.lemanski.tc.domain.service.navigation.goTo
 import pl.lemanski.tc.domain.useCase.generateAudioUseCase.GenerateAudioUseCase
 import pl.lemanski.tc.domain.useCase.getProject.GetProjectUseCase
 import pl.lemanski.tc.domain.useCase.playbackControlUseCase.PlaybackControlUseCase
+import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
@@ -32,11 +34,13 @@ internal class ProjectDetailsViewModel(
     private val i18n: I18n,
     private val navigationService: NavigationService,
     private val getProjectUseCase: GetProjectUseCase,
+    private val updateProjectUseCase: UpdateProjectUseCase,
     private val playbackControlUseCase: PlaybackControlUseCase,
     private val generateAudioUseCase: GenerateAudioUseCase
 ) : ProjectDetailsContract.ViewModel() {
 
     private val logger = Logger(this::class)
+    private var playbackJob: Job? = null
     private var project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
     private val initialState = ProjectDetailsContract.State(
         isLoading = true,
@@ -60,13 +64,17 @@ internal class ProjectDetailsViewModel(
             text = "",
             onClick = ::onAddButtonClicked
         ),
-        noteBeats = listOf(),
-        chordBeats = listOf(),
+        noteBeats = project.melody.mapIndexed { index, note -> note.toNoteBeatsComponent(index) },
+        chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
         bottomSheet = null,
         tabComponent = StateComponent.TabComponent(
             selected = tabToOption(ProjectDetailsContract.Tab.CHORDS),
             options = ProjectDetailsContract.Tab.entries.map { tabToOption(it) }.toSet(),
             onTabSelected = ::onTabSelected
+        ),
+        projectDetailsButton = StateComponent.Button(
+            text = "",
+            onClick = ::onProjectOptionsButtonClicked
         ),
     )
 
@@ -99,11 +107,22 @@ internal class ProjectDetailsViewModel(
         }
 
         val audioData = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, project.melody, project.bpm)
-        playbackControlUseCase.play(PlaybackControlErrorHandler(), audioData)
+        playbackJob = launch { playbackControlUseCase.play(PlaybackControlErrorHandler(), audioData) }
+        playbackJob?.invokeOnCompletion {
+            _stateFlow.update {
+                it.copy(
+                    playButton = StateComponent.Button(
+                        text = "",
+                        onClick = ::onPlayButtonClicked
+                    ),
+                    stopButton = null
+                )
+            }
+        }
     }
 
     override fun onStopButtonClicked(): Job = viewModelScope.launch {
-        playbackControlUseCase.stop(PlaybackControlErrorHandler())
+        playbackJob?.cancel()
 
         _stateFlow.update {
             it.copy(
@@ -115,7 +134,10 @@ internal class ProjectDetailsViewModel(
 
     override fun onAiGenerateButtonClicked() {
         viewModelScope.launch { // FIXME run synchronously
-            navigationService.goTo(ProjectAiGenerateDestination(key.projectId))
+
+            updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project)?.run {
+                navigationService.goTo(ProjectAiGenerateDestination(key.projectId))
+            }
         }
     }
 
@@ -263,7 +285,9 @@ internal class ProjectDetailsViewModel(
     override fun back() {
         // FIXME run synchronously
         viewModelScope.launch {
-            navigationService.back()
+            updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project)?.run {
+                navigationService.back()
+            }
         }
     }
 
@@ -284,6 +308,14 @@ internal class ProjectDetailsViewModel(
             state.copy(
                 snackBar = null
             )
+        }
+    }
+
+    override fun onProjectOptionsButtonClicked() {
+        viewModelScope.launch {
+            updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project)?.run {
+                navigationService.goTo(ProjectOptionsDestination(project.id))
+            }
         }
     }
 
@@ -361,11 +393,33 @@ internal class ProjectDetailsViewModel(
         }
     }
 
+    inner class UpdateProjectUseCaseErrorHandler : UpdateProjectUseCase.ErrorHandler {
+        override fun onInvalidProjectName() {
+            // Will not happen
+        }
+
+        override fun onInvalidProjectBpm() {
+            // Will not happen
+        }
+
+        override fun onProjectSaveError() {
+            showSnackBar(i18n.projectDetails.projectSaveError, null, null)
+        }
+
+    }
+
     //---
 
     inner class ChordBeatsBottomSheetStateHelper(
         private val id: Int,
     ) {
+        private val chordTypeOptions = Chord.Type.entries.map { chordType ->
+            StateComponent.SelectInput.Option(
+                name = chordType.name,
+                value = chordType
+            )
+        }.toSet()
+
         private val chordBeats = project.chords[id]
         val initialState = ProjectDetailsContract.State.BottomSheet.ChordBottomSheet(
             chordBeatId = id,
@@ -374,8 +428,23 @@ internal class ProjectDetailsViewModel(
                 value = chordBeats.second,
                 onValueChange = ::onDurationValueChange
             ),
-            onDismiss = ::onDismiss
-            // TODO add velocity
+            onDismiss = ::onDismiss,
+            chordTypeSelect = StateComponent.SelectInput(
+                selected = chordTypeOptions.find { it.value == chordBeats.first.type } ?: chordTypeOptions.first(),
+                label = i18n.projectDetails.chordType,
+                onSelected = ::onChordTypeSelected,
+                options = chordTypeOptions
+            ),
+            octaveValuePicker = StateComponent.ValuePicker(
+                label = i18n.projectDetails.octave,
+                value = chordBeats.first.notes.first().octave,
+                onValueChange = ::onOctaveValueChange
+            ),
+            velocityValuePicker = StateComponent.ValuePicker(
+                label = i18n.projectDetails.velocity,
+                value = chordBeats.first.velocity,
+                onValueChange = ::onVelocityValueChange
+            )
         )
 
         private fun onDismiss() {
@@ -399,17 +468,85 @@ internal class ProjectDetailsViewModel(
 
             _stateFlow.update { state ->
                 state.copy(
-                    chordBeats = state.chordBeats.map { chordBeatsComponent ->
-                        if (chordBeatsComponent.id == id) {
-                            chordBeatsComponent.copy(
-                                chordBeats = ChordBeats(chord, value)
-                            )
-                        } else {
-                            chordBeatsComponent
-                        }
-                    },
+                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
                     bottomSheet = (state.bottomSheet as ProjectDetailsContract.State.BottomSheet.ChordBottomSheet).copy(
                         durationValuePicker = state.bottomSheet.durationValuePicker.copy(
+                            value = value
+                        )
+                    )
+                )
+            }
+        }
+
+        fun onChordTypeSelected(chordTypeOption: StateComponent.SelectInput.Option<Chord.Type>) {
+            val chordType = chordTypeOption.value
+            val (chord, duration) = project.chords[id]
+            val newChords = project.chords.toMutableList()
+            val newChord = ChordBeats(chordType.build(chord.notes.first()), duration)
+
+            newChords[id] = newChord
+
+            project = project.copy(
+                chords = newChords
+            )
+
+            _stateFlow.update { state ->
+                state.copy(
+                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
+                    bottomSheet = (state.bottomSheet as ProjectDetailsContract.State.BottomSheet.ChordBottomSheet).copy(
+                        chordTypeSelect = state.bottomSheet.chordTypeSelect.copy(
+                            selected = chordTypeOptions.find { it.value == chordType } ?: chordTypeOptions.first()
+                        )
+                    )
+                )
+            }
+        }
+
+        fun onOctaveValueChange(value: Int) {
+            if (value !in 1..8) {
+                return
+            }
+
+            val (chord, duration) = project.chords[id]
+            val sign = if (value > chord.notes.first().octave) 1 else -1
+            val delta = abs(value - chord.notes.first().octave) * sign
+            val newChord = chord.copy(notes = chord.notes.map { it.changeOctave(delta) })
+
+            val newChords = project.chords.toMutableList()
+            newChords[id] = ChordBeats(newChord, duration)
+
+            project = project.copy(
+                chords = newChords
+            )
+
+            _stateFlow.update { state ->
+                state.copy(
+                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
+                    bottomSheet = (state.bottomSheet as ProjectDetailsContract.State.BottomSheet.ChordBottomSheet).copy(
+                        octaveValuePicker = state.bottomSheet.octaveValuePicker.copy(
+                            value = value
+                        )
+                    )
+                )
+            }
+        }
+
+        fun onVelocityValueChange(value: Int) {
+            val (chord, duration) = project.chords[id]
+            val newChords = project.chords.toMutableList()
+            val newChord = chord.copy(velocity = value)
+
+            newChords[id] = ChordBeats(newChord, duration)
+
+            project = project.copy(
+                chords = newChords
+            )
+
+            _stateFlow.update { state ->
+                state.copy(
+                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
+                    bottomSheet = (state.bottomSheet as ProjectDetailsContract.State.BottomSheet.ChordBottomSheet).copy(
+                        velocityValuePicker = state.bottomSheet.velocityValuePicker.copy(
                             value = value
                         )
                     )
@@ -451,6 +588,10 @@ internal class ProjectDetailsViewModel(
         }
 
         fun onOctaveValueChange(value: Int) {
+            if (value !in 1..8) {
+                return
+            }
+
             val (note, duration) = project.melody[id]
             val sign = if (value > note.octave) 1 else -1
             val delta = abs(value - note.octave) * sign

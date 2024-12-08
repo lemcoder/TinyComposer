@@ -7,7 +7,8 @@ package pl.lemanski.tc.domain.model.core
 
 data class Chord(
     val type: Type,
-    val notes: List<Note>
+    val notes: List<Note>,
+    val velocity: Int = 127,
 ) {
     val name = "${notes.first().name}${type.notation}"
 
