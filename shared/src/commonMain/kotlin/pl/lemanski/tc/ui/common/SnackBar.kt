@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 
 @Composable
-fun StateComponent.SnackBar?.ToComposable(
+internal fun StateComponent.SnackBar?.ToComposable(
     snackBarState: SnackbarHostState,
 ) {
     LaunchedEffect(this) {

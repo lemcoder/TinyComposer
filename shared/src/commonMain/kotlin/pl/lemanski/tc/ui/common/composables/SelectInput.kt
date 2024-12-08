@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import pl.lemanski.tc.ui.common.StateComponent
 
 @Composable
-fun <T> StateComponent.SelectInput<T>.ToComposable() {
+internal fun <T> StateComponent.SelectInput<T>.ToComposable() {
     var expanded by remember { mutableStateOf(false) }
 
     Box {
@@ -44,7 +44,7 @@ fun <T> StateComponent.SelectInput<T>.ToComposable() {
                     disabledSupportingTextColor = if (expanded) colors.focusedSupportingTextColor else colors.unfocusedSupportingTextColor,
                 ),
                 onValueChange = { },
-                label = { Text(hint) },
+                label = { Text(label) },
             )
         }
 

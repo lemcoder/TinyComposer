@@ -12,7 +12,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import pl.lemanski.tc.ui.common.StateComponent
 
 @Composable
-fun StateComponent.Input.ToComposable() {
+internal fun StateComponent.Input.ToComposable() {
     when (type) {
         StateComponent.Input.Type.NUMBER -> {
             Column(

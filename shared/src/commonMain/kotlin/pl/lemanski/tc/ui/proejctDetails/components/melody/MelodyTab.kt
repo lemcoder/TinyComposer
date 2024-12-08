@@ -40,13 +40,13 @@ internal fun MelodyTab(
 private fun NoteBeatsComponent.NoteBeatItem(
     itemWidth: Dp
 ) {
-    val (note, beats) = remember { noteBeats }
+    val (note, beats) = noteBeats
     val color = remember(note.value) {
         Color(
             red = 0f,
             green = (id.toFloat() / 20).coerceIn(0f, 1f),
-            blue = (id.toFloat() / 10).coerceIn(0f, 1f),
-            alpha = (id.toFloat() / 10).coerceIn(0f, 1f)
+            blue = 1f,
+            alpha = (id.toFloat() / 100).coerceIn(.1f, 1f)
         )
     }
 

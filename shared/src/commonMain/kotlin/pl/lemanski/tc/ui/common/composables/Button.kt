@@ -35,7 +35,7 @@ import pl.lemanski.tc.ui.common.StateComponent
  * This button acts on press.
  */
 @Composable
-fun StateComponent.Button.ToComposable() = Button(onClick = onClick) {
+internal fun StateComponent.Button.ToComposable() = Button(onClick = onClick) {
     Text(text = text)
 }
 
@@ -43,7 +43,7 @@ fun StateComponent.Button.ToComposable() = Button(onClick = onClick) {
  * This button acts on press.
  */
 @Composable
-fun StateComponent.Button.ToComposableActingOnPress() {
+internal fun StateComponent.Button.ToComposableActingOnPress() {
     val absoluteElevation = LocalAbsoluteTonalElevation.current + 0.dp
     CompositionLocalProvider(
         LocalContentColor provides MaterialTheme.colorScheme.surface,

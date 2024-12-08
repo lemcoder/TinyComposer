@@ -98,6 +98,9 @@ internal class I18nImpl : I18n {
         override val controlStateError: String = " control state error"
         override val chordsTab: String = "Chords"
         override val melodyTab: String = "Melody"
+        override val duration: String = "duration"
+        override val octave: String = "octave"
+        override val velocity: String = "velocity"
         override val title: String = " Project details"
     }
 }

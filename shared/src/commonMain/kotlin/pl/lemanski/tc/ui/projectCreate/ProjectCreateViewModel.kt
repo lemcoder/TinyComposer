@@ -43,7 +43,7 @@ internal class ProjectCreateViewModel(
         projectRhythm = StateComponent.SelectInput(
             selected = rhythmToInputOption(Rhythm.FOUR_FOURS),
             onSelected = ::onProjectRhythmSelectChange,
-            hint = i18n.projectCreate.projectRhythm,
+            label = i18n.projectCreate.projectRhythm,
             options = Rhythm.entries.map(::rhythmToInputOption).toSet()
         ),
         createProjectButton = StateComponent.Button(

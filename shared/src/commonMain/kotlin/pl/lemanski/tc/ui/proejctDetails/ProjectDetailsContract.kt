@@ -21,6 +21,9 @@ internal interface ProjectDetailsContract {
         abstract fun onTabSelected(tab: Tab)
         abstract fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?)
         abstract fun hideSnackBar()
+        abstract fun onBeatComponentClick(id: Int)
+        abstract fun onBeatComponentLongClick(id: Int)
+        abstract fun onBeatComponentDoubleClick(id: Int)
         abstract fun back()
     }
 
@@ -36,6 +39,7 @@ internal interface ProjectDetailsContract {
         val wheelPicker: WheelPicker?,
         val noteBeats: List<NoteBeatsComponent>,
         val chordBeats: List<ChordBeatsComponent>,
+        val bottomSheet: BottomSheet?,
         val snackBar: StateComponent.SnackBar?,
     ) {
         data class WheelPicker(
@@ -63,14 +67,16 @@ internal interface ProjectDetailsContract {
         sealed interface BottomSheet {
             data class NoteBottomSheet(
                 val noteBeatId: Int,
+                val octaveValuePicker: StateComponent.ValuePicker,
                 val durationValuePicker: StateComponent.ValuePicker,
                 val velocityValuePicker: StateComponent.ValuePicker,
+                val onDismiss: () -> Unit
             ) : BottomSheet
 
             data class ChordBottomSheet(
                 val chordBeatId: Int,
                 val durationValuePicker: StateComponent.ValuePicker,
-                val velocityValuePicker: StateComponent.ValuePicker,
+                val onDismiss: () -> Unit
             ) : BottomSheet
         }
     }

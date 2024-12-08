@@ -61,6 +61,9 @@ internal interface I18n {
         val controlStateError: String
         val chordsTab: String
         val melodyTab: String
+        val duration: String
+        val octave: String
+        val velocity: String
         val title: String
     }
 }

@@ -1,6 +1,6 @@
 package pl.lemanski.tc.ui.common
 
-sealed class StateComponent {
+internal sealed class StateComponent {
     data class Button(
         val text: String,
         val onClick: () -> Unit
@@ -21,7 +21,7 @@ sealed class StateComponent {
 
     data class SelectInput<T>(
         val selected: Option<T>,
-        val hint: String,
+        val label: String,
         val onSelected: (Option<T>) -> Unit,
         val options: Set<Option<T>>
     ) {
@@ -38,6 +38,7 @@ sealed class StateComponent {
     ) : StateComponent()
 
     data class ValuePicker(
+        val label: String,
         val value: Int,
         val onValueChange: (Int) -> Unit
     ) : StateComponent()

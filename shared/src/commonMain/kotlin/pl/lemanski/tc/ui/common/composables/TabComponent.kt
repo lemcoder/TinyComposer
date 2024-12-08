@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import pl.lemanski.tc.ui.common.StateComponent
 
 @Composable
-fun <T> StateComponent.TabComponent<T>.ToComposable() {
+internal fun <T> StateComponent.TabComponent<T>.ToComposable() {
     TabRow(
         selectedTabIndex = options.indexOf(selected),
         modifier = Modifier.fillMaxWidth(),

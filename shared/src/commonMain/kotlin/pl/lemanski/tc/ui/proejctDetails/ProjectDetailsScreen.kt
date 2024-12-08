@@ -28,8 +28,10 @@ import pl.lemanski.tc.ui.common.composables.ToComposable
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.Tab
 import pl.lemanski.tc.ui.proejctDetails.components.BottomBar
 import pl.lemanski.tc.ui.proejctDetails.components.Wheel
+import pl.lemanski.tc.ui.proejctDetails.components.chords.ChordDetailsBottomSheet
 import pl.lemanski.tc.ui.proejctDetails.components.chords.ChordsTab
 import pl.lemanski.tc.ui.proejctDetails.components.melody.MelodyTab
+import pl.lemanski.tc.ui.proejctDetails.components.melody.NoteDetailsBottomSheet
 
 @Composable
 internal fun ProjectDetailsScreen(
@@ -44,6 +46,7 @@ internal fun ProjectDetailsScreen(
     noteBeats: List<ProjectDetailsContract.State.NoteBeatsComponent>,
     chordBeats: List<ProjectDetailsContract.State.ChordBeatsComponent>,
     wheelPicker: ProjectDetailsContract.State.WheelPicker?,
+    bottomSheet: ProjectDetailsContract.State.BottomSheet?,
     snackBar: StateComponent.SnackBar?,
 ) {
     LoaderScaffold(isLoading) { snackbarHostState ->
@@ -115,11 +118,12 @@ internal fun ProjectDetailsScreen(
 
         snackBar?.ToComposable(snackbarHostState)
     }
+
+    bottomSheet?.let {
+        when (it) {
+            is ProjectDetailsContract.State.BottomSheet.NoteBottomSheet  -> NoteDetailsBottomSheet(it)
+            is ProjectDetailsContract.State.BottomSheet.ChordBottomSheet -> ChordDetailsBottomSheet(it)
+        }
+    }
 }
 
-//    bottomSheet?.let {
-//        when (it) {
-//            is ProjectDetailsContract.State.BottomSheet.NoteBottomSheet  ->
-//            is ProjectDetailsContract.State.BottomSheet.ChordBottomSheet ->
-//        }
-//    }

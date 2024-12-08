@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import pl.lemanski.tc.ui.common.StateComponent
 
 @Composable
-fun BottomBar(
+internal fun BottomBar(
     playButton: StateComponent.Button?,
     pauseButton: StateComponent.Button?,
     addButton: StateComponent.Button,

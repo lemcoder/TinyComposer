@@ -6,7 +6,10 @@ import pl.lemanski.tc.utils.exception.InvalidNoteException
  * Represents a note in a musical context.
  * A note can have a value of 0-127, where 0 is the lowest and 127 is the highest.
  */
-class Note(val value: Int) {
+data class Note(
+    val value: Int,
+    val velocity: Int = 127,
+) {
     init {
         if (value !in 0..127) {
             throw InvalidNoteException("Note value must be between 0 and 127")
@@ -53,6 +56,10 @@ class Note(val value: Int) {
         // TODO add flats notation
         fun note(value: Int): String? = notes.getOrNull(value)
     }
+}
+
+internal fun Note.changeOctave(newOctave: Int): Note {
+    return Note(this.value + (newOctave * 12))
 }
 
 //--- Flats and sharps
