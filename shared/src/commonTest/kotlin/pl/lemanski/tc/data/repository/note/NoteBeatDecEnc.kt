@@ -10,7 +10,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class NoteBeatDecEncTest {
-
+    // FIXME tests not checking velocity
     @Test
     fun testEncodeToString() {
         val noteBeatsList = listOf(

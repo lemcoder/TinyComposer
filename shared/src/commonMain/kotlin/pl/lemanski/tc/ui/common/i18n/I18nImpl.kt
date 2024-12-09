@@ -45,6 +45,7 @@ internal class I18nImpl : I18n {
     override val welcome: I18n.Welcome by lazy { Welcome() }
     override val rhythm: I18n.Rhythm by lazy { Rhythm() }
     override val projectOptions: I18n.ProjectOptions by lazy { ProjectOptions() }
+    override val projectAiGenerate: I18n.ProjectAiGenerate by lazy { ProjectAiGenerate() }
 
     private inner class Welcome : I18n.Welcome {
         override val title: String = stringResourceBlocking(Res.string.welcome_title)
@@ -114,5 +115,17 @@ internal class I18nImpl : I18n {
         override val tempo: String = "Tempo"
         override val tempoError: String = "Bad tempo"
         override val saveError: String = "Save error"
+    }
+
+    private inner class ProjectAiGenerate : I18n.ProjectAiGenerate {
+        override val unknownError: String = "unknownError"
+        override val networkError: String = "networkError"
+        override val parsingError: String = "parsingError"
+        override val promptHint: String = "Prompt hint"
+        override val promptOptions: String = "Prompt options"
+        override val promptOptionChordsForMelody: String = "promptOptionChordsForMelody"
+        override val promptOptionMelodyForChords: String = "promptOptionMelodyForChords"
+        override val promptOptionChords: String = "promptOptionChords"
+        override val promptOptionMelody: String = "promptOptionMelody"
     }
 }

@@ -11,6 +11,6 @@ internal fun String.tryDecodeNoteBeats(): List<NoteBeats> = when {
     else      -> split(SEPARATOR).map {
         val (noteAndVelocity, beat) = it.split(BEAT_DELIMITER)
         val (note, velocity) = noteAndVelocity.split(VELOCITY_DELIMITER)
-        NoteBeats(Note(note.toInt()), beat.toInt())
+        NoteBeats(Note(note.toInt(), velocity.toInt()), beat.toInt())
     }
 }

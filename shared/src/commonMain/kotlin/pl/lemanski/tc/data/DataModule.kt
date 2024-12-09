@@ -1,5 +1,6 @@
 package pl.lemanski.tc.data
 
+import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -27,7 +28,7 @@ object DataModule {
         singleOf(::ChordRepositoryImpl) bind ChordRepository::class
         singleOf(::SoundFontRepositoryImpl) bind SoundFontRepository::class
         singleOf(::GeminiClient) bind GenAiClient::class
-        singleOf(::GenAiRepositoryImpl) bind GenAiRepository::class
         singleOf(::PresetRepositoryImpl) bind PresetRepository::class
+        single<GenAiRepository> { GenAiRepositoryImpl(get(), Dispatchers.IO) }
     }
 }

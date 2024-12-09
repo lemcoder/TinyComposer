@@ -19,6 +19,18 @@ internal sealed class StateComponent {
         }
     }
 
+    data class RadioGroup<T>(
+        val selected: Option<T>,
+        val label: String,
+        val onSelected: (Option<T>) -> Unit,
+        val options: Set<Option<T>>
+    ) {
+        data class Option<T>(
+            val name: String,
+            val value: T
+        )
+    }
+
     data class SelectInput<T>(
         val selected: Option<T>,
         val label: String,

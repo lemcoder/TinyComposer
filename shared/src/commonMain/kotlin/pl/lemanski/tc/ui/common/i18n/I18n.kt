@@ -8,6 +8,7 @@ internal interface I18n {
     val projectDetails: ProjectDetails
     val rhythm: Rhythm
     val projectOptions: ProjectOptions
+    val projectAiGenerate: ProjectAiGenerate
 
     interface Common {
         val ok: String
@@ -77,5 +78,17 @@ internal interface I18n {
         val export: String
         val melodyPreset: String
         val chordsPreset: String
+    }
+    
+    interface ProjectAiGenerate {
+        val unknownError: String
+        val networkError: String
+        val parsingError: String
+        val promptHint: String
+        val promptOptions: String
+        val promptOptionChordsForMelody: String
+        val promptOptionMelodyForChords: String
+        val promptOptionChords: String
+        val promptOptionMelody: String
     }
 }

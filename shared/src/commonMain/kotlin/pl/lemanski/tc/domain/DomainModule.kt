@@ -6,6 +6,8 @@ import org.koin.dsl.module
 import pl.lemanski.tc.domain.service.audio.AudioMapper
 import pl.lemanski.tc.domain.service.audio.AudioService
 import pl.lemanski.tc.domain.service.navigation.NavigationService
+import pl.lemanski.tc.domain.useCase.aiGenerate.AiGenerateUseCase
+import pl.lemanski.tc.domain.useCase.aiGenerate.AiGenerateUseCaseImpl
 import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCase
 import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCaseImpl
 import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCase
@@ -41,5 +43,6 @@ internal object DomainModule {
         singleOf(::UpdateProjectUseCaseImpl) bind UpdateProjectUseCase::class
         singleOf(::GetSoundFontPresetsUseCaseImpl) bind GetSoundFontPresetsUseCase::class
         singleOf(::PresetsControlUseCaseImpl) bind PresetsControlUseCase::class
+        singleOf(::AiGenerateUseCaseImpl) bind AiGenerateUseCase::class
     }
 }

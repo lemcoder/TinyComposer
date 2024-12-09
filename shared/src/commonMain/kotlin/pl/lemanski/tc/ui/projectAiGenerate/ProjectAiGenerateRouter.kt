@@ -14,10 +14,12 @@ fun ProjectAiGenerateRouter() = router<ProjectAiGenerateContract.ViewModel, Proj
 
     ProjectAiGenerateScreen(
         isLoading = state.isLoading,
-        backButton = state.backButton,
-        snackBar = state.snackBar,
-        text = state.text,
+        title = state.title,
+        promptOptions = state.promptOptions,
         promptInput = state.promptInput,
-        submitButton = state.submitButton
+        submitButton = state.submitButton,
+        backButton = state.backButton,
+        text = state.text,
+        snackBar = state.snackBar,
     )
 }
