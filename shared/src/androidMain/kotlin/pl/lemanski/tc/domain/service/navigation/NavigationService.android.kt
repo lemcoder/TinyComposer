@@ -1,9 +1,8 @@
 package pl.lemanski.tc.domain.service.navigation
 
-import kotlinx.coroutines.withContext
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
 
-actual suspend fun NavigationService.back(): Boolean = withContext(dispatcher) {
+actual fun NavigationService.back(): Boolean {
     logger.debug("Back")
     var result = true
 
@@ -15,13 +14,14 @@ actual suspend fun NavigationService.back(): Boolean = withContext(dispatcher) {
         }
 
         val newHistory = history.toMutableList()
-        val removed = newHistory.removeAt(newHistory.size - 1)
+        val removed = newHistory.removeAt(newHistory.lastIndex)
         removed.viewModelStore.clear()
+
         newHistory.toSet()
     }
 
     if (!result) {
-        return@withContext result
+        return false
     }
 
     val newHistory = history()
@@ -33,5 +33,5 @@ actual suspend fun NavigationService.back(): Boolean = withContext(dispatcher) {
         )
     )
 
-    return@withContext result
+    return result
 }

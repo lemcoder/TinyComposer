@@ -1,14 +1,10 @@
 package pl.lemanski.tc.domain.service.navigation
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
-import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.utils.Logger
 
 /**
@@ -16,53 +12,35 @@ import pl.lemanski.tc.utils.Logger
  * This implementation is based on single callback so it is easy to apply to platform navigation
  * on each supported platform
  */
-class NavigationService(
-    val dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate
-) {
-    // TODO logger should be injected (maybe use context receiver here?)
+class NavigationService {
     internal val logger = Logger(this::class)
-
-    private val listenerMut: Mutex = Mutex()
     private var listener: OnNavigateListener? = null
-
-    private val historyMut: Mutex = Mutex()
-    private var history: Set<Destination> = setOf(WelcomeDestination)
+    private var history: Set<Destination> = setOf(ProjectListDestination)
 
     fun setOnNavigateListener(listener: OnNavigateListener?) = runBlocking {
         logger.debug("Set on navigate listener")
-
-        listenerMut.withLock {
-            this@NavigationService.listener = listener
-        }
+        this@NavigationService.listener = listener
     }
 
-    internal fun getOnNavigateListener(): OnNavigateListener? = runBlocking {
+    internal fun getOnNavigateListener(): OnNavigateListener? {
         logger.info("Get on navigate listener")
-
-        return@runBlocking listenerMut.withLock {
-            listener
-        }
+        return listener
     }
 
-    internal suspend fun updateHistory(reducer: (Set<Destination>) -> Set<Destination>) {
+    internal fun updateHistory(reducer: (Set<Destination>) -> Set<Destination>) {
         val newHistory = reducer(history)
         logger.debug("Update history with:\n${newHistory.joinToString(separator = "\n") { it.toString() }}")
 
-        historyMut.withLock {
-            history = newHistory
-        }
+        history = newHistory
     }
 
-    internal suspend fun history(): Set<Destination> {
+    internal fun history(): Set<Destination> {
         logger.info("History")
-
-        return historyMut.withLock {
-            history
-        }
+        return history.toSet() // Return copy of history
     }
 }
 
-suspend fun NavigationService.goTo(destination: Destination) = withContext(dispatcher) {
+fun NavigationService.goTo(destination: Destination) {
     logger.debug("Go to: $destination")
 
     updateHistory { history ->
@@ -79,38 +57,4 @@ suspend fun NavigationService.goTo(destination: Destination) = withContext(dispa
     )
 }
 
-suspend fun NavigationService.replace(destination: Destination) = withContext(dispatcher) {
-    logger.debug("Replace with: $destination")
-
-    updateHistory { history ->
-        val newHistory = history.toMutableList()
-        newHistory.removeAt(newHistory.size - 1)
-        newHistory.add(destination)
-        newHistory.toSet()
-    }
-
-    getOnNavigateListener()?.onNavigate(
-        NavigationEvent(
-            destination = history().last(),
-            direction = NavigationEvent.Direction.FORWARD
-        )
-    )
-}
-
-suspend fun NavigationService.replaceAll(destination: Destination) = withContext(dispatcher) {
-    logger.debug("Replace all with: $destination")
-
-    updateHistory { _ ->
-        val newHistory = setOf(destination)
-        newHistory
-    }
-
-    getOnNavigateListener()?.onNavigate(
-        NavigationEvent(
-            destination = history().last(),
-            direction = NavigationEvent.Direction.FORWARD
-        )
-    )
-}
-
-expect suspend fun NavigationService.back(): Boolean
+expect fun NavigationService.back(): Boolean

@@ -55,7 +55,8 @@ internal class GenAiRepositoryImpl(
     override suspend fun generateMelody(prompt: String): List<NoteBeats> = withContext(dispatcher) {
         val context = """
             You a music composer. You composing song.
-            Provide melody. The notes are in the format of 52V60:2;44V70:4.
+            Provide melody. The notes are in the format of 
+            52V60:2;44V70:4
             The first number is the MIDI note, the second is the velocity.
             The third is the number of beats that note should last. Return the note in the same format no newlines or spaces.
             Do not put trailing ; at the end of the string.

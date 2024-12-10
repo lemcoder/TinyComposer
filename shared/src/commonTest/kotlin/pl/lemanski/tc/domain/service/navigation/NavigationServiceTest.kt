@@ -1,13 +1,12 @@
 package pl.lemanski.tc.domain.service.navigation
 
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import pl.lemanski.tc.domain.model.navigation.Destination
-import pl.lemanski.tc.domain.model.navigation.NavigationEvent
+import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
-import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
 import pl.lemanski.tc.ui.common.key
+import pl.lemanski.tc.utils.UUID
 import pl.lemanski.tc.utils.exception.NavigationStateException
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -22,7 +21,7 @@ class NavigationServiceTest {
     private var mockListener: OnNavigateListener = OnNavigateListener { callCounter++ }
 
     private val TestScope.navigationService: NavigationService
-        get() = NavigationService(StandardTestDispatcher(testScheduler)).apply {
+        get() = NavigationService().apply {
             setOnNavigateListener(mockListener)
         }
 
@@ -34,7 +33,7 @@ class NavigationServiceTest {
     @Test
     fun `goTo should add destination to stack and notify listener`() = runTest {
         val service = navigationService
-        val destination = WelcomeDestination
+        val destination = ProjectListDestination
         service.goTo(destination)
 
         assertEquals(1, service.history().size)
@@ -45,8 +44,8 @@ class NavigationServiceTest {
     @Test
     fun `back should remove last destination and notify listener`() = runTest {
         val service = navigationService
-        val startDestination = WelcomeDestination
-        val projectsDestination = ProjectListDestination
+        val startDestination = ProjectListDestination
+        val projectsDestination = ProjectDetailsDestination(UUID.random())
         service.goTo(startDestination)
         service.goTo(projectsDestination)
 
@@ -61,7 +60,7 @@ class NavigationServiceTest {
     @Test
     fun `back should return false if only one destination in stack`() = runTest {
         val service = navigationService
-        val destination = WelcomeDestination
+        val destination = ProjectListDestination
         service.goTo(destination)
 
         val result = service.back()
@@ -75,7 +74,7 @@ class NavigationServiceTest {
     fun `key should return destination of the correct type`() = runTest {
         val service = navigationService
 
-        val homeDestination = WelcomeDestination
+        val homeDestination = ProjectListDestination
         service.goTo(homeDestination)
 
         val result: Destination? = service.key<Destination>()
@@ -84,15 +83,15 @@ class NavigationServiceTest {
 
     @Test
     fun `key should return null if no destination of type exists`() = runTest {
-        val result: Destination? = navigationService.key<ProjectListDestination>()
+        val result: Destination? = navigationService.key<ProjectDetailsDestination>()
         assertNull(result)
     }
 
     @Test
     fun `key should throw exception if more than one destination of type exists`() = runTest {
         val service = navigationService
-        val homeDestination = WelcomeDestination
-        val projectsDestination = ProjectListDestination
+        val homeDestination = ProjectListDestination
+        val projectsDestination = ProjectDetailsDestination(UUID.random())
         service.goTo(homeDestination)
         service.goTo(projectsDestination)
         service.goTo(homeDestination)

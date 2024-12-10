@@ -6,10 +6,6 @@ import pl.lemanski.tc.utils.UUID
 
 sealed interface Destination : ViewModelStoreOwner
 
-data object WelcomeDestination : Destination {
-    override val viewModelStore: ViewModelStore = ViewModelStore()
-}
-
 data object ProjectListDestination : Destination {
     override val viewModelStore: ViewModelStore = ViewModelStore()
 }

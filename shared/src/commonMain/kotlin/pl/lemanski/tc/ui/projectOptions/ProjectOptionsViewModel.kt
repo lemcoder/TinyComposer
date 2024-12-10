@@ -92,10 +92,7 @@ internal class ProjectOptionsViewModel(
     }
 
     override fun back() {
-        // FIXME run synchronously
-        viewModelScope.launch {
-            navigationService.back()
-        }
+        navigationService.back()
     }
 
     override fun onTempoChanged(tempo: String) {

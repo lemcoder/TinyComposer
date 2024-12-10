@@ -1,11 +1,9 @@
 package pl.lemanski.tc.ui.projectCreate
 
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.model.project.Rhythm
@@ -119,9 +117,7 @@ internal class ProjectCreateViewModel(
             )
         ) ?: return
 
-        viewModelScope.launch {
-            navigationService.back()
-        }
+        navigationService.back()
     }
 
     override fun clearErrors() {
