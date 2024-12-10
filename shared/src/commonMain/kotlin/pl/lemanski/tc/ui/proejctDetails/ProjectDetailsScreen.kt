@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,13 +62,6 @@ internal fun ProjectDetailsScreen(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = backButton.onClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                        contentDescription = "Back"
-                    )
-                }
-
                 Text(
                     text = projectName,
                     style = MaterialTheme.typography.headlineMedium
@@ -79,7 +73,7 @@ internal fun ProjectDetailsScreen(
                     onClick = projectDetailsButton.onClick,
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.List,
+                        imageVector = Icons.Outlined.Menu,
                         contentDescription = "Back"
                     )
                 }

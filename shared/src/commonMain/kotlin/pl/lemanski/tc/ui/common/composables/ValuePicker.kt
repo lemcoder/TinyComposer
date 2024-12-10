@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import pl.lemanski.tc.ui.common.StateComponent
+import pl.lemanski.tc.ui.common.icons.Remove
 
 @Composable
 internal fun StateComponent.ValuePicker.ToComposable() {
@@ -33,7 +34,7 @@ internal fun StateComponent.ValuePicker.ToComposable() {
                 onClick = { this@ToComposable.onValueChange(value - 1) }
             ) {
                 Icon(
-                    imageVector = Icons.Default.ArrowBack,
+                    imageVector = Icons.Outlined.Remove,
                     contentDescription = "Decrease value"
                 )
             }
