@@ -76,6 +76,7 @@ internal fun StateComponent.Button.ToComposableActingOnPress() {
             ) {
                 Text(
                     text = text,
+                    color = MaterialTheme.colorScheme.surface,
                 )
             }
         }

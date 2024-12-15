@@ -74,6 +74,8 @@ internal class I18nImpl : I18n {
         override val projectDeleted: String = stringResourceBlocking(Res.string.project_list_project_deleted)
         override val projectDeleteFailed: String = stringResourceBlocking(Res.string.project_list_project_delete_failed)
         override val projectRecreateFailed: String = stringResourceBlocking(Res.string.project_list_project_recreate_failed)
+        override val loadSampleProjects: String = "Load sample projects"
+        override val noProjects: String = "No projects found. Create new project or load sample projects."
     }
 
     private inner class ProjectCreate : I18n.ProjectCreate {

@@ -1,5 +1,6 @@
 package pl.lemanski.tc.ui.proejctDetails.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -95,7 +97,7 @@ private fun CircleButton(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .border(1.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
             .padding(4.dp)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center

@@ -10,6 +10,7 @@ internal interface ProjectsListContract {
         abstract fun onProjectClick(id: UUID): Job
         abstract fun onProjectDelete(id: UUID)
         abstract fun onAddButtonClick(): Job
+        abstract fun onLoadSampleProjectsClick(): Job
         abstract fun showSnackBar(message: String, action: String? = null, onAction: (() -> Unit)? = null)
         abstract fun hideSnackBar()
     }
@@ -18,6 +19,8 @@ internal interface ProjectsListContract {
         val isLoading: Boolean,
         val title: String,
         val projectCards: List<ProjectCard>,
+        val noProjectsText: String,
+        val loadSampleProjectsButton: StateComponent.Button,
         val addButton: StateComponent.Button,
         val snackBar: StateComponent.SnackBar?
     ) {

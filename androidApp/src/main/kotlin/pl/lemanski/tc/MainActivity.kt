@@ -19,7 +19,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
-import pl.lemanski.tc.theme.TcTheme
+import pl.lemanski.tc.ui.common.theme.TcTheme
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsRouter
 import pl.lemanski.tc.ui.projectAiGenerate.ProjectAiGenerateRouter
 import pl.lemanski.tc.ui.projectCreate.ProjectCreateRouter

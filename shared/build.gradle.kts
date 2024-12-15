@@ -52,6 +52,8 @@ kotlin {
             implementation(libs.mikrosoundfont.soundFont)
 
             implementation(libs.generative.ai)
+
+            implementation(libs.compottie)
         }
 
         commonTest.dependencies {

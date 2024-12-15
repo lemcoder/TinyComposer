@@ -18,6 +18,8 @@ fun ProjectListRouter() = router<ProjectsListContract.ViewModel, ProjectListDest
         title = state.title,
         projectCards = state.projectCards,
         addButton = state.addButton,
+        noProjectsText = state.noProjectsText,
+        loadSampleProjectsButton = state.loadSampleProjectsButton,
         snackBar = state.snackBar
     )
 }

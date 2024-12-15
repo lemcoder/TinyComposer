@@ -39,7 +39,12 @@ internal class ProjectListViewModel(
             text = i18n.projectList.addProject,
             onClick = ::onAddButtonClick
         ),
-        snackBar = null
+        snackBar = null,
+        noProjectsText = i18n.projectList.noProjects,
+        loadSampleProjectsButton = StateComponent.Button(
+            text = i18n.projectList.loadSampleProjects,
+            onClick = ::onLoadSampleProjectsClick
+        )
     )
 
     private val _stateFlow = MutableStateFlow(initialState)
@@ -129,6 +134,13 @@ internal class ProjectListViewModel(
         navigationService.goTo(ProjectCreateDestination)
     }
 
+    override fun onLoadSampleProjectsClick(): Job = viewModelScope.launch {
+        logger.debug("Load sample projects clicked")
+        hideSnackBar()
+
+        // TODO
+    }
+
     override fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?) {
         _stateFlow.update { state ->
             state.copy(
@@ -154,7 +166,7 @@ internal class ProjectListViewModel(
         logger.debug("Cleared")
     }
 
-    //---
+//---
 
     internal fun mapProjectToProjectCard(project: Project): ProjectsListContract.State.ProjectCard = ProjectsListContract.State.ProjectCard(
         id = project.id,
@@ -164,7 +176,7 @@ internal class ProjectListViewModel(
         onClick = ::onProjectClick
     )
 
-    //---
+//---
 
     inner class DeleteProjectErrorHandler : DeleteProjectUseCase.ErrorHandler {
         override fun handleDeleteProjectError() {
@@ -172,7 +184,7 @@ internal class ProjectListViewModel(
         }
     }
 
-    //---
+//---
 
     inner class CreateProjectErrorHandler : CreateProjectUseCase.ErrorHandler {
         override fun onInvalidProjectName() {}

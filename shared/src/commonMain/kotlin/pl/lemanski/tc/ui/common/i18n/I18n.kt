@@ -31,6 +31,8 @@ internal interface I18n {
     }
 
     interface ProjectList {
+        val loadSampleProjects: String
+        val noProjects: String
         val title: String
         val addProject: String
         val duration: String
