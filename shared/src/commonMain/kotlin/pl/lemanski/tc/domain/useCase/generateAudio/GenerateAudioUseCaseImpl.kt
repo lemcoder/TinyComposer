@@ -2,8 +2,8 @@ package pl.lemanski.tc.domain.useCase.generateAudio
 
 import io.github.lemcoder.mikrosoundfont.midi.MidiMetaMessage
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import pl.lemanski.tc.domain.model.project.ChordBeats
-import pl.lemanski.tc.domain.model.project.NoteBeats
+import pl.lemanski.tc.domain.model.core.ChordBeats
+import pl.lemanski.tc.domain.model.core.NoteBeats
 import pl.lemanski.tc.domain.service.audio.AudioMapper
 import pl.lemanski.tc.domain.service.audio.AudioService
 import tinycomposer.shared.generated.resources.Res
@@ -23,9 +23,7 @@ internal class GenerateAudioUseCaseImpl(
         tempo: Int
     ): FloatArray {
         if (!audioService.isSoundFontLoaded()) {
-            Res.readBytes("files/font.sf2").let {
-                audioService.useSoundFont(it)
-            }
+
         }
 
         val tempoMessage = MidiMetaMessage.SetTempo(0, tempo)

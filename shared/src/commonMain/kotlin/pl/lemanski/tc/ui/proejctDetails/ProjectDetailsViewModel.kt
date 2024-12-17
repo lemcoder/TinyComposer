@@ -14,8 +14,8 @@ import pl.lemanski.tc.domain.model.core.changeOctave
 import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
-import pl.lemanski.tc.domain.model.project.ChordBeats
-import pl.lemanski.tc.domain.model.project.NoteBeats
+import pl.lemanski.tc.domain.model.core.ChordBeats
+import pl.lemanski.tc.domain.model.core.NoteBeats
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back

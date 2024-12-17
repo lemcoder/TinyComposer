@@ -1,11 +1,9 @@
 package pl.lemanski.tc.domain.repository.soundFont
 
-import pl.lemanski.tc.domain.model.soundFont.SoundFontHolder
+import io.github.lemcoder.mikrosoundfont.SoundFont
 
 interface SoundFontRepository {
-
-    fun loadSoundFont(path: String): ByteArray
     fun setSoundFont(name: String, soundFont: ByteArray)
-    fun currentSoundFont(): SoundFontHolder?
+    fun currentSoundFont(): SoundFont?
     fun getSoundFontPresets(): List<Pair<Int, String>>  // TODO create some structure for preset (maybe in library?)
 }

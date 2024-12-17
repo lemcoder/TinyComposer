@@ -2,8 +2,8 @@ package pl.lemanski.tc.ui.proejctDetails
 
 import kotlinx.coroutines.Job
 import pl.lemanski.tc.domain.model.core.Chord
-import pl.lemanski.tc.domain.model.project.ChordBeats
-import pl.lemanski.tc.domain.model.project.NoteBeats
+import pl.lemanski.tc.domain.model.core.ChordBeats
+import pl.lemanski.tc.domain.model.core.NoteBeats
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.TcViewModel
 

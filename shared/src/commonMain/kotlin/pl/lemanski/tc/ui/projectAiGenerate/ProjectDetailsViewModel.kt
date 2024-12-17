@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import pl.lemanski.tc.data.persistent.encoder.encodeToString
 import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
@@ -84,17 +83,14 @@ internal class ProjectAiGenerateViewModel(
         val prompt = _stateFlow.value.promptInput.value
         val errorHandler = AiGenerateErrorHandler()
 
-        val melodyPrompt = "Current chords are: " + project.chords.encodeToString() + "Generate melody for these chords"
-        val chordsPrompt = "Current melody is" + project.melody.encodeToString() + "Generate chords for this melody"
-
         val chordBeats = when (selectedPromptOption) {
-            ProjectAiGenerateContract.PromptOption.CHORDS_FOR_MELODY -> aiGenerateUseCase.generateChordBeats(errorHandler, chordsPrompt)
+            ProjectAiGenerateContract.PromptOption.CHORDS_FOR_MELODY -> aiGenerateUseCase.generateChordBeats(errorHandler, "TODO")
             ProjectAiGenerateContract.PromptOption.CHORDS            -> aiGenerateUseCase.generateChordBeats(errorHandler, prompt)
             else                                                     -> listOf()
         }
 
         val noteBeats = when (selectedPromptOption) {
-            ProjectAiGenerateContract.PromptOption.MELODY_FOR_CHORDS -> aiGenerateUseCase.generateMelody(errorHandler, melodyPrompt)
+            ProjectAiGenerateContract.PromptOption.MELODY_FOR_CHORDS -> aiGenerateUseCase.generateMelody(errorHandler, "TODO")
             ProjectAiGenerateContract.PromptOption.MELODY            -> aiGenerateUseCase.generateMelody(errorHandler, prompt)
             else                                                     -> listOf()
         }
@@ -103,10 +99,8 @@ internal class ProjectAiGenerateViewModel(
             state.copy(
                 text = """
                     |Chords:
-                    |${chordBeats.encodeToString()}
                     |
                     |Melody:
-                    |${noteBeats.encodeToString()}
                 """.trimIndent()
             )
         }

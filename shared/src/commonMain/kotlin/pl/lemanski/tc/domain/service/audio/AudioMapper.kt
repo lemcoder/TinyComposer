@@ -2,8 +2,8 @@ package pl.lemanski.tc.domain.service.audio
 
 import io.github.lemcoder.mikrosoundfont.midi.MidiMessage
 import io.github.lemcoder.mikrosoundfont.midi.MidiVoiceMessage
-import pl.lemanski.tc.domain.model.project.ChordBeats
-import pl.lemanski.tc.domain.model.project.NoteBeats
+import pl.lemanski.tc.domain.model.core.ChordBeats
+import pl.lemanski.tc.domain.model.core.NoteBeats
 
 internal class AudioMapper {
     fun mapChordBeatsToMidiMessage(chordBeats: List<ChordBeats>, tempo: Int, channel: Int): List<MidiMessage> {

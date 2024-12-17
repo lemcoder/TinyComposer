@@ -3,6 +3,11 @@ package pl.lemanski.tc.domain.model.core
 import pl.lemanski.tc.utils.exception.InvalidNoteException
 
 /**
+ * Represents a note in a musical context with a duration.
+ */
+typealias NoteBeats = Pair<Note, Int>
+
+/**
  * Represents a note in a musical context.
  * A note can have a value of 0-127, where 0 is the lowest and 127 is the highest.
  */

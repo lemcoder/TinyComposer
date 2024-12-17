@@ -1,53 +1,58 @@
 package pl.lemanski.tc.data.repository.soundFont
 
-import io.github.lemcoder.mikrosoundfont.MikroSoundFont
-import kotlinx.io.buffered
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.readByteArray
-import pl.lemanski.tc.data.cache.MemoryCache
-import pl.lemanski.tc.domain.model.soundFont.SoundFontHolder
+import io.github.lemcoder.mikrosoundfont.SoundFont
+import io.github.lemcoder.mikrosoundfont.SoundFontLoader
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import pl.lemanski.tc.data.source.cache.MemoryCache
+import pl.lemanski.tc.data.source.persistent.ResourcesLoader
 import pl.lemanski.tc.domain.repository.soundFont.SoundFontRepository
-import pl.lemanski.tc.utils.exception.EntryNotFoundException
+import pl.lemanski.tc.utils.Logger
 
 internal class SoundFontRepositoryImpl(
-    private val cacheMemory: MemoryCache
+    private val cacheMemory: MemoryCache,
+    private val coroutineDispatcher: CoroutineDispatcher,
+    private val soundFontLoader: SoundFontLoader,
+    private val resourcesLoader: ResourcesLoader
 ) : SoundFontRepository {
-    internal var lastSoundFontName: String? = null
 
-    override fun loadSoundFont(path: String): ByteArray {
-        val filePath = Path(path)
-        if (!SystemFileSystem.exists(filePath)) {
-            throw EntryNotFoundException("SoundFont file not found")
+    private val logging = Logger(this::class)
+    private var lastSfName: String = DEFAULT_SOUNDFONT_NAME
+
+    init {
+        // Have to load default soundfont, it's needed for the app to work
+        CoroutineScope(coroutineDispatcher).launch {
+            resourcesLoader.loadBytes(DEFAULT_SOUNDFONT_PATH).let {
+                val soundFont = soundFontLoader.load(it)
+                cacheMemory.put(DEFAULT_SOUNDFONT_NAME, soundFont)
+            }
+        }.invokeOnCompletion {
+            logging.info("Default soundfont loaded form $DEFAULT_SOUNDFONT_PATH")
         }
-
-        return SystemFileSystem.source(Path(path)).buffered().readByteArray()
     }
 
     override fun setSoundFont(name: String, soundFont: ByteArray) {
         cacheMemory.remove(name)
-        lastSoundFontName = name
-        cacheMemory.put(name, soundFont)
+        val newSoundFont = soundFontLoader.load(soundFont)
+        lastSfName = name
+        cacheMemory.put(name, newSoundFont)
     }
 
-    override fun currentSoundFont(): SoundFontHolder? {
-        val ln = lastSoundFontName ?: return null
-        val soundFont = cacheMemory.get<ByteArray>(ln) ?: return null
-
-        return SoundFontHolder(
-            name = ln,
-            soundFont = soundFont
-        )
+    override fun currentSoundFont(): SoundFont? {
+        return cacheMemory.get<SoundFont>(lastSfName)
     }
 
     override fun getSoundFontPresets(): List<Pair<Int, String>> {
-        val soundFont = currentSoundFont()?.soundFont ?: return emptyList()
+        val soundFont = currentSoundFont() ?: return emptyList()
 
-        // FIXME do not load here
-        MikroSoundFont.load(soundFont).let { sf ->
-            return (0 until sf.getPresetsCount()).map { index ->
-                index to sf.getPresetName(index)
-            }
+        return (0 until soundFont.getPresetsCount()).map { index ->
+            index to soundFont.getPresetName(index)
         }
+    }
+
+    companion object {
+        const val DEFAULT_SOUNDFONT_NAME = "default_soundfont"
+        const val DEFAULT_SOUNDFONT_PATH = "files/font.sf2"
     }
 }

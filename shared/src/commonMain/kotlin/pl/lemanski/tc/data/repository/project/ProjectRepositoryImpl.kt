@@ -1,15 +1,20 @@
 package pl.lemanski.tc.data.repository.project
 
-import pl.lemanski.tc.data.persistent.TcDatabase
-import pl.lemanski.tc.data.persistent.decoder.tryParseProject
-import pl.lemanski.tc.data.persistent.encoder.encodeToString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import pl.lemanski.tc.data.model.project.ProjectEntity
+import pl.lemanski.tc.data.model.project.toDomain
+import pl.lemanski.tc.data.model.project.toEntity
+import pl.lemanski.tc.data.source.cache.MemoryCache
+import pl.lemanski.tc.data.source.persistent.FileSystemDatabase
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.repository.project.ProjectRepository
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.UUID
 
 internal class ProjectRepositoryImpl(
-    private val database: TcDatabase
+    private val database: FileSystemDatabase,
+    private val cache: MemoryCache
 ) : ProjectRepository {
     private val logger = Logger(this::class)
 
@@ -17,7 +22,8 @@ internal class ProjectRepositoryImpl(
 
     override fun getProject(id: UUID): Project? {
         try {
-            val project = database.loadFile(id).tryParseProject()
+            val projectString = database.loadFile(id)
+            val project = Json.decodeFromString<ProjectEntity>(projectString).toDomain()
             return project
         } catch (ex: Exception) {
             logger.error("Failed to load project: $id", ex)
@@ -27,7 +33,7 @@ internal class ProjectRepositoryImpl(
     }
 
     override fun saveProject(project: Project): Project {
-        database.saveFile(project.id, project.encodeToString())
+        database.saveFile(project.id, Json.encodeToString(project.toEntity()))
         return project
     }
 
@@ -48,5 +54,23 @@ internal class ProjectRepositoryImpl(
         }
 
         return null
+    }
+
+    //---
+
+    override fun cacheProject(project: Project): Project? {
+        cache.put(CURRENT_PROJECT_KEY, project)
+
+        return cache.get(CURRENT_PROJECT_KEY)
+    }
+
+    override fun getCurrentProject(): Project? {
+        return cache.get(CURRENT_PROJECT_KEY)
+    }
+
+    //---
+
+    companion object {
+        private const val CURRENT_PROJECT_KEY = "current_project"
     }
 }
