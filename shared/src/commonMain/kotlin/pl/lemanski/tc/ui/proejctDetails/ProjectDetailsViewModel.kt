@@ -559,6 +559,8 @@ internal class ProjectDetailsViewModel(
         }
     }
 
+    //---
+
     inner class NoteBeatsBottomSheetStateHelper(
         private val id: Int,
     ) {

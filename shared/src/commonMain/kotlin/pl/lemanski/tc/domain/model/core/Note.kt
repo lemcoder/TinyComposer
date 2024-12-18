@@ -65,9 +65,10 @@ data class Note(
     }
 }
 
-internal fun Note.changeOctave(newOctave: Int): Note {
-    return Note(this.value + (newOctave * 12))
-}
+internal fun Note.changeOctave(newOctave: Int): Note = Note(
+    value = this.value + (newOctave * 12),
+    velocity = this.velocity
+)
 
 //--- Flats and sharps
 
