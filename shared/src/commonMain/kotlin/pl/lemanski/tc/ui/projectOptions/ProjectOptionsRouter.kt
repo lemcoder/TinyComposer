@@ -14,8 +14,7 @@ fun ProjectOptionsRouter() = router<ProjectOptionsContract.ViewModel, ProjectOpt
 
     ProjectOptionsScreen(
         isLoading = state.isLoading,
-        projectName = state.projectName,
-        backButton = state.backButton,
+        title = state.title,
         snackBar = state.snackBar,
         tempoInput = state.tempoInput,
         chordsPresetSelect = state.chordsPresetSelect,

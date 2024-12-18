@@ -8,14 +8,14 @@ import pl.lemanski.tc.domain.service.audio.AudioService
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.useCase.aiGenerate.AiGenerateUseCase
 import pl.lemanski.tc.domain.useCase.aiGenerate.AiGenerateUseCaseImpl
-import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCase
-import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCaseImpl
+import pl.lemanski.tc.domain.useCase.saveProject.SaveProjectUseCase
+import pl.lemanski.tc.domain.useCase.saveProject.SaveProjectUseCaseImpl
 import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCase
 import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCaseImpl
 import pl.lemanski.tc.domain.useCase.generateAudio.GenerateAudioUseCase
 import pl.lemanski.tc.domain.useCase.generateAudio.GenerateAudioUseCaseImpl
-import pl.lemanski.tc.domain.useCase.getProject.GetProjectUseCase
-import pl.lemanski.tc.domain.useCase.getProject.GetProjectUseCaseImpl
+import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
+import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCaseImpl
 import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCase
 import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCaseImpl
 import pl.lemanski.tc.domain.useCase.getSoundFontPresets.GetSoundFontPresetsUseCase
@@ -34,11 +34,11 @@ internal object DomainModule {
         singleOf(::AudioService)
 
         // UseCases
-        singleOf(::CreateProjectUseCaseImpl) bind CreateProjectUseCase::class
+        singleOf(::SaveProjectUseCaseImpl) bind SaveProjectUseCase::class
         singleOf(::DeleteProjectUseCaseImpl) bind DeleteProjectUseCase::class
         singleOf(::GetProjectsListUseCaseImpl) bind GetProjectsListUseCase::class
         singleOf(::GenerateAudioUseCaseImpl) bind GenerateAudioUseCase::class
-        singleOf(::GetProjectUseCaseImpl) bind GetProjectUseCase::class
+        singleOf(::LoadProjectUseCaseImpl) bind LoadProjectUseCase::class
         singleOf(::PlaybackControlUseCaseImpl) bind PlaybackControlUseCase::class
         singleOf(::UpdateProjectUseCaseImpl) bind UpdateProjectUseCase::class
         singleOf(::GetSoundFontPresetsUseCaseImpl) bind GetSoundFontPresetsUseCase::class

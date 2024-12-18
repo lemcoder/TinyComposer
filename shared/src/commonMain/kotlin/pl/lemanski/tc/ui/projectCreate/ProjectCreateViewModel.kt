@@ -10,7 +10,7 @@ import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.domain.model.project.name
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
-import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCase
+import pl.lemanski.tc.domain.useCase.saveProject.SaveProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
@@ -20,7 +20,7 @@ internal class ProjectCreateViewModel(
     override val key: ProjectCreateDestination,
     private val i18n: I18n,
     private val navigationService: NavigationService,
-    private val createProjectUseCase: CreateProjectUseCase
+    private val saveProjectUseCase: SaveProjectUseCase
 ) : ProjectCreateContract.ViewModel() {
     private val logger = Logger(this::class)
     private val initialState = ProjectCreateContract.State(
@@ -105,7 +105,7 @@ internal class ProjectCreateViewModel(
         val projectBpm = _stateFlow.value.projectBpm.value.toIntOrNull() ?: 0
         val projectRhythm = _stateFlow.value.projectRhythm.selected.value
 
-        createProjectUseCase(
+        saveProjectUseCase(
             errorHandler = CreateProjectErrorHandler(),
             project = Project(
                 id = UUID.random(),
@@ -167,7 +167,7 @@ internal class ProjectCreateViewModel(
 
     //---
 
-    inner class CreateProjectErrorHandler : CreateProjectUseCase.ErrorHandler {
+    inner class CreateProjectErrorHandler : SaveProjectUseCase.ErrorHandler {
         override fun onInvalidProjectName() {
             _stateFlow.update { state ->
                 state.copy(

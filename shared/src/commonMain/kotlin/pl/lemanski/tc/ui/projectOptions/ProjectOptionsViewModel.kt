@@ -9,13 +9,12 @@ import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
-import pl.lemanski.tc.domain.useCase.getProject.GetProjectUseCase
+import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
 import pl.lemanski.tc.domain.useCase.getSoundFontPresets.GetSoundFontPresetsUseCase
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
-import pl.lemanski.tc.utils.EMPTY
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.exception.ViewModelInitException
 
@@ -23,7 +22,7 @@ internal class ProjectOptionsViewModel(
     override val key: ProjectOptionsDestination,
     private val i18n: I18n,
     private val navigationService: NavigationService,
-    private val getProjectUseCase: GetProjectUseCase,
+    private val loadProjectUseCase: LoadProjectUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val getSoundFontPresetsUseCase: GetSoundFontPresetsUseCase,
     private val presetsControlUseCase: PresetsControlUseCase
@@ -33,15 +32,11 @@ internal class ProjectOptionsViewModel(
     private val chordPreset = presetsControlUseCase.getPresets(key.projectId).first
     private val notePresets = presetsControlUseCase.getPresets(key.projectId).second
     private val logger = Logger(this::class)
-    private var project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
+    private var project = loadProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
 
     private val initialState = ProjectOptionsContract.State(
         isLoading = false,
-        projectName = project.name,
-        backButton = StateComponent.Button(
-            text = String.EMPTY,
-            onClick = ::back
-        ),
+        title = i18n.projectOptions.title,
         snackBar = null,
         tempoInput = StateComponent.Input(
             value = project.bpm.toString(),
@@ -115,6 +110,7 @@ internal class ProjectOptionsViewModel(
 
         if (error == null && tempoInt != null) {
             project = project.copy(bpm = tempoInt)
+            updateProjectUseCase(UpdateProjectErrorHandler(), project, project.id)
         }
     }
 
@@ -125,8 +121,7 @@ internal class ProjectOptionsViewModel(
             )
         }
 
-        val currentChordPreset = _stateFlow.value.chordsPresetSelect.selected.value
-        presetsControlUseCase.setPresets(key.projectId, currentChordPreset to notePresets)
+        presetsControlUseCase.setPresets(project.id, preset.value to notePresets)
     }
 
     override fun onNotesPresetSelected(preset: StateComponent.SelectInput.Option<Int>) = viewModelScope.launch {
@@ -136,8 +131,7 @@ internal class ProjectOptionsViewModel(
             )
         }
 
-        val currentNotePreset = _stateFlow.value.notesPresetSelect.selected.value
-        presetsControlUseCase.setPresets(key.projectId, chordPreset to currentNotePreset)
+        presetsControlUseCase.setPresets(key.projectId, chordPreset to preset.value)
     }
 
     override fun onExportClicked() {
@@ -166,7 +160,6 @@ internal class ProjectOptionsViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        updateProjectUseCase(UpdateProjectErrorHandler(), project, project.id)
         logger.debug("Cleared")
     }
 

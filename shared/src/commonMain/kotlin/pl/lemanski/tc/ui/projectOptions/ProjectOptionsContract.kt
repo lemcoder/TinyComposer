@@ -18,11 +18,10 @@ internal interface ProjectOptionsContract {
 
     data class State(
         val isLoading: Boolean,
-        val projectName: String,
+        val title: String,
         val tempoInput: StateComponent.Input,
         val chordsPresetSelect: StateComponent.SelectInput<Int>,
         val notesPresetSelect: StateComponent.SelectInput<Int>,
-        val backButton: StateComponent.Button,
         val exportButton: StateComponent.Button,
         val snackBar: StateComponent.SnackBar?,
     )

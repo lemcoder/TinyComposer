@@ -21,7 +21,7 @@ import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.service.navigation.goTo
 import pl.lemanski.tc.domain.useCase.generateAudio.GenerateAudioUseCase
-import pl.lemanski.tc.domain.useCase.getProject.GetProjectUseCase
+import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
 import pl.lemanski.tc.domain.useCase.playbackControl.PlaybackControlUseCase
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
@@ -35,7 +35,7 @@ internal class ProjectDetailsViewModel(
     override val key: ProjectDetailsDestination,
     private val i18n: I18n,
     private val navigationService: NavigationService,
-    private val getProjectUseCase: GetProjectUseCase,
+    private val loadProjectUseCase: LoadProjectUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val playbackControlUseCase: PlaybackControlUseCase,
     private val generateAudioUseCase: GenerateAudioUseCase,
@@ -43,7 +43,7 @@ internal class ProjectDetailsViewModel(
 ) : ProjectDetailsContract.ViewModel() {
 
     private val logger = Logger(this::class)
-    private var project: Project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
+    private var project: Project = loadProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
     private var playbackJob: Job? = null
     private val initialState = ProjectDetailsContract.State(
         isLoading = true,
@@ -93,7 +93,7 @@ internal class ProjectDetailsViewModel(
     override fun onAttached() {
         logger.debug("Attached")
 
-        project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
+        project = loadProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
         _stateFlow.update { state ->
             state.copy(
                 isLoading = false,

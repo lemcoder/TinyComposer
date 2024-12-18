@@ -10,7 +10,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.useCase.aiGenerate.AiGenerateUseCase
-import pl.lemanski.tc.domain.useCase.getProject.GetProjectUseCase
+import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
@@ -20,13 +20,13 @@ internal class ProjectAiGenerateViewModel(
     override val key: ProjectAiGenerateDestination,
     private val i18n: I18n,
     private val navigationService: NavigationService,
-    private val getProjectUseCase: GetProjectUseCase,
+    private val loadProjectUseCase: LoadProjectUseCase,
     private val aiGenerateUseCase: AiGenerateUseCase
 ) : ProjectAiGenerateContract.ViewModel() {
 
     private val promptOptions = ProjectAiGenerateContract.PromptOption.entries.map { it.toOption() }
     private val logger = Logger(this::class)
-    private var project = getProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
+    private var project = loadProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
     private val initialState = ProjectAiGenerateContract.State(
         isLoading = true,
         snackBar = null,

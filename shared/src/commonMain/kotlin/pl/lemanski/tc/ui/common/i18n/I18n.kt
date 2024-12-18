@@ -2,7 +2,6 @@ package pl.lemanski.tc.ui.common.i18n
 
 internal interface I18n {
     val common: Common
-    val welcome: Welcome
     val projectList: ProjectList
     val projectCreate: ProjectCreate
     val projectDetails: ProjectDetails
@@ -24,10 +23,6 @@ internal interface I18n {
         val reset: String
         val undo: String
         val retry: String
-    }
-
-    interface Welcome {
-        val title: String
     }
 
     interface ProjectList {
@@ -58,7 +53,7 @@ internal interface I18n {
     }
 
     interface ProjectDetails {
-        val invalidTempo: String?
+        val invalidTempo: String
         val tempo: String
         val invalidChordBeats: String
         val invalidNoteBeats: String
@@ -74,6 +69,7 @@ internal interface I18n {
     }
 
     interface ProjectOptions {
+        val title: String
         val tempo: String
         val tempoError: String
         val saveError: String

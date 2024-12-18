@@ -27,8 +27,7 @@ import pl.lemanski.tc.ui.common.composables.ToComposable
 @Composable
 internal fun ProjectOptionsScreen(
     isLoading: Boolean,
-    projectName: String,
-    backButton: StateComponent.Button,
+    title: String,
     tempoInput: StateComponent.Input,
     notesPresetSelect: StateComponent.SelectInput<Int>,
     chordsPresetSelect: StateComponent.SelectInput<Int>,
@@ -50,28 +49,12 @@ internal fun ProjectOptionsScreen(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = backButton.onClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                        contentDescription = "Back"
-                    )
-                }
-
                 Text(
-                    text = projectName,
+                    text = title,
                     style = MaterialTheme.typography.headlineMedium
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
-
-                IconButton(
-                    onClick = { }, // TODO go to project details
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.List,
-                        contentDescription = "Back"
-                    )
-                }
             }
 
             tempoInput.ToComposable()

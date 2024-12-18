@@ -1,16 +1,16 @@
-package pl.lemanski.tc.domain.useCase.createProject
+package pl.lemanski.tc.domain.useCase.saveProject
 
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.repository.project.ProjectRepository
 import pl.lemanski.tc.utils.Logger
 
-internal class CreateProjectUseCaseImpl(
+internal class SaveProjectUseCaseImpl(
     private val projectRepository: ProjectRepository,
-) : CreateProjectUseCase {
+) : SaveProjectUseCase {
     private val logger = Logger(this::class)
 
     override operator fun invoke(
-        errorHandler: CreateProjectUseCase.ErrorHandler,
+        errorHandler: SaveProjectUseCase.ErrorHandler,
         project: Project
     ): Project? {
         logger.debug("Starting with: $project")

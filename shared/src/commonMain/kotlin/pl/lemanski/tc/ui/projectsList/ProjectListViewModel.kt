@@ -13,7 +13,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.goTo
-import pl.lemanski.tc.domain.useCase.createProject.CreateProjectUseCase
+import pl.lemanski.tc.domain.useCase.saveProject.SaveProjectUseCase
 import pl.lemanski.tc.domain.useCase.deleteProject.DeleteProjectUseCase
 import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCase
 import pl.lemanski.tc.ui.common.StateComponent
@@ -24,7 +24,7 @@ import pl.lemanski.tc.utils.UUID
 internal class ProjectListViewModel(
     override val key: ProjectListDestination,
     private val i18n: I18n,
-    private val createProjectUseCase: CreateProjectUseCase,
+    private val saveProjectUseCase: SaveProjectUseCase,
     private val deleteProjectUseCase: DeleteProjectUseCase,
     private val getProjectsListUseCase: GetProjectsListUseCase,
     private val navigationService: NavigationService
@@ -101,7 +101,7 @@ internal class ProjectListViewModel(
                 message = i18n.projectList.projectDeleted,
                 action = i18n.common.undo
             ) {
-                val recreatedProject = createProjectUseCase(CreateProjectErrorHandler(), project)
+                val recreatedProject = saveProjectUseCase(CreateProjectErrorHandler(), project)
                 if (recreatedProject == null) {
                     logger.error("Error while recreating project")
                     return@showSnackBar
@@ -186,7 +186,7 @@ internal class ProjectListViewModel(
 
 //---
 
-    inner class CreateProjectErrorHandler : CreateProjectUseCase.ErrorHandler {
+    inner class CreateProjectErrorHandler : SaveProjectUseCase.ErrorHandler {
         override fun onInvalidProjectName() {}
 
         override fun onInvalidProjectBpm() {}

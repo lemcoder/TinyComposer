@@ -5,7 +5,7 @@ import pl.lemanski.tc.domain.repository.project.ProjectRepository
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.UUID
 
-class UpdateProjectUseCaseImpl(
+internal class UpdateProjectUseCaseImpl(
     private val projectRepository: ProjectRepository,
 ) : UpdateProjectUseCase {
     private val logger = Logger(this::class)
@@ -25,16 +25,8 @@ class UpdateProjectUseCaseImpl(
             return null
         }
 
-        try {
-            projectRepository.deleteProject(projectId)
-            projectRepository.saveProject(project)
-        } catch (ex: Exception) {
-            logger.error("Error saving project: $project", ex)
-            errorHandler.onProjectSaveError()
-            return null
-        }
+        projectRepository.cacheProject(project)
 
         return project
-
     }
 }
