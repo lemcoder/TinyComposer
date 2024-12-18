@@ -28,10 +28,11 @@ import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.State.NoteBeatsCo
 internal fun MelodyTab(
     noteBeatsComponents: List<NoteBeatsComponent>,
     maxWidth: Dp,
+    barLength: Int
 ) {
     MultiRowLayout {
         noteBeatsComponents.forEach {
-            it.NoteBeatItem(itemWidth = maxWidth / 5)
+            it.NoteBeatItem(itemWidth = maxWidth / barLength)
         }
     }
 }

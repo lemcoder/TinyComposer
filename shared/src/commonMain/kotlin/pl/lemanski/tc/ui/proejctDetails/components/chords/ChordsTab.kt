@@ -28,10 +28,11 @@ import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.State.ChordBeatsC
 internal fun ChordsTab(
     chordBeatsComponents: List<ChordBeatsComponent>,
     maxWidth: Dp,
+    barLength: Int
 ) {
     MultiRowLayout {
         chordBeatsComponents.forEach {
-            it.ChordBeatItem(itemWidth = maxWidth / 5)
+            it.ChordBeatItem(itemWidth = maxWidth / barLength)
         }
     }
 }

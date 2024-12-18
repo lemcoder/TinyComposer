@@ -4,6 +4,7 @@ import pl.lemanski.tc.utils.exception.InvalidNoteException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 
 class NoteTest {
 
@@ -64,5 +65,19 @@ class NoteTest {
 
         assertEquals(4, major_third.value)
         assertEquals("E", major_third.name)
+    }
+
+    @Test
+    fun changes_octave_correctly() {
+        val noteC = Note(0)
+        val noteCInNewOctave = noteC.changeOctave(1)
+        assertEquals(12, noteCInNewOctave.value)
+    }
+
+    @Test
+    fun fromString_creates_correct_note() {
+        val noteC = Note.fromString("C")
+        assertNotNull(noteC)
+        assertEquals(60, noteC.value)
     }
 }

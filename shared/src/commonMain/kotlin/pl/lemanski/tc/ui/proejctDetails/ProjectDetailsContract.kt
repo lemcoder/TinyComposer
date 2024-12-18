@@ -32,6 +32,7 @@ internal interface ProjectDetailsContract {
     data class State(
         val isLoading: Boolean,
         val projectName: String,
+        val barLength: Int,
         val tabComponent: StateComponent.TabComponent<Tab>,
         val playButton: StateComponent.Button?,
         val stopButton: StateComponent.Button?,

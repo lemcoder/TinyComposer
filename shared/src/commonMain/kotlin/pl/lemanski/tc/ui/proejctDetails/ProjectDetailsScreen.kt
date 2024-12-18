@@ -38,6 +38,7 @@ import pl.lemanski.tc.ui.proejctDetails.components.melody.NoteDetailsBottomSheet
 internal fun ProjectDetailsScreen(
     isLoading: Boolean,
     projectName: String,
+    barLength: Int,
     tabComponent: StateComponent.TabComponent<Tab>,
     playButton: StateComponent.Button?,
     stopButton: StateComponent.Button?,
@@ -97,8 +98,8 @@ internal fun ProjectDetailsScreen(
                     )
                 } else {
                     when (tabComponent.selected.value) {
-                        Tab.MELODY -> MelodyTab(noteBeats, maxWidth) // TODO
-                        Tab.CHORDS -> ChordsTab(chordBeats, maxWidth) // TODO
+                        Tab.MELODY -> MelodyTab(noteBeats, maxWidth, barLength)
+                        Tab.CHORDS -> ChordsTab(chordBeats, maxWidth, barLength)
                     }
                 }
             }

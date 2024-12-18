@@ -16,6 +16,7 @@ fun ProjectDetailsRouter() = router<ProjectDetailsContract.ViewModel, ProjectDet
     ProjectDetailsScreen(
         isLoading = state.isLoading,
         projectName = state.projectName,
+        barLength = state.barLength,
         playButton = state.playButton,
         stopButton = state.stopButton,
         backButton = state.backButton,

@@ -48,6 +48,7 @@ internal class ProjectDetailsViewModel(
     private val initialState = ProjectDetailsContract.State(
         isLoading = true,
         projectName = project.name,
+        barLength = project.rhythm.beatsPerBar,
         playButton = StateComponent.Button(
             text = "",
             onClick = ::onPlayButtonClicked
