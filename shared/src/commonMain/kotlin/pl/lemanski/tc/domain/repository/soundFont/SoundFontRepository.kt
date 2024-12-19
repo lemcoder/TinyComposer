@@ -5,5 +5,5 @@ import io.github.lemcoder.mikrosoundfont.SoundFont
 interface SoundFontRepository {
     fun setSoundFont(name: String, soundFont: ByteArray)
     fun currentSoundFont(): SoundFont?
-    fun getSoundFontPresets(): List<Pair<Int, String>>  // TODO create some structure for preset (maybe in library?)
+    fun getSoundFontPresets(): Map<Int, String>  // TODO create some structure for preset (maybe in library?)
 }

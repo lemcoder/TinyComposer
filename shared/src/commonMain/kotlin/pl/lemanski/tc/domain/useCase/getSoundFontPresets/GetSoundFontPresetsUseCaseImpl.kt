@@ -6,7 +6,7 @@ internal class GetSoundFontPresetsUseCaseImpl(
     private val soundFontRepository: SoundFontRepository
 ) : GetSoundFontPresetsUseCase {
 
-    override fun invoke(): List<Pair<Int, String>> {
+    override fun invoke(): Map<Int, String> {
         return soundFontRepository.getSoundFontPresets()
     }
 }

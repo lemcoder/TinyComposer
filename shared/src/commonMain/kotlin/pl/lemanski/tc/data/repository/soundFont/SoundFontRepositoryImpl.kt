@@ -43,12 +43,12 @@ internal class SoundFontRepositoryImpl(
         return cacheMemory.get<SoundFont>(lastSfName)
     }
 
-    override fun getSoundFontPresets(): List<Pair<Int, String>> {
-        val soundFont = currentSoundFont() ?: return emptyList()
+    override fun getSoundFontPresets(): Map<Int, String> {
+        val soundFont = currentSoundFont() ?: return emptyMap()
 
         return (0 until soundFont.getPresetsCount()).map { index ->
             index to soundFont.getPresetName(index)
-        }
+        }.toMap()
     }
 
     companion object {

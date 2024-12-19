@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
-import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
 import pl.lemanski.tc.domain.useCase.getSoundFontPresets.GetSoundFontPresetsUseCase
+import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
@@ -28,11 +28,13 @@ internal class ProjectOptionsViewModel(
     private val presetsControlUseCase: PresetsControlUseCase
 ) : ProjectOptionsContract.ViewModel() {
 
-    private val presetOptions = getSoundFontPresetsUseCase().map { StateComponent.SelectInput.Option(name = it.second, value = it.first) }.toSet()
-    private val chordPreset = presetsControlUseCase.getPresets(key.projectId).first
-    private val notePresets = presetsControlUseCase.getPresets(key.projectId).second
-    private val logger = Logger(this::class)
     private var project = loadProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
+
+    private val presetOptions = getSoundFontPresetsUseCase().map { mapToPresetOption(it.key to it.value) }.toSet()
+
+    private val chordPreset = presetsControlUseCase.getChordPreset(key.projectId)
+    private val melodyPreset = presetsControlUseCase.getMelodyPreset(key.projectId)
+    private val logger = Logger(this::class)
 
     private val initialState = ProjectOptionsContract.State(
         isLoading = false,
@@ -54,13 +56,13 @@ internal class ProjectOptionsViewModel(
             onSelected = ::onChordsPresetSelected,
             options = presetOptions
         ),
-        notesPresetSelect = StateComponent.SelectInput(
+        melodyPresetSelect = StateComponent.SelectInput(
             selected = StateComponent.SelectInput.Option(
-                value = notePresets,
-                name = presetOptions.elementAt(notePresets).name
+                value = melodyPreset,
+                name = presetOptions.elementAt(melodyPreset).name
             ),
             label = i18n.projectOptions.melodyPreset,
-            onSelected = ::onNotesPresetSelected,
+            onSelected = ::onMelodyPresetSelected,
             options = presetOptions
         ),
         exportButton = StateComponent.Button(
@@ -121,17 +123,23 @@ internal class ProjectOptionsViewModel(
             )
         }
 
-        presetsControlUseCase.setPresets(project.id, preset.value to notePresets)
+        presetsControlUseCase.setPresets(
+            projectId = project.id,
+            chordPreset = preset.value
+        )
     }
 
-    override fun onNotesPresetSelected(preset: StateComponent.SelectInput.Option<Int>) = viewModelScope.launch {
+    override fun onMelodyPresetSelected(preset: StateComponent.SelectInput.Option<Int>) = viewModelScope.launch {
         _stateFlow.update { state ->
             state.copy(
-                notesPresetSelect = state.notesPresetSelect.copy(selected = preset)
+                melodyPresetSelect = state.melodyPresetSelect.copy(selected = preset)
             )
         }
 
-        presetsControlUseCase.setPresets(key.projectId, chordPreset to preset.value)
+        presetsControlUseCase.setPresets(
+            projectId = project.id,
+            melodyPreset = preset.value
+        )
     }
 
     override fun onExportClicked() {
@@ -161,6 +169,15 @@ internal class ProjectOptionsViewModel(
     override fun onCleared() {
         super.onCleared()
         logger.debug("Cleared")
+    }
+
+    //---
+
+    fun mapToPresetOption(preset: Pair<Int, String>): StateComponent.SelectInput.Option<Int> {
+        return StateComponent.SelectInput.Option(
+            value = preset.first,
+            name = preset.second
+        )
     }
 
     //---

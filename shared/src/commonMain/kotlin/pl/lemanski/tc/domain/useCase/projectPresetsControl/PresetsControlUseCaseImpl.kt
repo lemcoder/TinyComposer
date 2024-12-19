@@ -9,19 +9,31 @@ internal class PresetsControlUseCaseImpl(
 ) : PresetsControlUseCase {
     private val logger = Logger(this::class)
 
-    override fun getPresets(projectId: UUID): ChordToNotePresets {
+    override fun getChordPreset(projectId: UUID): Int {
         logger.debug("Starting with params: projectId=$projectId")
 
         val chordPreset = presetsRepository.getChordsPreset(projectId)
-        val notePreset = presetsRepository.getMelodyPreset(projectId)
 
-        return chordPreset to notePreset
+        return chordPreset
     }
 
-    override fun setPresets(projectId: UUID, presets: ChordToNotePresets) {
-        logger.debug("Starting with params: id=$projectId, presets=$presets")
+    override fun getMelodyPreset(projectId: UUID): Int {
+        logger.debug("Starting with params: projectId=$projectId")
 
-        presetsRepository.setChordsPreset(projectId, presets.first)
-        presetsRepository.setMelodyPreset(projectId, presets.second)
+        val notePreset = presetsRepository.getMelodyPreset(projectId)
+
+        return notePreset
+    }
+
+    override fun setPresets(projectId: UUID, chordPreset: Int?, melodyPreset: Int?) {
+        logger.debug("Starting with params: id=$projectId, presets=$chordPreset")
+
+        chordPreset?.let {
+            presetsRepository.setChordsPreset(projectId, it)
+        }
+
+        melodyPreset?.let {
+            presetsRepository.setMelodyPreset(projectId, it)
+        }
     }
 }

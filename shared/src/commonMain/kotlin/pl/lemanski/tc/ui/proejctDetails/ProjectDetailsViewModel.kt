@@ -112,7 +112,9 @@ internal class ProjectDetailsViewModel(
             )
         }
 
-        val (chordPreset, notePreset) = presetsControlUseCase.getPresets(project.id)
+        val chordPreset = presetsControlUseCase.getChordPreset(project.id)
+        val notePreset = presetsControlUseCase.getMelodyPreset(project.id)
+
         val audioData = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, chordPreset, project.melody, notePreset, project.bpm)
         playbackJob = launch { playbackControlUseCase.play(PlaybackControlErrorHandler(), audioData) }
         playbackJob?.invokeOnCompletion {
