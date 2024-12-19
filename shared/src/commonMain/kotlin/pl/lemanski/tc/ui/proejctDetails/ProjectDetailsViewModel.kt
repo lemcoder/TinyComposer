@@ -24,6 +24,7 @@ import pl.lemanski.tc.domain.useCase.generateAudio.GenerateAudioUseCase
 import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
 import pl.lemanski.tc.domain.useCase.playbackControl.PlaybackControlUseCase
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
+import pl.lemanski.tc.domain.useCase.saveProject.SaveProjectUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
@@ -39,7 +40,8 @@ internal class ProjectDetailsViewModel(
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val playbackControlUseCase: PlaybackControlUseCase,
     private val generateAudioUseCase: GenerateAudioUseCase,
-    private val presetsControlUseCase: PresetsControlUseCase
+    private val presetsControlUseCase: PresetsControlUseCase,
+    private val saveProjectUseCase: SaveProjectUseCase
 ) : ProjectDetailsContract.ViewModel() {
 
     private val logger = Logger(this::class)
@@ -327,6 +329,7 @@ internal class ProjectDetailsViewModel(
         super.onCleared()
         logger.debug("Cleared")
         updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), project, project.id)
+        saveProjectUseCase(SaveProjectUseCaseErrorHandler(), project)
     }
 
     //---
@@ -398,6 +401,8 @@ internal class ProjectDetailsViewModel(
         }
     }
 
+    //---
+
     inner class UpdateProjectUseCaseErrorHandler : UpdateProjectUseCase.ErrorHandler {
         override fun onInvalidProjectName() {
             // Will not happen
@@ -410,7 +415,22 @@ internal class ProjectDetailsViewModel(
         override fun onProjectSaveError() {
             showSnackBar(i18n.projectDetails.projectSaveError, null, null)
         }
+    }
 
+    //---
+
+    inner class SaveProjectUseCaseErrorHandler : SaveProjectUseCase.ErrorHandler {
+        override fun onInvalidProjectName() {
+            // Will not happen
+        }
+
+        override fun onInvalidProjectBpm() {
+            // Will not happen
+        }
+
+        override fun onProjectSaveError() {
+            showSnackBar(i18n.projectDetails.projectSaveError, null, null)
+        }
     }
 
     //---
