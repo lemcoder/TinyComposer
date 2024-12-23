@@ -2,12 +2,15 @@ package pl.lemanski.tc.ui.projectAiGenerate
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import pl.lemanski.tc.ui.common.StateComponent
@@ -23,25 +26,36 @@ internal fun ProjectAiGenerateScreen(
     promptOptions: StateComponent.RadioGroup<PromptOption>,
     promptInput: StateComponent.Input,
     submitButton: StateComponent.Button,
-    text: String,
-    backButton: StateComponent.Button,
     snackBar: StateComponent.SnackBar?,
 ) {
     LoaderScaffold(isLoading) { snackbarHostState ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .safeContentPadding()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .safeContentPadding(),
+            verticalArrangement = Arrangement.spacedBy(
+                space = 16.dp,
+                alignment = Alignment.Top
+            )
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
             promptOptions.ToComposable()
 
             promptInput.ToComposable()
 
             submitButton.ToComposable()
-
-            Text(text = text)
 
             snackBar?.ToComposable(snackbarHostState)
         }

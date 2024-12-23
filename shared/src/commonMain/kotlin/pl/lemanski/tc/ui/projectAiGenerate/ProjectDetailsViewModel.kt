@@ -11,6 +11,7 @@ import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.useCase.aiGenerate.AiGenerateUseCase
 import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
+import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
@@ -21,7 +22,8 @@ internal class ProjectAiGenerateViewModel(
     private val i18n: I18n,
     private val navigationService: NavigationService,
     private val loadProjectUseCase: LoadProjectUseCase,
-    private val aiGenerateUseCase: AiGenerateUseCase
+    private val aiGenerateUseCase: AiGenerateUseCase,
+    private val updateProjectUseCase: UpdateProjectUseCase
 ) : ProjectAiGenerateContract.ViewModel() {
 
     private val promptOptions = ProjectAiGenerateContract.PromptOption.entries.map { it.toOption() }
@@ -31,10 +33,7 @@ internal class ProjectAiGenerateViewModel(
         isLoading = true,
         snackBar = null,
         title = project.name,
-        backButton = StateComponent.Button(
-            text = "",
-            onClick = ::back
-        ),
+
         promptInput = StateComponent.Input(
             value = "",
             type = StateComponent.Input.Type.TEXT,
@@ -49,7 +48,6 @@ internal class ProjectAiGenerateViewModel(
             onSelected = ::onPromptOptionSelected,
             options = promptOptions.toSet()
         ),
-        text = "",
         submitButton = StateComponent.Button(
             text = i18n.common.confirm,
             onClick = ::onSubmitClicked
@@ -86,24 +84,25 @@ internal class ProjectAiGenerateViewModel(
         val chordBeats = when (selectedPromptOption) {
             ProjectAiGenerateContract.PromptOption.CHORDS_FOR_MELODY -> aiGenerateUseCase.generateChordBeats(errorHandler, "TODO")
             ProjectAiGenerateContract.PromptOption.CHORDS            -> aiGenerateUseCase.generateChordBeats(errorHandler, prompt)
-            else                                                     -> listOf()
+            else                                                     -> project.chords
         }
 
         val noteBeats = when (selectedPromptOption) {
             ProjectAiGenerateContract.PromptOption.MELODY_FOR_CHORDS -> aiGenerateUseCase.generateMelody(errorHandler, "TODO")
             ProjectAiGenerateContract.PromptOption.MELODY            -> aiGenerateUseCase.generateMelody(errorHandler, prompt)
-            else                                                     -> listOf()
+            else                                                     -> project.melody
         }
 
-        _stateFlow.update { state ->
-            state.copy(
-                text = """
-                    |Chords:
-                    |
-                    |Melody:
-                """.trimIndent()
-            )
-        }
+        project = project.copy(
+            chords = chordBeats,
+            melody = noteBeats
+        )
+
+        updateProjectUseCase.invoke(
+            errorHandler = UpdateProjectErrorHandler(),
+            project = project,
+            projectId = project.id
+        )
     }
 
     override fun onPromptInputChanged(input: String) {
@@ -182,6 +181,22 @@ internal class ProjectAiGenerateViewModel(
 
         override fun onUnknownError() {
             showSnackBar(i18n.projectAiGenerate.unknownError, null, null)
+        }
+    }
+
+    //---
+
+    inner class UpdateProjectErrorHandler : UpdateProjectUseCase.ErrorHandler {
+        override fun onInvalidProjectName() {
+            // will not happen
+        }
+
+        override fun onInvalidProjectBpm() {
+
+        }
+
+        override fun onProjectSaveError() {
+            TODO("Not yet implemented")
         }
     }
 }

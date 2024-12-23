@@ -18,8 +18,6 @@ fun ProjectAiGenerateRouter() = router<ProjectAiGenerateContract.ViewModel, Proj
         promptOptions = state.promptOptions,
         promptInput = state.promptInput,
         submitButton = state.submitButton,
-        backButton = state.backButton,
-        text = state.text,
         snackBar = state.snackBar,
     )
 }

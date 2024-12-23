@@ -20,10 +20,10 @@ import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCase
 import pl.lemanski.tc.domain.useCase.getProjectsList.GetProjectsListUseCaseImpl
 import pl.lemanski.tc.domain.useCase.getSoundFontPresets.GetSoundFontPresetsUseCase
 import pl.lemanski.tc.domain.useCase.getSoundFontPresets.GetSoundFontPresetsUseCaseImpl
-import pl.lemanski.tc.domain.useCase.playbackControl.PlaybackControlUseCase
-import pl.lemanski.tc.domain.useCase.playbackControl.PlaybackControlUseCaseImpl
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCaseImpl
+import pl.lemanski.tc.domain.useCase.setMarkersUseCase.SetMarkersUseCase
+import pl.lemanski.tc.domain.useCase.setMarkersUseCase.SetMarkersUseCaseImpl
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCaseImpl
 
@@ -39,8 +39,8 @@ internal object DomainModule {
         singleOf(::GetProjectsListUseCaseImpl) bind GetProjectsListUseCase::class
         singleOf(::GenerateAudioUseCaseImpl) bind GenerateAudioUseCase::class
         singleOf(::LoadProjectUseCaseImpl) bind LoadProjectUseCase::class
-        singleOf(::PlaybackControlUseCaseImpl) bind PlaybackControlUseCase::class
         singleOf(::UpdateProjectUseCaseImpl) bind UpdateProjectUseCase::class
+        singleOf(::SetMarkersUseCaseImpl) bind SetMarkersUseCase::class
         singleOf(::GetSoundFontPresetsUseCaseImpl) bind GetSoundFontPresetsUseCase::class
         singleOf(::PresetsControlUseCaseImpl) bind PresetsControlUseCase::class
         singleOf(::AiGenerateUseCaseImpl) bind AiGenerateUseCase::class

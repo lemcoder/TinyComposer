@@ -7,24 +7,27 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.lemanski.tc.domain.model.audio.AudioStream
+import pl.lemanski.tc.domain.model.audio.play
+import pl.lemanski.tc.domain.model.audio.stop
 import pl.lemanski.tc.domain.model.core.Chord
+import pl.lemanski.tc.domain.model.core.ChordBeats
 import pl.lemanski.tc.domain.model.core.Note
+import pl.lemanski.tc.domain.model.core.NoteBeats
 import pl.lemanski.tc.domain.model.core.build
 import pl.lemanski.tc.domain.model.core.changeOctave
 import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
-import pl.lemanski.tc.domain.model.core.ChordBeats
-import pl.lemanski.tc.domain.model.core.NoteBeats
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
 import pl.lemanski.tc.domain.service.navigation.goTo
 import pl.lemanski.tc.domain.useCase.generateAudio.GenerateAudioUseCase
 import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
-import pl.lemanski.tc.domain.useCase.playbackControl.PlaybackControlUseCase
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
 import pl.lemanski.tc.domain.useCase.saveProject.SaveProjectUseCase
+import pl.lemanski.tc.domain.useCase.setMarkersUseCase.SetMarkersUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
@@ -38,15 +41,15 @@ internal class ProjectDetailsViewModel(
     private val navigationService: NavigationService,
     private val loadProjectUseCase: LoadProjectUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
-    private val playbackControlUseCase: PlaybackControlUseCase,
     private val generateAudioUseCase: GenerateAudioUseCase,
     private val presetsControlUseCase: PresetsControlUseCase,
-    private val saveProjectUseCase: SaveProjectUseCase
+    private val saveProjectUseCase: SaveProjectUseCase,
+    private val setMarkersUseCase: SetMarkersUseCase
 ) : ProjectDetailsContract.ViewModel() {
 
     private val logger = Logger(this::class)
+    private var audioStream: AudioStream = AudioStream.EMPTY
     private var project: Project = loadProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
-    private var playbackJob: Job? = null
     private val initialState = ProjectDetailsContract.State(
         isLoading = true,
         projectName = project.name,
@@ -114,26 +117,57 @@ internal class ProjectDetailsViewModel(
             )
         }
 
+        val isLoopingEnabled = true // TODO implement looping control
         val chordPreset = presetsControlUseCase.getChordPreset(project.id)
         val notePreset = presetsControlUseCase.getMelodyPreset(project.id)
 
-        val audioData = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, chordPreset, project.melody, notePreset, project.bpm)
-        playbackJob = launch { playbackControlUseCase.play(PlaybackControlErrorHandler(), audioData) }
-        playbackJob?.invokeOnCompletion {
-            _stateFlow.update {
-                it.copy(
-                    playButton = StateComponent.Button(
-                        text = "",
-                        onClick = ::onPlayButtonClicked
-                    ),
-                    stopButton = null
-                )
+        audioStream = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, chordPreset, project.melody, notePreset, project.bpm)
+        val option = if (_stateFlow.value.tabComponent.selected.value == ProjectDetailsContract.Tab.CHORDS) SetMarkersUseCase.Option.CHORDS else SetMarkersUseCase.Option.MELODY
+        setMarkersUseCase(project, audioStream, option)
+
+        audioStream.onMarkerReached { marker ->
+            logger.error("Marker reached: ${marker.index}")
+            if (marker == AudioStream.END_MARKER) {
+                _stateFlow.update {
+                    it.copy(
+                        playButton = StateComponent.Button(
+                            text = "",
+                            onClick = ::onPlayButtonClicked
+                        ),
+                        stopButton = null
+                    )
+                }
+                audioStream.stop()
+                return@onMarkerReached
+            }
+
+            val markerIndex = marker.index
+
+            val o = if (_stateFlow.value.tabComponent.selected.value == ProjectDetailsContract.Tab.CHORDS) SetMarkersUseCase.Option.CHORDS else SetMarkersUseCase.Option.MELODY
+            if (o == SetMarkersUseCase.Option.CHORDS) {
+                _stateFlow.update { state ->
+                    state.copy(
+                        chordBeats = state.chordBeats.map {
+                            it.copy(isActive = it.id == markerIndex)
+                        },
+                    )
+                }
+            } else {
+                _stateFlow.update { state ->
+                    state.copy(
+                        noteBeats = state.noteBeats.map {
+                            it.copy(isActive = it.id == markerIndex)
+                        }
+                    )
+                }
             }
         }
+
+        audioStream.play(isLoopingEnabled)
     }
 
     override fun onStopButtonClicked(): Job = viewModelScope.launch {
-        playbackJob?.cancel()
+        audioStream.stop()
 
         _stateFlow.update {
             it.copy(
@@ -346,6 +380,7 @@ internal class ProjectDetailsViewModel(
 
     private fun ChordBeats.toChordBeatsComponent(id: Int) = ProjectDetailsContract.State.ChordBeatsComponent(
         id = id,
+        isActive = false,
         chordBeats = this,
         onChordClick = ::onBeatComponentClick,
         onChordDoubleClick = ::onBeatComponentDoubleClick,
@@ -354,24 +389,12 @@ internal class ProjectDetailsViewModel(
 
     private fun NoteBeats.toNoteBeatsComponent(id: Int) = ProjectDetailsContract.State.NoteBeatsComponent(
         id = id,
+        isActive = false,
         noteBeats = this,
         onNoteClick = ::onBeatComponentClick,
         onNoteDoubleClick = ::onBeatComponentDoubleClick,
         onNoteLongClick = ::onBeatComponentLongClick
     )
-
-    //---
-
-    inner class PlaybackControlErrorHandler : PlaybackControlUseCase.ErrorHandler {
-        override fun onAudioDataNotInitialized() {
-        }
-
-        override fun onControlStateError() {
-            logger.error("Control state error")
-            hideSnackBar()
-            showSnackBar(i18n.projectDetails.controlStateError, null, null)
-        }
-    }
 
     //---
 

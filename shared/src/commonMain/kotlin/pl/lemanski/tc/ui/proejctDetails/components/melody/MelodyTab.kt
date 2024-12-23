@@ -44,13 +44,17 @@ private fun NoteBeatsComponent.NoteBeatItem(
 ) {
     val haptic = LocalHapticFeedback.current
     val (note, beats) = noteBeats
-    val color = remember(note.value) {
-        Color(
-            red = 0f,
-            green = (id.toFloat() / 20).coerceIn(0f, 1f),
-            blue = 1f,
-            alpha = (id.toFloat() / 100).coerceIn(.1f, 1f)
-        )
+    val color = if (isActive) {
+        Color.Red
+    } else {
+        remember(note.value) {
+            Color(
+                red = 0f,
+                green = (id.toFloat() / 20).coerceIn(0f, 1f),
+                blue = 1f,
+                alpha = (id.toFloat() / 100).coerceIn(.1f, 1f)
+            )
+        }
     }
 
     Box(

@@ -25,11 +25,9 @@ internal interface ProjectAiGenerateContract {
     data class State(
         val isLoading: Boolean,
         val title: String,
-        val text: String,
         val promptOptions: StateComponent.RadioGroup<PromptOption>,
         val promptInput: StateComponent.Input,
         val submitButton: StateComponent.Button,
-        val backButton: StateComponent.Button,
         val snackBar: StateComponent.SnackBar?,
     )
 }

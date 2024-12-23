@@ -44,13 +44,17 @@ private fun ChordBeatsComponent.ChordBeatItem(
 ) {
     val haptic = LocalHapticFeedback.current
     val (chord, beats) = chordBeats
-    val color = remember(chord.type.ordinal) {
-        Color(
-            red = 0f,
-            green = (id.toFloat() / 20).coerceIn(0f, 1f),
-            blue = 1f,
-            alpha = (id.toFloat() / 100).coerceIn(.1f, 1f)
-        )
+    val color = if (isActive) {
+        Color.Red
+    } else {
+        remember(chord.type.ordinal) {
+            Color(
+                red = 0f,
+                green = (id.toFloat() / 20).coerceIn(0f, 1f),
+                blue = 1f,
+                alpha = (id.toFloat() / 100).coerceIn(.1f, 1f)
+            )
+        }
     }
 
     Box(

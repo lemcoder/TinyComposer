@@ -15,7 +15,7 @@ import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.exception.ApplicationStateException
 import kotlin.coroutines.resume
 
-actual suspend fun playAudio(data: FloatArray, sampleRate: Int) = suspendCancellableCoroutine { continuation ->
+internal suspend fun playAudio(data: FloatArray, sampleRate: Int) = suspendCancellableCoroutine { continuation ->
     val playbackScope = CoroutineScope(Job())
     val logger = Logger(AudioService::class)
     val convertedData = convertPCM32ToPCM16(data)

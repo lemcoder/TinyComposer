@@ -54,6 +54,7 @@ internal interface ProjectDetailsContract {
 
         data class ChordBeatsComponent(
             val id: Int,
+            val isActive: Boolean,
             val chordBeats: ChordBeats,
             val onChordClick: (Int) -> Unit,
             val onChordDoubleClick: (Int) -> Unit,
@@ -62,6 +63,7 @@ internal interface ProjectDetailsContract {
 
         data class NoteBeatsComponent(
             val id: Int,
+            val isActive: Boolean,
             val noteBeats: NoteBeats,
             val onNoteClick: (Int) -> Unit,
             val onNoteDoubleClick: (Int) -> Unit,

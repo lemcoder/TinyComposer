@@ -30,6 +30,6 @@ internal object UiModule {
         viewModel<ProjectsListContract.ViewModel> { (key: ProjectListDestination) -> ProjectListViewModel(key, get(), get(), get(), get(), get()) }
         viewModel<ProjectDetailsContract.ViewModel> { (key: ProjectDetailsDestination) -> ProjectDetailsViewModel(key, get(), get(), get(), get(), get(), get(), get(), get()) }
         viewModel<ProjectOptionsContract.ViewModel> { (key: ProjectOptionsDestination) -> ProjectOptionsViewModel(key, get(), get(), get(), get(), get(), get()) }
-        viewModel<ProjectAiGenerateContract.ViewModel> { (key: ProjectAiGenerateDestination) -> ProjectAiGenerateViewModel(key, get(), get(), get(), get()) }
+        viewModel<ProjectAiGenerateContract.ViewModel> { (key: ProjectAiGenerateDestination) -> ProjectAiGenerateViewModel(key, get(), get(), get(), get(), get()) }
     }
 }

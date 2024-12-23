@@ -65,4 +65,11 @@ internal sealed class StateComponent {
             val value: T
         )
     }
+
+    data class Switch(
+        val label: String,
+        val description: String?,
+        val isChecked: Boolean,
+        val onCheckedChange: (Boolean) -> Unit
+    ): StateComponent()
 }

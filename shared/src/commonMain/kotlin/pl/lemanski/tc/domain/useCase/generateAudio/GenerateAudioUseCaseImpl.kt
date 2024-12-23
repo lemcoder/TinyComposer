@@ -1,19 +1,17 @@
 package pl.lemanski.tc.domain.useCase.generateAudio
 
 import io.github.lemcoder.mikrosoundfont.midi.MidiMetaMessage
-import org.jetbrains.compose.resources.ExperimentalResourceApi
+import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.core.ChordBeats
 import pl.lemanski.tc.domain.model.core.NoteBeats
 import pl.lemanski.tc.domain.service.audio.AudioMapper
 import pl.lemanski.tc.domain.service.audio.AudioService
-import tinycomposer.shared.generated.resources.Res
 
 internal class GenerateAudioUseCaseImpl(
     private val audioService: AudioService,
     private val audioMapper: AudioMapper
 ) : GenerateAudioUseCase {
 
-    @OptIn(ExperimentalResourceApi::class)
     override suspend operator fun invoke(
         errorHandler: GenerateAudioUseCase.ErrorHandler,
         chordBeats: List<ChordBeats>,
@@ -21,31 +19,25 @@ internal class GenerateAudioUseCaseImpl(
         noteBeats: List<NoteBeats>,
         notesPreset: Int,
         tempo: Int
-    ): FloatArray {
-        if (!audioService.isSoundFontLoaded()) {
-
-        }
-
+    ): AudioStream {
         val tempoMessage = MidiMetaMessage.SetTempo(0, tempo)
 
         val chordMidiMessages = try {
             listOf(
-                // MidiVoiceMessage.ProgramChange(0, 0, 0),
                 *audioMapper.mapChordBeatsToMidiMessage(chordBeats, tempo, chordsPreset).toTypedArray()
             )
         } catch (ex: Exception) {
             errorHandler.onInvalidChordBeats()
-            return floatArrayOf()
+            return AudioStream.EMPTY
         }
 
         val noteMidiMessages = try {
             listOf(
-                // MidiVoiceMessage.ProgramChange(0, 1, 8),
                 *audioMapper.mapNoteBeatsToMidiMessage(noteBeats, tempo, notesPreset).toTypedArray()
             )
         } catch (ex: Exception) {
             errorHandler.onInvalidNoteBeats()
-            return floatArrayOf()
+            return AudioStream.EMPTY
         }
 
         val midiMessages = (listOf(tempoMessage) + chordMidiMessages + noteMidiMessages).sortedBy { it.time }

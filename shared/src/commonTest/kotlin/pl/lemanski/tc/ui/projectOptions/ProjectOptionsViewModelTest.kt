@@ -2,13 +2,8 @@ package pl.lemanski.tc.ui.projectOptions
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
@@ -29,6 +24,7 @@ import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.ui.common.i18n.TestI18n
 import pl.lemanski.tc.utils.UUID
+import pl.lemanski.tc.utils.testViewModel
 import kotlin.test.BeforeTest
 
 class ProjectOptionsViewModelTest {
@@ -113,106 +109,113 @@ class ProjectOptionsViewModelTest {
 
     @Test
     fun test_initial_state() = runTest {
-        val state = viewModel.stateFlow.first()
-        assertFalse(state.isLoading)
-        assertEquals(i18n.projectOptions.title, state.title)
-        assertNull(state.snackBar)
-        assertEquals(project.bpm.toString(), state.tempoInput.value)
-        assertEquals(StateComponent.Input.Type.NUMBER, state.tempoInput.type)
-        assertEquals(i18n.projectOptions.tempo, state.tempoInput.hint)
-        assertNull(state.tempoInput.error)
+        testViewModel(viewModel) {
+            assertFalse(lastState.isLoading)
+            assertEquals(i18n.projectOptions.title, lastState.title)
+            assertNull(lastState.snackBar)
+            assertEquals(project.bpm.toString(), lastState.tempoInput.value)
+            assertEquals(StateComponent.Input.Type.NUMBER, lastState.tempoInput.type)
+            assertEquals(i18n.projectOptions.tempo, lastState.tempoInput.hint)
+            assertNull(lastState.tempoInput.error)
+        }
     }
 
     @Test
     fun test_onTempoChanged_with_valid_tempo() = runTest {
-        val vm = viewModel
+        testViewModel(viewModel) {
+            performAction {
+                onTempoChanged("120")
+            }
 
-        vm.onTempoChanged("120")
-        val state = vm.stateFlow.value
-        assertNull(state.tempoInput.error)
-        assertEquals("120", state.tempoInput.value)
+            assertNull(lastState.tempoInput.error)
+            assertEquals("120", lastState.tempoInput.value)
+        }
+
     }
 
     @Test
     fun test_onTempoChanged_with_invalid_tempo() = runTest {
-        val vm = viewModel
+        testViewModel(viewModel) {
+            performAction {
+                onTempoChanged("abc")
+            }
 
-        vm.onTempoChanged("10")
-        val state = vm.stateFlow.first()
-        assertEquals(i18n.projectOptions.tempoError, state.tempoInput.error)
+            assertEquals(i18n.projectOptions.tempoError, lastState.tempoInput.error)
+        }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_onChordsPresetSelected() = runTest {
-        val vm = viewModel
+        testViewModel(viewModel) {
+            val preset = lastState.chordsPresetSelect.options.random()
 
-        val preset = vm.stateFlow.value.chordsPresetSelect.options.random()
+            performAction {
+                onChordsPresetSelected(preset)
+            }
 
-        val values = mutableListOf<ProjectOptionsContract.State>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            vm.stateFlow.toList(values)
+            assertEquals(preset, lastState.chordsPresetSelect.selected)
         }
-
-        vm.onChordsPresetSelected(preset)
-        advanceUntilIdle()
-
-        assertEquals(preset, values.last().chordsPresetSelect.selected)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_onMelodyPresetSelected() = runTest {
-        val vm = viewModel
+        testViewModel(viewModel) {
+            val preset = lastState.melodyPresetSelect.options.random()
 
-        val preset = vm.stateFlow.value.melodyPresetSelect.options.random()
+            performAction {
+                onMelodyPresetSelected(preset)
+            }
 
-        val values = mutableListOf<ProjectOptionsContract.State>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            vm.stateFlow.toList(values)
+            assertEquals(preset, lastState.melodyPresetSelect.selected)
         }
-
-        vm.onMelodyPresetSelected(preset)
-        advanceUntilIdle()
-
-        assertEquals(preset, values.last().melodyPresetSelect.selected)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_note_and_chord_presets() = runTest {
-        val vm = viewModel
+        testViewModel(viewModel) {
+            val chordPreset = lastState.chordsPresetSelect.options.random()
+            val melodyPreset = lastState.melodyPresetSelect.options.random()
 
-        val chordPreset = vm.stateFlow.value.chordsPresetSelect.options.random()
-        val melodyPreset = vm.stateFlow.value.melodyPresetSelect.options.random()
+            performAction {
+                onMelodyPresetSelected(melodyPreset)
+            }
+            assertEquals(melodyPreset.value, presetsControlUseCase.lastMelodyPreset)
 
-        vm.onMelodyPresetSelected(melodyPreset)
-        advanceUntilIdle()
-        assertEquals(melodyPreset.value, presetsControlUseCase.lastMelodyPreset)
+            performAction {
+                onChordsPresetSelected(chordPreset)
+            }
 
-        vm.onChordsPresetSelected(chordPreset)
-        advanceUntilIdle()
-        assertEquals(chordPreset.value, presetsControlUseCase.lastChordPreset)
+            assertEquals(chordPreset.value, presetsControlUseCase.lastChordPreset)
+        }
     }
 
     @Test
     fun test_showSnackBar() = runTest {
-        val vm = viewModel
+        testViewModel(viewModel) {
+            performAction {
+                showSnackBar("Test message", "Action", null)
+            }
 
-        vm.showSnackBar("Test message", "Action", null)
-        val state = vm.stateFlow.first()
-        assertNotNull(state.snackBar)
-        assertEquals("Test message", state.snackBar?.message)
-        assertEquals("Action", state.snackBar?.action)
+            assertNotNull(lastState.snackBar)
+            assertEquals("Test message", lastState.snackBar?.message)
+            assertEquals("Action", lastState.snackBar?.action)
+        }
     }
 
     @Test
     fun test_hideSnackBar() = runTest {
-        val vm = viewModel
+        testViewModel(viewModel) {
+            performAction {
+                showSnackBar("Test message", "Action", null)
+            }
 
-        vm.showSnackBar("Test message", "Action", null)
-        vm.hideSnackBar()
-        val state = vm.stateFlow.first()
-        assertNull(state.snackBar)
+            assertNotNull(lastState.snackBar)
+
+            performAction {
+                hideSnackBar()
+            }
+
+            assertNull(lastState.snackBar)
+        }
     }
 }

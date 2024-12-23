@@ -1,5 +1,6 @@
 package pl.lemanski.tc.domain.useCase.generateAudio
 
+import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.core.ChordBeats
 import pl.lemanski.tc.domain.model.core.NoteBeats
 
@@ -16,5 +17,5 @@ internal interface GenerateAudioUseCase {
         noteBeats: List<NoteBeats>,
         notesPreset: Int,
         tempo: Int
-    ): FloatArray
+    ): AudioStream
 }
