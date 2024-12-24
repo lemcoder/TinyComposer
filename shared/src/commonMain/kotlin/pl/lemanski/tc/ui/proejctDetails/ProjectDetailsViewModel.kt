@@ -74,7 +74,9 @@ internal class ProjectDetailsViewModel(
             onClick = ::onAddButtonClicked
         ),
         noteBeats = project.melody.mapIndexed { index, note -> note.toNoteBeatsComponent(index) },
-        chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
+        chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) }.mapIndexed {
+            index, chordComponent -> chordComponent.copy(id = index)
+        }, // FIXME
         bottomSheet = null,
         tabComponent = StateComponent.TabComponent(
             selected = tabToOption(ProjectDetailsContract.Tab.CHORDS),
@@ -122,8 +124,7 @@ internal class ProjectDetailsViewModel(
         val notePreset = presetsControlUseCase.getMelodyPreset(project.id)
 
         audioStream = generateAudioUseCase(GenerateAudioErrorHandler(), project.chords, chordPreset, project.melody, notePreset, project.bpm)
-        val option = if (_stateFlow.value.tabComponent.selected.value == ProjectDetailsContract.Tab.CHORDS) SetMarkersUseCase.Option.CHORDS else SetMarkersUseCase.Option.MELODY
-        setMarkersUseCase(project, audioStream, option)
+        setMarkersUseCase(project, audioStream)
 
         audioStream.onMarkerReached { marker ->
             logger.error("Marker reached: ${marker.index}")
@@ -143,23 +144,16 @@ internal class ProjectDetailsViewModel(
 
             val markerIndex = marker.index
 
-            val o = if (_stateFlow.value.tabComponent.selected.value == ProjectDetailsContract.Tab.CHORDS) SetMarkersUseCase.Option.CHORDS else SetMarkersUseCase.Option.MELODY
-            if (o == SetMarkersUseCase.Option.CHORDS) {
-                _stateFlow.update { state ->
-                    state.copy(
-                        chordBeats = state.chordBeats.map {
-                            it.copy(isActive = it.id == markerIndex)
-                        },
-                    )
-                }
-            } else {
-                _stateFlow.update { state ->
-                    state.copy(
-                        noteBeats = state.noteBeats.map {
-                            it.copy(isActive = it.id == markerIndex)
-                        }
-                    )
-                }
+            _stateFlow.update { state ->
+                state.copy(
+                    chordBeats = state.chordBeats.map {
+                        it.copy(isActive = it.id == markerIndex)
+                    },
+                    noteBeats = state.noteBeats.map {
+                        it.copy(isActive = it.id == markerIndex)
+                    }
+
+                )
             }
         }
 
@@ -220,7 +214,7 @@ internal class ProjectDetailsViewModel(
                 _stateFlow.update { state ->
                     state.copy(
                         wheelPicker = null,
-                        chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) }
+                        chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) }
                     )
                 }
             }
@@ -276,7 +270,7 @@ internal class ProjectDetailsViewModel(
 
             _stateFlow.update { state ->
                 state.copy(
-                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) }
+                    chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) }
                 )
             }
         } else {
@@ -308,7 +302,7 @@ internal class ProjectDetailsViewModel(
 
             _stateFlow.update { state ->
                 state.copy(
-                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) }
+                    chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) }
                 )
             }
         } else {
@@ -378,14 +372,19 @@ internal class ProjectDetailsViewModel(
 
     private fun getWheelPickerValues(): Set<String> = setOf("D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D") // FIXME
 
-    private fun ChordBeats.toChordBeatsComponent(id: Int) = ProjectDetailsContract.State.ChordBeatsComponent(
-        id = id,
-        isActive = false,
-        chordBeats = this,
-        onChordClick = ::onBeatComponentClick,
-        onChordDoubleClick = ::onBeatComponentDoubleClick,
-        onChordLongClick = ::onBeatComponentLongClick
-    )
+    private fun ChordBeats.toChordComponents(id: Int): List<ProjectDetailsContract.State.ChordComponent> {
+        return List(this.second) { i ->
+            ProjectDetailsContract.State.ChordComponent(
+                id = id,
+                isActive = false,
+                isPrimary = i == 0,
+                chord = this.first,
+                onChordClick = ::onBeatComponentClick,
+                onChordDoubleClick = ::onBeatComponentDoubleClick,
+                onChordLongClick = ::onBeatComponentLongClick
+            )
+        }
+    }
 
     private fun NoteBeats.toNoteBeatsComponent(id: Int) = ProjectDetailsContract.State.NoteBeatsComponent(
         id = id,
@@ -516,7 +515,7 @@ internal class ProjectDetailsViewModel(
 
             _stateFlow.update { state ->
                 state.copy(
-                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
+                    chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) },
                     bottomSheet = (state.bottomSheet as ProjectDetailsContract.State.BottomSheet.ChordBottomSheet).copy(
                         durationValuePicker = state.bottomSheet.durationValuePicker.copy(
                             value = value
@@ -540,7 +539,7 @@ internal class ProjectDetailsViewModel(
 
             _stateFlow.update { state ->
                 state.copy(
-                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
+                    chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) },
                     bottomSheet = (state.bottomSheet as ProjectDetailsContract.State.BottomSheet.ChordBottomSheet).copy(
                         chordTypeSelect = state.bottomSheet.chordTypeSelect.copy(
                             selected = chordTypeOptions.find { it.value == chordType } ?: chordTypeOptions.first()
@@ -569,7 +568,7 @@ internal class ProjectDetailsViewModel(
 
             _stateFlow.update { state ->
                 state.copy(
-                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
+                    chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) },
                     bottomSheet = (state.bottomSheet as ProjectDetailsContract.State.BottomSheet.ChordBottomSheet).copy(
                         octaveValuePicker = state.bottomSheet.octaveValuePicker.copy(
                             value = value
@@ -594,7 +593,7 @@ internal class ProjectDetailsViewModel(
 
             _stateFlow.update { state ->
                 state.copy(
-                    chordBeats = project.chords.mapIndexed { index, chord -> chord.toChordBeatsComponent(index) },
+                    chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) },
                     bottomSheet = (state.bottomSheet as ProjectDetailsContract.State.BottomSheet.ChordBottomSheet).copy(
                         velocityValuePicker = state.bottomSheet.velocityValuePicker.copy(
                             value = value

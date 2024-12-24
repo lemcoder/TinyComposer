@@ -10,43 +10,20 @@ internal class SetMarkersUseCaseImpl : SetMarkersUseCase {
     override operator fun invoke(
         project: Project,
         audioStream: AudioStream,
-        option: SetMarkersUseCase.Option
     ) {
-        logger.info("Setting markers for project: ${project.id} ${option.name}")
+        logger.info("Setting markers for project: ${project.id}")
 
-        // TODO add error handling
-        when (option) {
-            SetMarkersUseCase.Option.CHORDS -> setMarkersForChordBeats(project, audioStream)
-            SetMarkersUseCase.Option.MELODY -> setMarkersForNoteBeats(project, audioStream)
-        }
-    }
-
-    private fun setMarkersForChordBeats(
-        project: Project,
-        audioStream: AudioStream
-    ) {
         val beatSize = calculateBeatSize(audioStream, project)
+        val numOfChordBeats = project.chords.sumOf { it.second }
+        val numOfMelodyBeats = project.melody.sumOf { it.second }
+        val maxNumOfBeats = maxOf(numOfMelodyBeats, numOfChordBeats)
 
-        var currentBeatPos = 0
-        for (i in project.chords.indices) {
-            currentBeatPos += project.chords.getOrNull(i - 1)?.second ?: 0
-            val markerPos = currentBeatPos * beatSize
+        logger.info("Beat size: $beatSize")
+        logger.info("Number of chord beats: $numOfChordBeats | Number of melody beats: $numOfMelodyBeats")
+
+        for (i in 0..<maxNumOfBeats) {
+            val markerPos = i * beatSize
             logger.info("Adding marker at position: $markerPos")
-            audioStream.addMarker(markerPos)
-        }
-    }
-
-    private fun setMarkersForNoteBeats(
-        project: Project,
-        audioStream: AudioStream
-    ) {
-        val beatSize = calculateBeatSize(audioStream, project)
-
-        var currentBeatPos = 0
-        for (i in project.melody.indices) {
-            currentBeatPos += project.melody.getOrNull(i - 1)?.second ?: 0
-            val markerPos = currentBeatPos * beatSize
-            logger.warn("Adding marker at position: $markerPos")
             audioStream.addMarker(markerPos)
         }
     }

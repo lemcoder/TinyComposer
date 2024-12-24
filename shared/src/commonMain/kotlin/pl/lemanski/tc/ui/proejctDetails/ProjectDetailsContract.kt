@@ -2,7 +2,6 @@ package pl.lemanski.tc.ui.proejctDetails
 
 import kotlinx.coroutines.Job
 import pl.lemanski.tc.domain.model.core.Chord
-import pl.lemanski.tc.domain.model.core.ChordBeats
 import pl.lemanski.tc.domain.model.core.NoteBeats
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.TcViewModel
@@ -42,7 +41,7 @@ internal interface ProjectDetailsContract {
         val aiGenerateButton: StateComponent.Button,
         val wheelPicker: WheelPicker?,
         val noteBeats: List<NoteBeatsComponent>,
-        val chordBeats: List<ChordBeatsComponent>,
+        val chordBeats: List<ChordComponent>,
         val bottomSheet: BottomSheet?,
         val snackBar: StateComponent.SnackBar?,
     ) {
@@ -52,10 +51,11 @@ internal interface ProjectDetailsContract {
             val onValueSelected: (String) -> Unit,
         )
 
-        data class ChordBeatsComponent(
+        data class ChordComponent(
             val id: Int,
             val isActive: Boolean,
-            val chordBeats: ChordBeats,
+            val isPrimary: Boolean,
+            val chord: Chord,
             val onChordClick: (Int) -> Unit,
             val onChordDoubleClick: (Int) -> Unit,
             val onChordLongClick: (Int) -> Unit,

@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,7 +45,7 @@ internal fun ProjectDetailsScreen(
     aiGenerateButton: StateComponent.Button,
     projectDetailsButton: StateComponent.Button,
     noteBeats: List<ProjectDetailsContract.State.NoteBeatsComponent>,
-    chordBeats: List<ProjectDetailsContract.State.ChordBeatsComponent>,
+    chordBeats: List<ProjectDetailsContract.State.ChordComponent>,
     wheelPicker: ProjectDetailsContract.State.WheelPicker?,
     bottomSheet: ProjectDetailsContract.State.BottomSheet?,
     snackBar: StateComponent.SnackBar?,
