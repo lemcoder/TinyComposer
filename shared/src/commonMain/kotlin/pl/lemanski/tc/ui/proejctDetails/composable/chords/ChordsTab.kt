@@ -76,7 +76,7 @@ private fun ProjectDetailsContract.State.PageState.ChordComponent.ChordBeatItem(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(color = if (isActive) MaterialTheme.colorScheme.tertiary else Color.Unspecified)
+                .background(color = if (isActive) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = .5f) else Color.Unspecified)
                 .combinedClickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,

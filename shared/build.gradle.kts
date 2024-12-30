@@ -10,6 +10,7 @@ kotlin {
     jvmToolchain(17)
 
     androidTarget()
+    androidNativeArm64() // TODO remove
 
     if (System.getProperty("os.name").lowercase().contains("mac")) {
         listOf(

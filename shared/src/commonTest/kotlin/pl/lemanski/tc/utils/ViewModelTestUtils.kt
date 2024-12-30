@@ -44,7 +44,10 @@ internal interface TCViewModelTestScope<VM : TcViewModel<STATE>, STATE> {
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal fun <VM : TcViewModel<STATE>, STATE> TestScope.testViewModel(viewModel: VM, block: TCViewModelTestScope<VM, STATE>.() -> Unit) = launch {
+internal fun <VM : TcViewModel<STATE>, STATE> TestScope.testViewModel(
+    viewModel: VM,
+    block: TCViewModelTestScope<VM, STATE>.(VM) -> Unit
+) = launch {
 
     val items = mutableListOf<STATE>()
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -71,6 +74,6 @@ internal fun <VM : TcViewModel<STATE>, STATE> TestScope.testViewModel(viewModel:
     }
 
     with(scope) {
-        block()
+        block(viewModel)
     }
 }

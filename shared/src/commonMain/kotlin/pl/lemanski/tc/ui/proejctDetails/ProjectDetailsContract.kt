@@ -90,7 +90,7 @@ internal interface ProjectDetailsContract {
             companion object {
                 val EMPTY = PageState(
                     addButton = StateComponent.Button("") { },
-                    barLength = 0,
+                    barLength = 1,
                     wheelPicker = null,
                     noteBeats = emptyList(),
                     chordBeats = emptyList(),

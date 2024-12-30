@@ -2,7 +2,6 @@ package pl.lemanski.tc.domain.useCase
 
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.junit.Test
 import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.core.Note
@@ -11,6 +10,7 @@ import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.domain.useCase.setMarkersUseCase.SetMarkersUseCaseImpl
 import pl.lemanski.tc.utils.UUID
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class SetMarkersUseCaseTest {

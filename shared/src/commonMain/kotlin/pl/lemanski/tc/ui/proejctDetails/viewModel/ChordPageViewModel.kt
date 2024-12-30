@@ -231,7 +231,7 @@ internal class ChordPageViewModel(
             mutableStateFlow.update { state ->
                 state.copy(
                     pageState = state.pageState.copy(
-                        bottomSheet = initialState
+                        bottomSheet = null
                     ),
                 )
             }
@@ -258,7 +258,8 @@ internal class ChordPageViewModel(
                             durationValuePicker = state.pageState.bottomSheet.durationValuePicker.copy(
                                 value = value
                             )
-                        )
+                        ),
+                        chordBeats = getChordComponents(newProject)
                     ),
                 )
             }
@@ -287,7 +288,8 @@ internal class ChordPageViewModel(
                             chordTypeSelect = state.pageState.bottomSheet.chordTypeSelect.copy(
                                 selected = chordTypeOptions.find { it.value == chordType } ?: chordTypeOptions.first()
                             )
-                        )
+                        ),
+                        chordBeats = getChordComponents(newProject)
                     )
                 )
             }
@@ -322,7 +324,8 @@ internal class ChordPageViewModel(
                             octaveValuePicker = state.pageState.bottomSheet.octaveValuePicker.copy(
                                 value = value
                             )
-                        )
+                        ),
+                        chordBeats = getChordComponents(newProject)
                     )
                 )
             }
@@ -352,7 +355,8 @@ internal class ChordPageViewModel(
                             velocityValuePicker = state.pageState.bottomSheet.velocityValuePicker.copy(
                                 value = value
                             )
-                        )
+                        ),
+                        chordBeats = getChordComponents(newProject)
                     )
                 )
             }

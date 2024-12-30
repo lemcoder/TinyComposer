@@ -63,7 +63,7 @@ internal class ProjectDetailsViewModel(
         i18n = i18n
     )
 
-    private val currentViewModel: ProjectDetailsContract.PageViewModel
+    private val currentPageViewModel: ProjectDetailsContract.PageViewModel
         get() = when (mutableStateFlow.value.tabComponent.selected.value) {
             ProjectDetailsContract.Tab.CHORDS -> chordPageViewModel
             ProjectDetailsContract.Tab.MELODY -> melodyPageViewModel
@@ -109,6 +109,7 @@ internal class ProjectDetailsViewModel(
     override fun onAttached() {
         logger.debug("Attached")
 
+        currentPageViewModel.onAttached()
         mutableStateFlow.update { state ->
             state.copy(
                 isLoading = false,
@@ -163,11 +164,11 @@ internal class ProjectDetailsViewModel(
             mutableStateFlow.update { state ->
                 state.copy(
                     pageState = state.pageState.copy(
-                        chordBeats = state.pageState.chordBeats.map {
-                            it.copy(isActive = it.id == markerIndex)
+                        chordBeats = state.pageState.chordBeats.mapIndexed { index, chord ->
+                            chord.copy(isActive = index == markerIndex)
                         },
-                        noteBeats = state.pageState.noteBeats.map {
-                            it.copy(isActive = it.id == markerIndex)
+                        noteBeats = state.pageState.noteBeats.mapIndexed { index, note ->
+                            note.copy(isActive = index == markerIndex)
                         }
                     )
                 )
@@ -206,7 +207,7 @@ internal class ProjectDetailsViewModel(
             )
         }
 
-        currentViewModel.onAttached()
+        currentPageViewModel.onAttached()
     }
 
     //---
