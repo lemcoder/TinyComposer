@@ -9,7 +9,7 @@ internal fun NoteBeats.toNoteBeatsComponent(
     onNoteDoubleClick: (Int) -> Unit,
     onNoteLongClick: (Int) -> Unit
 ) = List(this.second) { i ->
-    ProjectDetailsContract.State.NoteComponent(
+    ProjectDetailsContract.State.PageState.NoteComponent(
         id = id,
         isActive = false,
         isPrimary = i == 0,

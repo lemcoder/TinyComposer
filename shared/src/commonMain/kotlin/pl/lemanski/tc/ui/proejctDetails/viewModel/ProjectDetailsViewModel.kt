@@ -10,11 +10,6 @@ import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.audio.play
 import pl.lemanski.tc.domain.model.audio.stop
-import pl.lemanski.tc.domain.model.core.Chord
-import pl.lemanski.tc.domain.model.core.ChordBeats
-import pl.lemanski.tc.domain.model.core.Note
-import pl.lemanski.tc.domain.model.core.NoteBeats
-import pl.lemanski.tc.domain.model.core.build
 import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
@@ -31,10 +26,6 @@ import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract
-import pl.lemanski.tc.ui.proejctDetails.composable.chords.toChordComponents
-import pl.lemanski.tc.ui.proejctDetails.composable.melody.toNoteBeatsComponent
-import pl.lemanski.tc.ui.proejctDetails.viewModel.stateHolder.ChordBottomSheetStateHolder
-import pl.lemanski.tc.ui.proejctDetails.viewModel.stateHolder.MelodyBottomSheetStateHolder
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.UUID
 import pl.lemanski.tc.utils.exception.ViewModelInitException
@@ -54,11 +45,34 @@ internal class ProjectDetailsViewModel(
     private var audioStream: AudioStream = AudioStream.EMPTY
 
     private val logger = Logger(this::class)
+    private val chordPageViewModel = ChordPageViewModel(
+        projectId = key.projectId,
+        viewModelScope = viewModelScope,
+        updateProjectUseCase = updateProjectUseCase,
+        loadProjectUseCase = loadProjectUseCase,
+        projectDetailsViewModel = this,
+        i18n = i18n
+    )
+
+    private val melodyPageViewModel = MelodyPageViewModel(
+        projectId = key.projectId,
+        viewModelScope = viewModelScope,
+        updateProjectUseCase = updateProjectUseCase,
+        loadProjectUseCase = loadProjectUseCase,
+        projectDetailsViewModel = this,
+        i18n = i18n
+    )
+
+    private val currentViewModel: ProjectDetailsContract.PageViewModel
+        get() = when (mutableStateFlow.value.tabComponent.selected.value) {
+            ProjectDetailsContract.Tab.CHORDS -> chordPageViewModel
+            ProjectDetailsContract.Tab.MELODY -> melodyPageViewModel
+        }
+
     private val initialProjectValue: Project = loadProjectOrThrow(key.projectId)
     private val initialState = ProjectDetailsContract.State(
         isLoading = true,
         projectName = initialProjectValue.name,
-        barLength = initialProjectValue.rhythm.beatsPerBar,
         playButton = StateComponent.Button(
             text = "",
             onClick = ::onPlayButtonClicked
@@ -73,29 +87,20 @@ internal class ProjectDetailsViewModel(
             onClick = ::onAiGenerateButtonClicked
         ),
         snackBar = null,
-        wheelPicker = null,
-        addButton = StateComponent.Button(
-            text = "",
-            onClick = ::onAddButtonClicked
-        ),
-        noteBeats = initialProjectValue.melody.mapIndexed { index, note -> note.toNoteBeatsComponent(index) },
-        chordBeats = initialProjectValue.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) }.mapIndexed { index, chordComponent ->
-            chordComponent.copy(id = index)
-        }, // FIXME
-        bottomSheet = null,
         tabComponent = StateComponent.TabComponent(
             selected = tabToOption(ProjectDetailsContract.Tab.CHORDS),
             options = ProjectDetailsContract.Tab.entries.map { tabToOption(it) }.toSet(),
             onTabSelected = ::onTabSelected
         ),
+        pageState = ProjectDetailsContract.State.PageState.EMPTY,
         projectDetailsButton = StateComponent.Button(
             text = "",
             onClick = ::onProjectOptionsButtonClicked
         ),
     )
 
-    private val _stateFlow = MutableStateFlow(initialState)
-    override val stateFlow: StateFlow<ProjectDetailsContract.State> = _stateFlow.asStateFlow()
+    override val mutableStateFlow = MutableStateFlow(initialState)
+    override val stateFlow: StateFlow<ProjectDetailsContract.State> = mutableStateFlow.asStateFlow()
 
     init {
         logger.debug("Init")
@@ -104,7 +109,7 @@ internal class ProjectDetailsViewModel(
     override fun onAttached() {
         logger.debug("Attached")
 
-        _stateFlow.update { state ->
+        mutableStateFlow.update { state ->
             state.copy(
                 isLoading = false,
             )
@@ -114,7 +119,7 @@ internal class ProjectDetailsViewModel(
     override fun onPlayButtonClicked(): Job = viewModelScope.launch {
         val project = loadProjectOrThrow(key.projectId)
 
-        _stateFlow.update {
+        mutableStateFlow.update {
             it.copy(
                 playButton = null,
                 stopButton = StateComponent.Button(
@@ -140,7 +145,7 @@ internal class ProjectDetailsViewModel(
         audioStream.onMarkerReached { marker ->
             logger.error("Marker reached: ${marker.index}")
             if (marker == AudioStream.END_MARKER) {
-                _stateFlow.update {
+                mutableStateFlow.update {
                     it.copy(
                         playButton = StateComponent.Button(
                             text = "",
@@ -155,15 +160,16 @@ internal class ProjectDetailsViewModel(
 
             val markerIndex = marker.index
 
-            _stateFlow.update { state ->
+            mutableStateFlow.update { state ->
                 state.copy(
-                    chordBeats = state.chordBeats.map {
-                        it.copy(isActive = it.id == markerIndex)
-                    },
-                    noteBeats = state.noteBeats.map {
-                        it.copy(isActive = it.id == markerIndex)
-                    }
-
+                    pageState = state.pageState.copy(
+                        chordBeats = state.pageState.chordBeats.map {
+                            it.copy(isActive = it.id == markerIndex)
+                        },
+                        noteBeats = state.pageState.noteBeats.map {
+                            it.copy(isActive = it.id == markerIndex)
+                        }
+                    )
                 )
             }
         }
@@ -179,7 +185,7 @@ internal class ProjectDetailsViewModel(
     override fun onStopButtonClicked(): Job = viewModelScope.launch {
         audioStream.stop()
 
-        _stateFlow.update {
+        mutableStateFlow.update {
             it.copy(
                 playButton = StateComponent.Button(text = "", onClick = ::onPlayButtonClicked),
                 stopButton = null
@@ -191,184 +197,16 @@ internal class ProjectDetailsViewModel(
         navigationService.goTo(ProjectAiGenerateDestination(key.projectId))
     }
 
-    override fun onAddButtonClicked(): Job = viewModelScope.launch {
-        _stateFlow.update { state ->
-            state.copy(
-                wheelPicker = ProjectDetailsContract.State.WheelPicker(
-                    values = getWheelPickerValues(),
-                    selectedValue = getWheelPickerValues().first(),
-                    onValueSelected = ::onWheelPickerValueSelected
-                )
-            )
-        }
-    }
-
-    override fun onWheelPickerValueSelected(value: String) {
-        val project = loadProjectOrThrow(key.projectId)
-        val wheelPicker = _stateFlow.value.wheelPicker ?: run {
-            logger.error("Wheel picker is null")
-            return
-        }
-
-        _stateFlow.update { state ->
-            state.copy(
-                wheelPicker = wheelPicker.copy(
-                    selectedValue = value
-                )
-            )
-        }
-
-        val note = Note.fromString(value) ?: run {
-            logger.error("Invalid note: $value")
-            showSnackBar(i18n.projectDetails.invalidNoteBeats, null, null)
-            return
-        }
-
-        when (_stateFlow.value.tabComponent.selected.value) {
-            ProjectDetailsContract.Tab.CHORDS -> {
-                val chord = Chord.Type.MAJOR.build(note)
-                val newChords = project.chords + ChordBeats(chord, 1)
-                val newProject = project.copy(chords = newChords)
-
-                updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), newProject, key.projectId)
-
-                _stateFlow.update { state ->
-                    state.copy(
-                        wheelPicker = null,
-                        chordBeats = newProject.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) }
-                    )
-                }
-            }
-            ProjectDetailsContract.Tab.MELODY -> {
-                val newNotes = project.melody + NoteBeats(note, 1)
-                val newProject = project.copy(melody = newNotes)
-
-                updateProjectUseCase(UpdateProjectUseCaseErrorHandler(), newProject, key.projectId)
-
-                _stateFlow.update { state ->
-                    state.copy(
-                        wheelPicker = null,
-                        noteBeats = newProject.melody.mapIndexed { index, note -> note.toNoteBeatsComponent(index) }
-                    )
-                }
-            }
-        }
-    }
-
     override fun onTabSelected(tab: ProjectDetailsContract.Tab) {
-        _stateFlow.update { state ->
+        mutableStateFlow.update { state ->
             state.copy(
                 tabComponent = state.tabComponent.copy(
                     selected = tabToOption(tab),
-                ),
-                wheelPicker = null
+                )
             )
         }
-    }
 
-    //---
-
-    override fun onBeatComponentClick(id: Int) {
-        val isChordsTab = _stateFlow.value.tabComponent.selected.value == ProjectDetailsContract.Tab.CHORDS
-        if (isChordsTab) {
-            ChordBottomSheetStateHolder(
-                chordIndex = id,
-                projectId = key.projectId,
-                i18n = i18n,
-                stateFlow = _stateFlow,
-                updateProjectUseCase = updateProjectUseCase,
-                loadProjectUseCase = loadProjectUseCase
-            )
-        } else {
-            MelodyBottomSheetStateHolder(
-                noteIndex = id,
-                projectId = key.projectId,
-                i18n = i18n,
-                stateFlow = _stateFlow,
-                updateProjectUseCase = updateProjectUseCase,
-                loadProjectUseCase = loadProjectUseCase
-            )
-
-        }
-    }
-
-    override fun onBeatComponentLongClick(id: Int) {
-        val project = loadProjectOrThrow(key.projectId)
-        val isChordsTab = _stateFlow.value.tabComponent.selected.value == ProjectDetailsContract.Tab.CHORDS
-
-        if (isChordsTab) {
-            val newChords = project.chords.toMutableList()
-            newChords.removeAt(id)
-            val newProject = project.copy(chords = newChords)
-            updateProjectUseCase(
-                errorHandler = UpdateProjectUseCaseErrorHandler(),
-                project = newProject,
-                projectId = key.projectId
-            )
-
-            _stateFlow.update { state ->
-                state.copy(
-                    chordBeats = newProject.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) }
-                )
-            }
-        } else {
-            val newMelody = project.melody.toMutableList()
-            newMelody.removeAt(id)
-            val newProject = project.copy(melody = newMelody)
-            updateProjectUseCase(
-                errorHandler = UpdateProjectUseCaseErrorHandler(),
-                project = newProject,
-                projectId = key.projectId
-            )
-
-            _stateFlow.update { state ->
-                state.copy(
-                    noteBeats = newProject.melody.mapIndexed { index, note -> note.toNoteBeatsComponent(index) }
-                )
-            }
-        }
-    }
-
-    override fun onBeatComponentDoubleClick(id: Int) {
-        val project = loadProjectOrThrow(key.projectId)
-        val isChordsTab = _stateFlow.value.tabComponent.selected.value == ProjectDetailsContract.Tab.CHORDS
-
-        // Clone
-        if (isChordsTab) {
-            val chordBeat = project.chords[id]
-            val newChordBeats = project.chords.toMutableList().apply {
-                add(id, chordBeat)
-            }
-            val newProject = project.copy(chords = newChordBeats)
-            updateProjectUseCase(
-                errorHandler = UpdateProjectUseCaseErrorHandler(),
-                project = newProject,
-                projectId = key.projectId
-            )
-
-            _stateFlow.update { state ->
-                state.copy(
-                    chordBeats = project.chords.flatMapIndexed { index, chord -> chord.toChordComponents(index) }
-                )
-            }
-        } else {
-            val noteBeat = project.melody[id]
-            val newMelody = project.melody.toMutableList().apply {
-                add(id, noteBeat)
-            }
-            val newProject = project.copy(melody = newMelody)
-            updateProjectUseCase(
-                errorHandler = UpdateProjectUseCaseErrorHandler(),
-                project = newProject,
-                projectId = key.projectId
-            )
-
-            _stateFlow.update { state ->
-                state.copy(
-                    noteBeats = newProject.melody.mapIndexed { index, note -> note.toNoteBeatsComponent(index) }
-                )
-            }
-        }
+        currentViewModel.onAttached()
     }
 
     //---
@@ -378,7 +216,7 @@ internal class ProjectDetailsViewModel(
     }
 
     override fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?) {
-        _stateFlow.update { state ->
+        mutableStateFlow.update { state ->
             state.copy(
                 snackBar = StateComponent.SnackBar(
                     message = message,
@@ -390,7 +228,7 @@ internal class ProjectDetailsViewModel(
     }
 
     override fun hideSnackBar() {
-        _stateFlow.update { state ->
+        mutableStateFlow.update { state ->
             state.copy(
                 snackBar = null
             )
@@ -412,11 +250,6 @@ internal class ProjectDetailsViewModel(
 
     //---
 
-    private fun getNoteComponents(): List<ProjectDetailsContract.State.NoteComponent> {
-        val project = loadProjectOrThrow(key.projectId)
-        return project.melody.mapIndexed { index, note -> note.toNoteBeatsComponent(index) }
-    }
-
     private fun loadProjectOrThrow(projectId: UUID): Project {
         return loadProjectUseCase(projectId) ?: throw ViewModelInitException("Project with id $projectId not found")
     }
@@ -429,13 +262,11 @@ internal class ProjectDetailsViewModel(
         value = tab
     )
 
-    private fun getWheelPickerValues(): Set<String> = setOf("D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D") // FIXME
-
     //---
 
     inner class GenerateAudioErrorHandler : GenerateAudioUseCase.ErrorHandler {
         override fun onInvalidChordBeats() {
-            _stateFlow.update { state ->
+            mutableStateFlow.update { state ->
                 state.copy(
                     snackBar = StateComponent.SnackBar(
                         message = i18n.projectDetails.invalidChordBeats,
@@ -447,7 +278,7 @@ internal class ProjectDetailsViewModel(
         }
 
         override fun onInvalidNoteBeats() {
-            _stateFlow.update { state ->
+            mutableStateFlow.update { state ->
                 state.copy(
                     snackBar = StateComponent.SnackBar(
                         message = i18n.projectDetails.invalidNoteBeats,
@@ -456,18 +287,6 @@ internal class ProjectDetailsViewModel(
                     )
                 )
             }
-        }
-    }
-
-    //---
-
-    inner class UpdateProjectUseCaseErrorHandler : UpdateProjectUseCase.ErrorHandler {
-        override fun onInvalidProjectName() {
-            logger.error("Invalid project name")
-        }
-
-        override fun onInvalidProjectBpm() {
-            logger.error("Invalid project bpm")
         }
     }
 

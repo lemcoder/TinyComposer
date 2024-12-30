@@ -1,6 +1,8 @@
 package pl.lemanski.tc.ui.proejctDetails
 
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.core.Note
 import pl.lemanski.tc.ui.common.StateComponent
@@ -12,67 +14,90 @@ internal interface ProjectDetailsContract {
         MELODY
     }
 
-    abstract class ViewModel : TcViewModel<State>() {
-        abstract fun onPlayButtonClicked(): Job
-        abstract fun onStopButtonClicked(): Job
-        abstract fun onAiGenerateButtonClicked()
-        abstract fun onTabSelected(tab: Tab)
-        abstract fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?)
-        abstract fun hideSnackBar()
-        abstract fun onProjectOptionsButtonClicked()
-        abstract fun back()
+    /**
+     * Workaround for the fact that we can't have multiple inheritance in Kotlin.
+     */
+    interface BaseViewModel {
+        val mutableStateFlow: MutableStateFlow<State>
+
+        fun onPlayButtonClicked(): Job
+        fun onStopButtonClicked(): Job
+        fun onAiGenerateButtonClicked()
+        fun onTabSelected(tab: Tab)
+        fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?)
+        fun hideSnackBar()
+        fun onProjectOptionsButtonClicked()
+        fun back()
     }
 
-    abstract class PageViewModel : ViewModel() {
-        abstract fun onBeatComponentClick(id: Int)
-        abstract fun onBeatComponentLongClick(id: Int)
-        abstract fun onBeatComponentDoubleClick(id: Int)
-        abstract fun onAddButtonClicked(): Job
-        abstract fun onWheelPickerValueSelected(value: String)
+    interface PageViewModel {
+        fun onBeatComponentClick(id: Int)
+        fun onBeatComponentLongClick(id: Int)
+        fun onBeatComponentDoubleClick(id: Int)
+        fun onAddButtonClicked(): Job
+        fun onWheelPickerValueSelected(value: String)
+        fun onAttached()
     }
+
+    abstract class ViewModel : TcViewModel<State>(), BaseViewModel
 
     data class State(
         val isLoading: Boolean,
         val projectName: String,
-        val barLength: Int,
         val tabComponent: StateComponent.TabComponent<Tab>,
         val playButton: StateComponent.Button?,
         val stopButton: StateComponent.Button?,
         val backButton: StateComponent.Button,
-        val addButton: StateComponent.Button,
         val projectDetailsButton: StateComponent.Button,
         val aiGenerateButton: StateComponent.Button,
-        val wheelPicker: WheelPicker?,
-        val noteBeats: List<NoteComponent>,
-        val chordBeats: List<ChordComponent>,
-        val bottomSheet: BottomSheet?,
+        val pageState: PageState,
         val snackBar: StateComponent.SnackBar?,
     ) {
-        data class WheelPicker(
-            val values: Set<String>,
-            val selectedValue: String,
-            val onValueSelected: (String) -> Unit,
-        )
+        data class PageState(
+            val addButton: StateComponent.Button,
+            val barLength: Int,
+            val wheelPicker: WheelPicker?,
+            val noteBeats: List<NoteComponent>,
+            val chordBeats: List<ChordComponent>,
+            val bottomSheet: BottomSheet?,
+        ) {
+            data class WheelPicker(
+                val values: Set<String>,
+                val selectedValue: String,
+                val onValueSelected: (String) -> Unit,
+            )
 
-        data class ChordComponent(
-            val id: Int,
-            val isActive: Boolean,
-            val isPrimary: Boolean,
-            val chord: Chord,
-            val onChordClick: (Int) -> Unit,
-            val onChordDoubleClick: (Int) -> Unit,
-            val onChordLongClick: (Int) -> Unit,
-        )
+            data class ChordComponent(
+                val id: Int,
+                val isActive: Boolean,
+                val isPrimary: Boolean,
+                val chord: Chord,
+                val onChordClick: (Int) -> Unit,
+                val onChordDoubleClick: (Int) -> Unit,
+                val onChordLongClick: (Int) -> Unit,
+            )
 
-        data class NoteComponent(
-            val id: Int,
-            val isActive: Boolean,
-            val isPrimary: Boolean,
-            val note: Note,
-            val onNoteClick: (Int) -> Unit,
-            val onNoteDoubleClick: (Int) -> Unit,
-            val onNoteLongClick: (Int) -> Unit,
-        )
+            data class NoteComponent(
+                val id: Int,
+                val isActive: Boolean,
+                val isPrimary: Boolean,
+                val note: Note,
+                val onNoteClick: (Int) -> Unit,
+                val onNoteDoubleClick: (Int) -> Unit,
+                val onNoteLongClick: (Int) -> Unit,
+            )
+
+            companion object {
+                val EMPTY = PageState(
+                    addButton = StateComponent.Button("") { },
+                    barLength = 0,
+                    wheelPicker = null,
+                    noteBeats = emptyList(),
+                    chordBeats = emptyList(),
+                    bottomSheet = null
+                )
+            }
+        }
 
         sealed interface BottomSheet {
             data class NoteBottomSheet(

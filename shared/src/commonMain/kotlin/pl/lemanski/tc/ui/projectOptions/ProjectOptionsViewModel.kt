@@ -196,10 +196,6 @@ internal class ProjectOptionsViewModel(
                 )
             }
         }
-
-        override fun onProjectSaveError() {
-            showSnackBar(i18n.projectOptions.saveError, null, null)
-        }
     }
 }
 

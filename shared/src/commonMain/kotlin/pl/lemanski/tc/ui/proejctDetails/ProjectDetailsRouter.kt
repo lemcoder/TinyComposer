@@ -16,18 +16,12 @@ fun ProjectDetailsRouter() = router<ProjectDetailsContract.ViewModel, ProjectDet
     ProjectDetailsScreen(
         isLoading = state.isLoading,
         projectName = state.projectName,
-        barLength = state.barLength,
         playButton = state.playButton,
         stopButton = state.stopButton,
-        backButton = state.backButton,
+        pageState = state.pageState,
         aiGenerateButton = state.aiGenerateButton,
         tabComponent = state.tabComponent,
-        wheelPicker = state.wheelPicker,
-        addButton = state.addButton,
-        noteBeats = state.noteBeats,
-        chordBeats = state.chordBeats,
         snackBar = state.snackBar,
         projectDetailsButton = state.projectDetailsButton,
-        bottomSheet = state.bottomSheet,
     )
 }

@@ -194,10 +194,6 @@ internal class ProjectAiGenerateViewModel(
         override fun onInvalidProjectBpm() {
 
         }
-
-        override fun onProjectSaveError() {
-            TODO("Not yet implemented")
-        }
     }
 }
 
