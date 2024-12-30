@@ -1,4 +1,4 @@
-package pl.lemanski.tc.ui.proejctDetails.components.melody
+package pl.lemanski.tc.ui.proejctDetails.composable.chords
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,10 +13,11 @@ import pl.lemanski.tc.ui.common.composables.SliderValuePicker
 import pl.lemanski.tc.ui.common.composables.ToComposable
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun NoteDetailsBottomSheet(
-    state: ProjectDetailsContract.State.BottomSheet.NoteBottomSheet,
+internal fun ChordDetailsBottomSheet(
+    state: ProjectDetailsContract.State.BottomSheet.ChordBottomSheet,
 ) {
     ModalBottomSheet(
         onDismissRequest = state.onDismiss,
@@ -28,12 +29,15 @@ internal fun NoteDetailsBottomSheet(
                 .padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            state.chordTypeSelect.ToComposable()
+
             state.durationValuePicker.ToComposable()
 
             SliderValuePicker(
                 state = state.velocityValuePicker,
                 maxValue = 127
             )
+
 
             state.octaveValuePicker.ToComposable()
         }

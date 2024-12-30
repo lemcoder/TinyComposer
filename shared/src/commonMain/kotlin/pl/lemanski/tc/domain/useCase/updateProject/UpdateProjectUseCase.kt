@@ -7,7 +7,6 @@ internal interface UpdateProjectUseCase {
     interface ErrorHandler {
         fun onInvalidProjectName()
         fun onInvalidProjectBpm()
-        fun onProjectSaveError()
     }
 
     operator fun invoke(

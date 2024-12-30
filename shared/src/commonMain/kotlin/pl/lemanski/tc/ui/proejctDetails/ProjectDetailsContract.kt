@@ -2,7 +2,7 @@ package pl.lemanski.tc.ui.proejctDetails
 
 import kotlinx.coroutines.Job
 import pl.lemanski.tc.domain.model.core.Chord
-import pl.lemanski.tc.domain.model.core.NoteBeats
+import pl.lemanski.tc.domain.model.core.Note
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.TcViewModel
 
@@ -16,16 +16,19 @@ internal interface ProjectDetailsContract {
         abstract fun onPlayButtonClicked(): Job
         abstract fun onStopButtonClicked(): Job
         abstract fun onAiGenerateButtonClicked()
-        abstract fun onAddButtonClicked(): Job
-        abstract fun onWheelPickerValueSelected(value: String)
         abstract fun onTabSelected(tab: Tab)
         abstract fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?)
         abstract fun hideSnackBar()
         abstract fun onProjectOptionsButtonClicked()
+        abstract fun back()
+    }
+
+    abstract class PageViewModel : ViewModel() {
         abstract fun onBeatComponentClick(id: Int)
         abstract fun onBeatComponentLongClick(id: Int)
         abstract fun onBeatComponentDoubleClick(id: Int)
-        abstract fun back()
+        abstract fun onAddButtonClicked(): Job
+        abstract fun onWheelPickerValueSelected(value: String)
     }
 
     data class State(
@@ -40,7 +43,7 @@ internal interface ProjectDetailsContract {
         val projectDetailsButton: StateComponent.Button,
         val aiGenerateButton: StateComponent.Button,
         val wheelPicker: WheelPicker?,
-        val noteBeats: List<NoteBeatsComponent>,
+        val noteBeats: List<NoteComponent>,
         val chordBeats: List<ChordComponent>,
         val bottomSheet: BottomSheet?,
         val snackBar: StateComponent.SnackBar?,
@@ -61,10 +64,11 @@ internal interface ProjectDetailsContract {
             val onChordLongClick: (Int) -> Unit,
         )
 
-        data class NoteBeatsComponent(
+        data class NoteComponent(
             val id: Int,
             val isActive: Boolean,
-            val noteBeats: NoteBeats,
+            val isPrimary: Boolean,
+            val note: Note,
             val onNoteClick: (Int) -> Unit,
             val onNoteDoubleClick: (Int) -> Unit,
             val onNoteLongClick: (Int) -> Unit,

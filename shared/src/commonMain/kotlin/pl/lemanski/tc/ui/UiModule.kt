@@ -12,7 +12,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.ui.common.i18n.I18nImpl
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract
-import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsViewModel
+import pl.lemanski.tc.ui.proejctDetails.viewModel.ProjectDetailsViewModel
 import pl.lemanski.tc.ui.projectAiGenerate.ProjectAiGenerateContract
 import pl.lemanski.tc.ui.projectAiGenerate.ProjectAiGenerateViewModel
 import pl.lemanski.tc.ui.projectCreate.ProjectCreateContract

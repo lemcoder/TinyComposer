@@ -1,4 +1,4 @@
-package pl.lemanski.tc.ui.proejctDetails.components.melody
+package pl.lemanski.tc.ui.proejctDetails.composable.melody
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -22,16 +22,16 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import pl.lemanski.tc.ui.common.composables.MultiRowLayout
-import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.State.NoteBeatsComponent
+import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.State.NoteComponent
 
 @Composable
 internal fun MelodyTab(
-    noteBeatsComponents: List<NoteBeatsComponent>,
+    noteComponents: List<NoteComponent>,
     maxWidth: Dp,
     barLength: Int
 ) {
     MultiRowLayout {
-        noteBeatsComponents.forEach {
+        noteComponents.forEach {
             it.NoteBeatItem(itemWidth = maxWidth / barLength)
         }
     }
@@ -39,7 +39,7 @@ internal fun MelodyTab(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NoteBeatsComponent.NoteBeatItem(
+private fun NoteComponent.NoteBeatItem(
     itemWidth: Dp
 ) {
     val haptic = LocalHapticFeedback.current

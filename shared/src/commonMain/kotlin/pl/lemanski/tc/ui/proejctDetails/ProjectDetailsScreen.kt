@@ -25,12 +25,12 @@ import pl.lemanski.tc.ui.common.ToComposable
 import pl.lemanski.tc.ui.common.composables.LoaderScaffold
 import pl.lemanski.tc.ui.common.composables.ToComposable
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract.Tab
-import pl.lemanski.tc.ui.proejctDetails.components.BottomBar
-import pl.lemanski.tc.ui.proejctDetails.components.Wheel
-import pl.lemanski.tc.ui.proejctDetails.components.chords.ChordDetailsBottomSheet
-import pl.lemanski.tc.ui.proejctDetails.components.chords.ChordsTab
-import pl.lemanski.tc.ui.proejctDetails.components.melody.MelodyTab
-import pl.lemanski.tc.ui.proejctDetails.components.melody.NoteDetailsBottomSheet
+import pl.lemanski.tc.ui.proejctDetails.composable.BottomBar
+import pl.lemanski.tc.ui.proejctDetails.composable.Wheel
+import pl.lemanski.tc.ui.proejctDetails.composable.chords.ChordDetailsBottomSheet
+import pl.lemanski.tc.ui.proejctDetails.composable.chords.ChordsTab
+import pl.lemanski.tc.ui.proejctDetails.composable.melody.MelodyTab
+import pl.lemanski.tc.ui.proejctDetails.composable.melody.NoteDetailsBottomSheet
 
 @Composable
 internal fun ProjectDetailsScreen(
@@ -44,7 +44,7 @@ internal fun ProjectDetailsScreen(
     addButton: StateComponent.Button,
     aiGenerateButton: StateComponent.Button,
     projectDetailsButton: StateComponent.Button,
-    noteBeats: List<ProjectDetailsContract.State.NoteBeatsComponent>,
+    noteBeats: List<ProjectDetailsContract.State.NoteComponent>,
     chordBeats: List<ProjectDetailsContract.State.ChordComponent>,
     wheelPicker: ProjectDetailsContract.State.WheelPicker?,
     bottomSheet: ProjectDetailsContract.State.BottomSheet?,

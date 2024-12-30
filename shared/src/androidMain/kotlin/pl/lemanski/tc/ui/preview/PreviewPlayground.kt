@@ -4,7 +4,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import pl.lemanski.tc.ui.common.StateComponent
-import pl.lemanski.tc.ui.proejctDetails.components.BottomBar
+import pl.lemanski.tc.ui.proejctDetails.composable.BottomBar
 
 @Composable
 @Preview
