@@ -110,6 +110,7 @@ internal class ProjectDetailsViewModel(
         logger.debug("Attached")
 
         currentPageViewModel.onAttached()
+
         mutableStateFlow.update { state ->
             state.copy(
                 isLoading = false,

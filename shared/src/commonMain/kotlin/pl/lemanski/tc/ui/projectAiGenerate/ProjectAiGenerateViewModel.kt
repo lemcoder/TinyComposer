@@ -33,14 +33,12 @@ internal class ProjectAiGenerateViewModel(
         isLoading = true,
         snackBar = null,
         title = project.name,
-
         promptInput = StateComponent.Input(
             value = "",
             type = StateComponent.Input.Type.TEXT,
             hint = i18n.projectAiGenerate.promptHint,
             error = null,
             onValueChange = ::onPromptInputChanged
-
         ),
         promptOptions = StateComponent.RadioGroup(
             selected = promptOptions.first(),
@@ -70,13 +68,16 @@ internal class ProjectAiGenerateViewModel(
     }
 
     override fun back() {
-        // FIXME run synchronously
-        viewModelScope.launch {
-            navigationService.back()
-        }
+        navigationService.back()
     }
 
     override fun onSubmitClicked() = viewModelScope.launch {
+        _stateFlow.update { state ->
+            state.copy(
+                isLoading = true
+            )
+        }
+
         val selectedPromptOption = _stateFlow.value.promptOptions.selected.value
         val prompt = _stateFlow.value.promptInput.value
         val errorHandler = AiGenerateErrorHandler()
@@ -103,6 +104,12 @@ internal class ProjectAiGenerateViewModel(
             project = project,
             projectId = project.id
         )
+
+        _stateFlow.update { state ->
+            state.copy(
+                isLoading = false
+            )
+        }
     }
 
     override fun onPromptInputChanged(input: String) {

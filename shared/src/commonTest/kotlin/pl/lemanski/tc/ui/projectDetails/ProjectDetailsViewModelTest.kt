@@ -53,12 +53,14 @@ class ProjectDetailsViewModelTest {
         }
     }
 
+    // TODO move to own class
     private val updateProjectUseCase = object : UpdateProjectUseCase {
         override fun invoke(errorHandler: UpdateProjectUseCase.ErrorHandler, project: Project, projectId: UUID): Project? {
             return project
         }
     }
 
+    // TODO move to own class
     private val generateAudioUseCase = object : GenerateAudioUseCase {
         override suspend fun invoke(
             errorHandler: GenerateAudioUseCase.ErrorHandler,
@@ -72,6 +74,7 @@ class ProjectDetailsViewModelTest {
         }
     }
 
+    // TODO move to own class
     private val presetsControlUseCase = object : PresetsControlUseCase {
         override fun getChordPreset(projectId: UUID): Int {
             return 0
@@ -84,12 +87,14 @@ class ProjectDetailsViewModelTest {
         override fun setPresets(projectId: UUID, chordPreset: Int?, melodyPreset: Int?) {}
     }
 
+    // TODO move to own class
     private val saveProjectUseCase = object : SaveProjectUseCase {
         override fun invoke(errorHandler: SaveProjectUseCase.ErrorHandler, project: Project): Project? {
             return project
         }
     }
 
+    // TODO move to own class
     private val setMarkersUseCase = object : SetMarkersUseCase {
         override fun invoke(project: Project, audioStream: AudioStream) {}
     }

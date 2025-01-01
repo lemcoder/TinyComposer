@@ -30,8 +30,10 @@ internal class ChordPageViewModel(
 ) : ProjectDetailsContract.BaseViewModel by projectDetailsViewModel,
     ProjectDetailsContract.PageViewModel {
 
-    private val initialProjectState = loadProjectOrThrow(projectId)
+    private val initialProjectState
+        get() = loadProjectOrThrow(projectId)
     private val logger = Logger(this::class)
+
     override fun onAddButtonClicked(): Job = viewModelScope.launch {
         mutableStateFlow.update { state ->
             state.copy(
