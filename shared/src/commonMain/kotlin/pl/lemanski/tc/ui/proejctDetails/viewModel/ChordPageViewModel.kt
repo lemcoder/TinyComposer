@@ -1,9 +1,7 @@
 package pl.lemanski.tc.ui.proejctDetails.viewModel
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.core.ChordBeats
 import pl.lemanski.tc.domain.model.core.Note
@@ -22,7 +20,6 @@ import kotlin.math.abs
 
 internal class ChordPageViewModel(
     private val projectId: UUID,
-    private val viewModelScope: CoroutineScope,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val loadProjectUseCase: LoadProjectUseCase,
     private val projectDetailsViewModel: ProjectDetailsContract.ViewModel,
@@ -30,11 +27,30 @@ internal class ChordPageViewModel(
 ) : ProjectDetailsContract.BaseViewModel by projectDetailsViewModel,
     ProjectDetailsContract.PageViewModel {
 
-    private val initialProjectState
-        get() = loadProjectOrThrow(projectId)
     private val logger = Logger(this::class)
 
-    override fun onAddButtonClicked(): Job = viewModelScope.launch {
+    override fun onAttached() {
+        val initialProjectState = loadProjectOrThrow(projectId)
+
+        mutableStateFlow.update { state ->
+            state.copy(
+                pageState = ProjectDetailsContract.State.PageState(
+                    addButton = StateComponent.Button(
+                        text = "",
+                        onClick = ::onAddButtonClicked
+                    ),
+                    barLength = initialProjectState.rhythm.beatsPerBar,
+                    wheelPicker = null,
+                    noteBeats = state.pageState.noteBeats, // TODO check
+                    chordBeats = getChordComponents(initialProjectState),
+                    bottomSheet = null
+                )
+            )
+        }
+    }
+
+
+    override fun onAddButtonClicked() {
         mutableStateFlow.update { state ->
             state.copy(
                 pageState = state.pageState.copy(
@@ -42,6 +58,22 @@ internal class ChordPageViewModel(
                         values = getWheelPickerValues(),
                         selectedValue = getWheelPickerValues().first(),
                         onValueSelected = ::onWheelPickerValueSelected
+                    ),
+                    addButton = state.pageState.addButton.copy(
+                        onClick = ::onCloseButtonClicked
+                    )
+                )
+            )
+        }
+    }
+
+    override fun onCloseButtonClicked() {
+        mutableStateFlow.update { state ->
+            state.copy(
+                pageState = state.pageState.copy(
+                    wheelPicker = null,
+                    addButton = state.pageState.addButton.copy(
+                        onClick = ::onAddButtonClicked
                     )
                 )
             )
@@ -82,24 +114,6 @@ internal class ChordPageViewModel(
                 pageState = state.pageState.copy(
                     wheelPicker = null,
                     chordBeats = getChordComponents(newProject)
-                )
-            )
-        }
-    }
-
-    override fun onAttached() {
-        mutableStateFlow.update { state ->
-            state.copy(
-                pageState = ProjectDetailsContract.State.PageState(
-                    addButton = StateComponent.Button(
-                        text = "",
-                        onClick = ::onAddButtonClicked
-                    ),
-                    barLength = initialProjectState.rhythm.beatsPerBar,
-                    wheelPicker = null,
-                    noteBeats = state.pageState.noteBeats, // TODO check
-                    chordBeats = getChordComponents(initialProjectState),
-                    bottomSheet = null
                 )
             )
         }

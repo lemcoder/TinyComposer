@@ -34,7 +34,8 @@ internal interface ProjectDetailsContract {
         fun onBeatComponentClick(id: Int)
         fun onBeatComponentLongClick(id: Int)
         fun onBeatComponentDoubleClick(id: Int)
-        fun onAddButtonClicked(): Job
+        fun onAddButtonClicked()
+        fun onCloseButtonClicked()
         fun onWheelPickerValueSelected(value: String)
         fun onAttached()
     }

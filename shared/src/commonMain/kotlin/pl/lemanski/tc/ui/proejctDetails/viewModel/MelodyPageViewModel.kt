@@ -20,7 +20,6 @@ import kotlin.math.abs
 
 internal class MelodyPageViewModel(
     private val projectId: UUID,
-    private val viewModelScope: CoroutineScope,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val loadProjectUseCase: LoadProjectUseCase,
     private val projectDetailsViewModel: ProjectDetailsContract.ViewModel,
@@ -28,9 +27,29 @@ internal class MelodyPageViewModel(
 ) : ProjectDetailsContract.BaseViewModel by projectDetailsViewModel,
     ProjectDetailsContract.PageViewModel {
 
-    private val initialProjectState = loadProjectOrThrow(projectId)
     private val logger = Logger(this::class)
-    override fun onAddButtonClicked(): Job = viewModelScope.launch {
+
+    override fun onAttached() {
+        val initialProjectState = loadProjectOrThrow(projectId)
+
+        mutableStateFlow.update { state ->
+            state.copy(
+                pageState = ProjectDetailsContract.State.PageState(
+                    addButton = StateComponent.Button(
+                        text = "",
+                        onClick = ::onAddButtonClicked
+                    ),
+                    barLength = initialProjectState.rhythm.beatsPerBar,
+                    wheelPicker = null,
+                    noteBeats = getNoteComponents(initialProjectState),
+                    chordBeats = state.pageState.chordBeats,
+                    bottomSheet = null
+                )
+            )
+        }
+    }
+
+    override fun onAddButtonClicked() {
         mutableStateFlow.update { state ->
             state.copy(
                 pageState = state.pageState.copy(
@@ -38,6 +57,22 @@ internal class MelodyPageViewModel(
                         values = getWheelPickerValues(),
                         selectedValue = getWheelPickerValues().first(),
                         onValueSelected = ::onWheelPickerValueSelected
+                    ),
+                    addButton = state.pageState.addButton.copy(
+                        onClick = ::onCloseButtonClicked
+                    )
+                )
+            )
+        }
+    }
+
+    override fun onCloseButtonClicked() {
+        mutableStateFlow.update { state ->
+            state.copy(
+                pageState = state.pageState.copy(
+                    wheelPicker = null,
+                    addButton = state.pageState.addButton.copy(
+                        onClick = ::onAddButtonClicked
                     )
                 )
             )
@@ -84,24 +119,6 @@ internal class MelodyPageViewModel(
         }
     }
 
-    override fun onAttached() {
-        mutableStateFlow.update { state ->
-            state.copy(
-                pageState = ProjectDetailsContract.State.PageState(
-                    addButton = StateComponent.Button(
-                        text = "",
-                        onClick = ::onAddButtonClicked
-                    ),
-                    barLength = initialProjectState.rhythm.beatsPerBar,
-                    wheelPicker = null,
-                    noteBeats = getNoteComponents(initialProjectState),
-                    chordBeats = state.pageState.chordBeats,
-                    bottomSheet = null
-                )
-            )
-        }
-    }
-
     //---
 
     override fun onBeatComponentClick(id: Int) {
@@ -111,9 +128,9 @@ internal class MelodyPageViewModel(
     override fun onBeatComponentLongClick(id: Int) {
         val project = loadProjectOrThrow(projectId)
 
-        val newChords = project.chords.toMutableList()
-        newChords.removeAt(id)
-        val newProject = project.copy(chords = newChords)
+        val newMelody = project.melody.toMutableList()
+        newMelody.removeAt(id)
+        val newProject = project.copy(melody = newMelody)
         updateProjectUseCase(
             errorHandler = UpdateProjectUseCaseErrorHandler(),
             project = newProject,
@@ -132,11 +149,11 @@ internal class MelodyPageViewModel(
     override fun onBeatComponentDoubleClick(id: Int) {
         val project = loadProjectOrThrow(projectId)
 
-        val chordBeat = project.chords[id]
-        val newChordBeats = project.chords.toMutableList().apply {
-            add(id, chordBeat)
+        val noteBeat = project.melody[id]
+        val newNoteBeats = project.melody.toMutableList().apply {
+            add(id, noteBeat)
         }
-        val newProject = project.copy(chords = newChordBeats)
+        val newProject = project.copy(melody = newNoteBeats)
         updateProjectUseCase(
             errorHandler = UpdateProjectUseCaseErrorHandler(),
             project = newProject,

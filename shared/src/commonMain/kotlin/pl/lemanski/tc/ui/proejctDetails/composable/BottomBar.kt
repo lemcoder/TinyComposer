@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -30,7 +31,8 @@ import pl.lemanski.tc.ui.common.icons.Pause
 internal fun BottomBar(
     playButton: StateComponent.Button?,
     pauseButton: StateComponent.Button?,
-    addButton: StateComponent.Button,
+    addButton: StateComponent.Button?,
+    closeButton: StateComponent.Button?,
     aiGenerateButton: StateComponent.Button,
     modifier: Modifier = Modifier
 ) {
@@ -77,11 +79,22 @@ internal fun BottomBar(
                 }
             }
 
-            IconButton(onClick = addButton.onClick) {
-                Icon(
-                    imageVector = Icons.Default.Add, // TODO add add icon
-                    contentDescription = "Add new element"
-                )
+            addButton?.let {
+                IconButton(onClick = addButton.onClick) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add new element"
+                    )
+                }
+            }
+
+            closeButton?.let {
+                IconButton(onClick = closeButton.onClick) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close"
+                    )
+                }
             }
         }
     }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -89,19 +90,18 @@ private fun ProjectDetailsContract.State.PageState.NoteComponent.NoteBeatItem() 
                 ) {
                     onNoteClick(id)
                 },
-            contentAlignment = Alignment.CenterStart
+            contentAlignment = Alignment.Center
         ) {
             if (isPrimary) {
                 Text(
-                    text = note.name,
+                    text = note.nameWithOctave,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 4.dp)
                 )
             } else {
-                Text(
-                    text = "%",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 4.dp)
+                Icon(
+                    imageVector = pl.lemanski.tc.ui.common.icons.Ditto,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
@@ -110,7 +110,7 @@ private fun ProjectDetailsContract.State.PageState.NoteComponent.NoteBeatItem() 
             modifier = Modifier
                 .padding(2.dp)
                 .fillMaxHeight(),
-            thickness = 2.dp
+            thickness = 1.dp
         )
     }
 }

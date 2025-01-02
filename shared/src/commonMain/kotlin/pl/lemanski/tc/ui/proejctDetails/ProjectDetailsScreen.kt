@@ -80,7 +80,8 @@ internal fun ProjectDetailsScreen(
             BottomBar(
                 playButton = playButton,
                 pauseButton = stopButton,
-                addButton = pageState.addButton, // FIXME
+                addButton = pageState.addButton.takeIf { pageState.wheelPicker == null }, // FIXME
+                closeButton = pageState.addButton.takeIf { pageState.wheelPicker != null }, // FIXME
                 aiGenerateButton = aiGenerateButton
             )
         }

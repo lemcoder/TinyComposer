@@ -47,7 +47,6 @@ internal class ProjectDetailsViewModel(
     private val logger = Logger(this::class)
     private val chordPageViewModel = ChordPageViewModel(
         projectId = key.projectId,
-        viewModelScope = viewModelScope,
         updateProjectUseCase = updateProjectUseCase,
         loadProjectUseCase = loadProjectUseCase,
         projectDetailsViewModel = this,
@@ -56,7 +55,6 @@ internal class ProjectDetailsViewModel(
 
     private val melodyPageViewModel = MelodyPageViewModel(
         projectId = key.projectId,
-        viewModelScope = viewModelScope,
         updateProjectUseCase = updateProjectUseCase,
         loadProjectUseCase = loadProjectUseCase,
         projectDetailsViewModel = this,
