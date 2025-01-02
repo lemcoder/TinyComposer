@@ -17,6 +17,7 @@ import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.ToComposable
 import pl.lemanski.tc.ui.common.composables.LoaderScaffold
 import pl.lemanski.tc.ui.common.composables.ToComposable
+import pl.lemanski.tc.ui.common.composables.ToTextArea
 import pl.lemanski.tc.ui.projectAiGenerate.ProjectAiGenerateContract.PromptOption
 
 @Composable
@@ -53,9 +54,14 @@ internal fun ProjectAiGenerateScreen(
 
             promptOptions.ToComposable()
 
-            promptInput.ToComposable()
+            promptInput.ToTextArea()
 
-            submitButton.ToComposable()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                submitButton.ToComposable()
+            }
 
             snackBar?.ToComposable(snackbarHostState)
         }

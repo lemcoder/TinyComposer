@@ -110,6 +110,8 @@ internal class ProjectAiGenerateViewModel(
                 isLoading = false
             )
         }
+
+        navigationService.back()
     }
 
     override fun onPromptInputChanged(input: String) {
