@@ -68,7 +68,8 @@ class ProjectDetailsViewModelTest {
             chordsPreset: Int,
             noteBeats: List<NoteBeats>,
             notesPreset: Int,
-            tempo: Int
+            tempo: Int,
+            compingStyle: GenerateAudioUseCase.CompingStyle
         ): AudioStream {
             return AudioStream.EMPTY
         }

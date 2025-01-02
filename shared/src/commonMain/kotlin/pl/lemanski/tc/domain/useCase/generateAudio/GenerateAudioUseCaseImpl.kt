@@ -4,6 +4,7 @@ import io.github.lemcoder.mikrosoundfont.midi.MidiMetaMessage
 import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.core.ChordBeats
 import pl.lemanski.tc.domain.model.core.NoteBeats
+import pl.lemanski.tc.domain.model.project.CompingStyle
 import pl.lemanski.tc.domain.service.audio.AudioMapper
 import pl.lemanski.tc.domain.service.audio.AudioService
 
@@ -18,14 +19,13 @@ internal class GenerateAudioUseCaseImpl(
         chordsPreset: Int,
         noteBeats: List<NoteBeats>,
         notesPreset: Int,
-        tempo: Int
+        tempo: Int,
+        compingStyle: CompingStyle
     ): AudioStream {
         val tempoMessage = MidiMetaMessage.SetTempo(0, tempo)
 
         val chordMidiMessages = try {
-            listOf(
-                *audioMapper.mapChordBeatsToMidiMessage(chordBeats, tempo, chordsPreset).toTypedArray()
-            )
+            listOf(*audioMapper.mapChordBeatsToMidiMessage(chordBeats, tempo, chordsPreset, compingStyle).toTypedArray())
         } catch (ex: Exception) {
             errorHandler.onInvalidChordBeats()
             return AudioStream.EMPTY

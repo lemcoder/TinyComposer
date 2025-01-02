@@ -13,6 +13,7 @@ import pl.lemanski.tc.domain.model.audio.stop
 import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
+import pl.lemanski.tc.domain.model.project.CompingStyle
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
@@ -139,7 +140,8 @@ internal class ProjectDetailsViewModel(
             chordsPreset = chordPreset,
             noteBeats = project.melody,
             notesPreset = notePreset,
-            tempo = project.bpm
+            tempo = project.bpm,
+            compingStyle = CompingStyle.CHARLESTON
         )
 
         audioStream.onMarkerReached { marker ->

@@ -1,15 +1,8 @@
 package pl.lemanski.tc.ui.projectDetails
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.core.ChordBeats
 import pl.lemanski.tc.domain.model.core.NoteBeats
-import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.domain.service.navigation.NavigationService
@@ -21,10 +14,7 @@ import pl.lemanski.tc.domain.useCase.setMarkersUseCase.SetMarkersUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.ui.common.i18n.TestI18n
-import pl.lemanski.tc.ui.proejctDetails.viewModel.ChordPageViewModel
-import pl.lemanski.tc.ui.proejctDetails.viewModel.ProjectDetailsViewModel
 import pl.lemanski.tc.utils.UUID
-import kotlin.test.BeforeTest
 
 class ChordPageViewModelTest {
 
@@ -61,7 +51,8 @@ class ChordPageViewModelTest {
             chordsPreset: Int,
             noteBeats: List<NoteBeats>,
             notesPreset: Int,
-            tempo: Int
+            tempo: Int,
+            compingStyle: GenerateAudioUseCase.CompingStyle
         ): AudioStream {
             return AudioStream.EMPTY
         }
