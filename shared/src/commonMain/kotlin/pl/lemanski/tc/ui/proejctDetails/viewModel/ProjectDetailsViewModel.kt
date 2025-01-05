@@ -141,7 +141,7 @@ internal class ProjectDetailsViewModel(
             noteBeats = project.melody,
             notesPreset = notePreset,
             tempo = project.bpm,
-            compingStyle = CompingStyle.CHARLESTON
+            compingStyle = CompingStyle.STRAIGHT
         )
 
         audioStream.onMarkerReached { marker ->
