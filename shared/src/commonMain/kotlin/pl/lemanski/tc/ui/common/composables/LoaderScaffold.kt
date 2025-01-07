@@ -1,6 +1,5 @@
 package pl.lemanski.tc.ui.common.composables
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +23,6 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import tinycomposer.shared.generated.resources.Res
 
 @Composable
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun LoaderScaffold(
     isLoading: Boolean,
     content: @Composable (SnackbarHostState) -> Unit

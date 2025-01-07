@@ -1,6 +1,5 @@
 package pl.lemanski.tc.domain.service.navigation
 
-import kotlinx.coroutines.withContext
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
 
 /**
@@ -10,7 +9,7 @@ import pl.lemanski.tc.domain.model.navigation.NavigationEvent
  * navigation event callback (like BackHandler) on iOS. We can only react to navigation already
  * done by the user.
  */
-internal suspend fun NavigationService.silentBack(): Boolean = withContext(dispatcher) {
+internal fun NavigationService.silentBack(): Boolean {
     logger.debug("Back")
     var result = true
 
@@ -22,12 +21,13 @@ internal suspend fun NavigationService.silentBack(): Boolean = withContext(dispa
         }
 
         val newHistory = history.toMutableList()
-        val removed = newHistory.removeAt(newHistory.size - 1)
+        val removed = newHistory.removeAt(newHistory.lastIndex)
+        logger.debug("Back: clearing viewModelStore for $removed")
         removed.viewModelStore.clear()
         newHistory.toSet()
     }
 
-    return@withContext result
+    return result
 }
 
 /**
@@ -36,7 +36,7 @@ internal suspend fun NavigationService.silentBack(): Boolean = withContext(dispa
  * The synchronization of the navigation state is done in the [silentBack] method
  * after UINavigationController viewWillDisappear event
  */
-actual suspend fun NavigationService.back(): Boolean {
+actual fun NavigationService.back(): Boolean {
     logger.debug("Back")
     val history = history()
 

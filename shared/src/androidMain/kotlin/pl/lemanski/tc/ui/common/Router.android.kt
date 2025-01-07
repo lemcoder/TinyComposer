@@ -21,8 +21,7 @@ internal actual inline fun <reified VM : TcViewModel<*>, reified K : Destination
         val key = remember { navigationService.key<K>() }
 
         val vm = koinViewModel<VM>(
-            viewModelStoreOwner = key
-                ?: throw NavigationStateException("Key not found in the navigation stack"),
+            viewModelStoreOwner = key ?: throw NavigationStateException("Key not found in the navigation stack"),
             parameters = { parametersOf(key) }
         )
 

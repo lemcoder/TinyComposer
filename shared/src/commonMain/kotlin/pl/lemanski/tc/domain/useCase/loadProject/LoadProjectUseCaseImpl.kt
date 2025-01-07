@@ -24,6 +24,8 @@ internal class LoadProjectUseCaseImpl(
         }
 
         projectRepository.cacheProject(project)
+
+        logger.debug("Project loaded: $project")
         return project
     }
 }

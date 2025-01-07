@@ -2,6 +2,7 @@ package pl.lemanski.tc.data
 
 import io.github.lemcoder.mikrosoundfont.MikroSoundFont
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module

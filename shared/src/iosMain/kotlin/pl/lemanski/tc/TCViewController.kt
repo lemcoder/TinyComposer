@@ -2,29 +2,34 @@ package pl.lemanski.tc
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.window.ComposeUIViewController
+import androidx.lifecycle.viewmodel.CreationExtras
+import org.koin.core.annotation.KoinInternalApi
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
+import org.koin.viewmodel.resolveViewModel
 import pl.lemanski.tc.TCViewController.start
-import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.Destination
 import pl.lemanski.tc.domain.model.navigation.NavigationEvent
+import pl.lemanski.tc.domain.model.navigation.ProjectAiGenerateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
-import pl.lemanski.tc.domain.model.navigation.WelcomeDestination
+import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.ui.common.localViewModel
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsRouter
+import pl.lemanski.tc.ui.projectAiGenerate.ProjectAiGenerateContract
+import pl.lemanski.tc.ui.projectAiGenerate.ProjectAiGenerateRouter
 import pl.lemanski.tc.ui.projectCreate.ProjectCreateContract
 import pl.lemanski.tc.ui.projectCreate.ProjectCreateRouter
+import pl.lemanski.tc.ui.projectOptions.ProjectOptionsContract
+import pl.lemanski.tc.ui.projectOptions.ProjectOptionsRouter
 import pl.lemanski.tc.ui.projectsList.ProjectListRouter
 import pl.lemanski.tc.ui.projectsList.ProjectsListContract
-import pl.lemanski.tc.ui.welcome.WelcomeContract
-import pl.lemanski.tc.ui.welcome.WelcomeRouter
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.MaterialThemeWrapper
-import pl.lemanski.tc.utils.provide
 import platform.UIKit.UIApplication
 import platform.UIKit.UINavigationController
 import platform.UIKit.UINavigationControllerDelegateProtocol
@@ -69,8 +74,9 @@ object TCViewController : KoinComponent {
         }
     }
 
+    // Used in iOSApp
     fun getInitialScreen(): UIViewController {
-        return WelcomeDestination.getViewController()
+        return ProjectListDestination.getViewController()
     }
 
     fun start() {
@@ -81,25 +87,13 @@ object TCViewController : KoinComponent {
 
         navigationService.setOnNavigateListener { event ->
             when (event.direction) {
-                NavigationEvent.Direction.FORWARD  -> goto(navigationController, event.destination)
+                NavigationEvent.Direction.FORWARD -> goto(navigationController, event.destination)
                 NavigationEvent.Direction.BACKWARD -> back(navigationController)
             }
         }
     }
 
-    private fun welcomeViewController(viewModel: WelcomeContract.ViewModel) =
-        UIViewControllerWrapper(
-            viewModel = viewModel,
-            controller = ComposeUIViewController {
-                MaterialThemeWrapper {
-                    CompositionLocalProvider(
-                        localViewModel provides viewModel
-                    ) {
-                        WelcomeRouter()
-                    }
-                }
-            }
-        )
+    // --- View controllers
 
     private fun projectListViewController(viewModel: ProjectsListContract.ViewModel) =
         UIViewControllerWrapper(
@@ -121,7 +115,7 @@ object TCViewController : KoinComponent {
             controller = ComposeUIViewController {
                 MaterialThemeWrapper {
                     CompositionLocalProvider(
-                        localViewModel provides viewModel
+                        localViewModel provides viewModel,
                     ) {
                         ProjectCreateRouter()
                     }
@@ -143,22 +137,87 @@ object TCViewController : KoinComponent {
             }
         )
 
-    // TODO use Koin to provide the view models
+    private fun projectAiGenerateViewController(viewModel: ProjectAiGenerateContract.ViewModel) =
+        UIViewControllerWrapper(
+            viewModel = viewModel,
+            controller = ComposeUIViewController {
+                MaterialThemeWrapper {
+                    CompositionLocalProvider(
+                        localViewModel provides viewModel
+                    ) {
+                        ProjectAiGenerateRouter()
+                    }
+                }
+            }
+        )
+
+    private fun projectOptionsViewController(viewModel: ProjectOptionsContract.ViewModel) =
+        UIViewControllerWrapper(
+            viewModel = viewModel,
+            controller = ComposeUIViewController {
+                MaterialThemeWrapper {
+                    CompositionLocalProvider(
+                        localViewModel provides viewModel,
+                    ) {
+                        ProjectOptionsRouter()
+                    }
+                }
+            }
+        )
+
+    // ---
+
+    @OptIn(KoinInternalApi::class)
     private fun Destination.getViewController(): UIViewController {
+
         return when (this) {
-            is ProjectAiGenerateDestination -> TODO()
-            ProjectCreateDestination        -> projectCreateViewController(
-                provide<ProjectCreateContract.ViewModel>(this)
+            ProjectListDestination -> projectListViewController(
+                resolveViewModel(
+                    vmClass = ProjectsListContract.ViewModel::class,
+                    viewModelStore = this.viewModelStore,
+                    parameters = { parametersOf(this) },
+                    extras = CreationExtras.Empty,
+                    scope = TCApp.koinInstance.koin.scopeRegistry.rootScope // TODO: refactor
+                )
             )
+
+            ProjectCreateDestination -> projectCreateViewController(
+                resolveViewModel(
+                    vmClass = ProjectCreateContract.ViewModel::class,
+                    viewModelStore = this.viewModelStore,
+                    parameters = { parametersOf(this) },
+                    extras = CreationExtras.Empty,
+                    scope = TCApp.koinInstance.koin.scopeRegistry.rootScope // TODO: refactor
+                )
+            )
+
             is ProjectDetailsDestination -> projectDetailsViewController(
-                provide<ProjectDetailsContract.ViewModel>(this)
+                resolveViewModel(
+                    vmClass = ProjectDetailsContract.ViewModel::class,
+                    viewModelStore = this.viewModelStore,
+                    parameters = { parametersOf(this) },
+                    extras = CreationExtras.Empty,
+                    scope = TCApp.koinInstance.koin.scopeRegistry.rootScope // TODO: refactor
+                )
             )
-            ProjectListDestination       -> projectListViewController(
-                provide<ProjectsListContract.ViewModel>(this)
+
+            is ProjectAiGenerateDestination -> projectAiGenerateViewController(
+                resolveViewModel(
+                    vmClass = ProjectAiGenerateContract.ViewModel::class,
+                    viewModelStore = this.viewModelStore,
+                    parameters = { parametersOf(this) },
+                    extras = CreationExtras.Empty,
+                    scope = TCApp.koinInstance.koin.scopeRegistry.rootScope // TODO: refactor
+                )
             )
-            WelcomeDestination           -> welcomeViewController(
-                provide<WelcomeContract.ViewModel>(
-                    this
+
+            is ProjectOptionsDestination -> projectOptionsViewController(
+                resolveViewModel(
+                    vmClass = ProjectOptionsContract.ViewModel::class,
+                    viewModelStore = this.viewModelStore,
+                    parameters = { parametersOf(this) },
+                    extras = CreationExtras.Empty,
+                    scope = TCApp.koinInstance.koin.scopeRegistry.rootScope // TODO: refactor
                 )
             )
         }
@@ -181,15 +240,15 @@ fun getNavigationController(): UINavigationController? {
  */
 fun getTopViewController(base: UIViewController? = UIApplication.sharedApplication().keyWindow?.rootViewController): UIViewController? {
     when {
-        base is UINavigationController                -> {
+        base is UINavigationController -> {
             return getTopViewController(base = base.visibleViewController)
         }
 
-        base is UITabBarController                    -> {
+        base is UITabBarController -> {
             return getTopViewController(base = base.selectedViewController)
         }
 
-        base?.presentedViewController != null         -> {
+        base?.presentedViewController != null -> {
             return getTopViewController(base = base.presentedViewController)
         }
 
@@ -197,7 +256,7 @@ fun getTopViewController(base: UIViewController? = UIApplication.sharedApplicati
             base = base?.childViewControllers()?.first() as UIViewController
         )
 
-        else                                          -> {
+        else -> {
             return base
         }
     }

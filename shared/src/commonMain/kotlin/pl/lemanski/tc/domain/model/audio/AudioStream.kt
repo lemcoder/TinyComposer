@@ -53,25 +53,29 @@ internal data class AudioStream(
 
     //---
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AudioStream
-
-        if (!data.contentEquals(other.data)) return false
-        if (output != other.output) return false
-        if (duration != other.duration) return false
-
-        return true
-    }
-
     override fun hashCode(): Int {
         var result = data.contentHashCode()
         result = 31 * result + SAMPLE_RATE
         result = 31 * result + output.value
         result = 31 * result + duration.hashCode()
         return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as AudioStream
+
+        if (!data.contentEquals(other.data)) return false
+        if (output != other.output) return false
+        if (logger != other.logger) return false
+        if (_markers != other._markers) return false
+        if (markerReachedCallback != other.markerReachedCallback) return false
+        if (duration != other.duration) return false
+        if (sizeInBytes != other.sizeInBytes) return false
+
+        return true
     }
 
     companion object {

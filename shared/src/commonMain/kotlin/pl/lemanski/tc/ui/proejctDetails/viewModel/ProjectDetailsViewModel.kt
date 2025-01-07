@@ -118,6 +118,7 @@ internal class ProjectDetailsViewModel(
     }
 
     override fun onPlayButtonClicked(): Job = viewModelScope.launch {
+        logger.debug("Play button clicked")
         val project = loadProjectOrThrow(key.projectId)
 
         mutableStateFlow.update {
@@ -134,6 +135,7 @@ internal class ProjectDetailsViewModel(
         val chordPreset = presetsControlUseCase.getChordPreset(project.id)
         val notePreset = presetsControlUseCase.getMelodyPreset(project.id)
 
+        logger.debug("Generating audio")
         audioStream = generateAudioUseCase(
             errorHandler = GenerateAudioErrorHandler(),
             chordBeats = project.chords,

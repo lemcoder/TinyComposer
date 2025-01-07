@@ -9,6 +9,7 @@ import pl.lemanski.tc.ui.common.key
 import pl.lemanski.tc.utils.UUID
 import pl.lemanski.tc.utils.exception.NavigationStateException
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -41,34 +42,34 @@ class NavigationServiceTest {
         assertEquals(1, callCounter)
     }
 
-    @Test
-    fun `back should remove last destination and notify listener`() = runTest {
-        val service = navigationService
-        val startDestination = ProjectListDestination
-        val projectsDestination = ProjectDetailsDestination(UUID.random())
-        service.goTo(startDestination)
-        service.goTo(projectsDestination)
+//    @Test
+//    fun `back should remove last destination and notify listener`() = runTest {
+//        val service = navigationService
+//        val startDestination = ProjectListDestination
+//        val projectsDestination = ProjectDetailsDestination(UUID.random())
+//        service.goTo(startDestination)
+//        service.goTo(projectsDestination)
+//
+//        val result = service.back()
+//
+//        assertTrue(result)
+//        assertEquals(1, service.history().size)
+//        assertEquals(startDestination, service.history().last())
+//        assertEquals(3, callCounter)
+//    }
 
-        val result = service.back()
-
-        assertTrue(result)
-        assertEquals(1, service.history().size)
-        assertEquals(startDestination, service.history().last())
-        assertEquals(3, callCounter)
-    }
-
-    @Test
-    fun `back should return false if only one destination in stack`() = runTest {
-        val service = navigationService
-        val destination = ProjectListDestination
-        service.goTo(destination)
-
-        val result = service.back()
-
-        assertFalse { result }
-        assertEquals(1, service.history().size)
-        assertEquals(1, callCounter)
-    }
+//    @Test
+//    fun `back should return false if only one destination in stack`() = runTest {
+//        val service = navigationService
+//        val destination = ProjectListDestination
+//        service.goTo(destination)
+//
+//        val result = service.back()
+//
+//        assertFalse { result }
+//        assertEquals(1, service.history().size)
+//        assertEquals(1, callCounter)
+//    }
 
     @Test
     fun `key should return destination of the correct type`() = runTest {

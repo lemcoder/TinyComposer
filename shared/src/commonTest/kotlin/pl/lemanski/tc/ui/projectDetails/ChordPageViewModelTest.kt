@@ -3,6 +3,7 @@ package pl.lemanski.tc.ui.projectDetails
 import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.core.ChordBeats
 import pl.lemanski.tc.domain.model.core.NoteBeats
+import pl.lemanski.tc.domain.model.project.CompingStyle
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.domain.service.navigation.NavigationService
@@ -52,7 +53,7 @@ class ChordPageViewModelTest {
             noteBeats: List<NoteBeats>,
             notesPreset: Int,
             tempo: Int,
-            compingStyle: GenerateAudioUseCase.CompingStyle
+            compingStyle: CompingStyle
         ): AudioStream {
             return AudioStream.EMPTY
         }

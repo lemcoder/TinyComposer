@@ -1,5 +1,7 @@
 package pl.lemanski.tc
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
@@ -109,9 +111,8 @@ class UIViewControllerWrapper(
     override fun viewDidDisappear(animated: Boolean) {
         super.viewDidDisappear(animated)
         if (isMovingFromParentViewController()) {
-            runBlocking {
-                navigationService.silentBack()
-            }
+            logger.debug("ViewDidDisappear")
+            navigationService.silentBack()
         }
     }
 }
