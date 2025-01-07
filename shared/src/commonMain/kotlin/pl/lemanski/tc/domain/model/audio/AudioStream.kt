@@ -90,6 +90,6 @@ internal data class AudioStream(
     }
 }
 
-internal expect fun AudioStream.play(isLoopingEnabled: Boolean = false)
+internal expect fun AudioStream.play(isLoopingEnabled: Boolean = false, tempo: Int)
 
 internal expect fun AudioStream.stop()

@@ -18,6 +18,13 @@ import platform.Foundation.NSSearchPathDirectory
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 import platform.Foundation.create
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import platform.darwin.DISPATCH_QUEUE_SERIAL
+import platform.darwin.dispatch_get_main_queue
+import platform.darwin.dispatch_queue_attr_t
+import platform.darwin.dispatch_queue_create
+import platform.darwin.dispatch_queue_t
 
 @OptIn(ExperimentalForeignApi::class)
 internal fun getDirUrl(directory: NSSearchPathDirectory, create: Boolean = false): NSURL? {
@@ -55,3 +62,13 @@ internal fun nativeRunCatching(block: NativeRethrowScope.(CPointer<ObjCObjectVar
         }
     }
 }
+
+@OptIn(ExperimentalForeignApi::class)
+internal fun CoroutineDispatcher.asDispatchQueue(): dispatch_queue_t =
+    when (this) {
+        Dispatchers.Main -> dispatch_get_main_queue()
+        else -> dispatch_queue_create(
+            "${toString()}.asDispatchQueue()",
+            DISPATCH_QUEUE_SERIAL as dispatch_queue_attr_t
+        )
+    }

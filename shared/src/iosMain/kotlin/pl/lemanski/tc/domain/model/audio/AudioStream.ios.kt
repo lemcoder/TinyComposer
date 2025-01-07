@@ -4,37 +4,77 @@ import io.github.lemcoder.mikrosoundfont.io.toByteArrayLittleEndian
 import io.github.lemcoder.mikrosoundfont.io.wav.WavFileHeader
 import io.github.lemcoder.mikrosoundfont.io.wav.toByteArray
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.files.SystemTemporaryDirectory
 import pl.lemanski.tc.domain.service.audio.AudioService
 import pl.lemanski.tc.utils.Logger
+import pl.lemanski.tc.utils.asDispatchQueue
 import pl.lemanski.tc.utils.nativeRunCatching
-import pl.lemanski.tc.utils.toNSData
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFAudio.setActive
-import platform.AVFoundation.AVPlayer
 import platform.AVFoundation.AVPlayerItem
+import platform.AVFoundation.AVPlayerLooper
+import platform.AVFoundation.AVQueuePlayer
 import platform.AVFoundation.addBoundaryTimeObserverForTimes
+import platform.AVFoundation.addPeriodicTimeObserverForInterval
 import platform.AVFoundation.duration
+import platform.AVFoundation.pause
 import platform.AVFoundation.play
 import platform.CoreMedia.CMTimeGetSeconds
-import platform.Foundation.NSDataWritingAtomic
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSTemporaryDirectory
+import platform.CoreMedia.CMTimeMakeWithSeconds
 import platform.Foundation.NSURL
-import platform.Foundation.writeToFile
+import platform.darwin.NSEC_PER_SEC
+
+internal interface OnPlaybackMarkerReachedListener {
+    fun onTimeReached(time: Double)
+    fun onEndOfStreamReached()
+}
 
 @OptIn(ExperimentalForeignApi::class)
-class AudioPlayer(
-    private val data: FloatArray,
-    private val channelCount: Int,
-    private val sampleRate: Int,
-) {
+internal class AudioPlayer {
+    // set no-op listener to avoid NPE
+    private var listener: OnPlaybackMarkerReachedListener = object : OnPlaybackMarkerReachedListener {
+        override fun onTimeReached(time: Double) {
+            // no-op
+        }
+
+        override fun onEndOfStreamReached() {
+            // no-op
+        }
+    }
+    private var isLooping = false
+    private var looper: AVPlayerLooper? = null
+    private var player: AVQueuePlayer? = null
+
+    private val playbackScope = CoroutineScope(SupervisorJob())
+    private var playbackJob: Job = Job()
+
+    internal fun setOnPlaybackMarkerReachedListener(listener: OnPlaybackMarkerReachedListener) {
+        this.listener = listener
+    }
+
+    internal fun setLooping(looping: Boolean) {
+        isLooping = looping
+    }
+
     @OptIn(ExperimentalForeignApi::class)
-    internal fun play() {
+    internal fun play(
+        data: FloatArray,
+        channelCount: Int,
+    ) {
         val logger = Logger(AudioService::class)
 
         logger.debug("Writing data to file")
-        val tmpFilePath = writeDataToTmpFile(data, sampleRate) ?: run {
+        val tmpFilePath = writeDataToTmpFile(data, AudioStream.SAMPLE_RATE, channelCount) ?: run {
             logger.error("Error writing data to file")
             return
         }
@@ -61,77 +101,123 @@ class AudioPlayer(
 
         logger.debug("Creating player")
         val item = AVPlayerItem(uRL = NSURL.fileURLWithPath(tmpFilePath))
-        val avAudioPlayer: AVPlayer = AVPlayer.playerWithPlayerItem(item)
 
-        logger.debug("Playing audio")
-        avAudioPlayer.addBoundaryTimeObserverForTimes(
-            listOf(CMTimeGetSeconds(item.duration)),
-            null
-        ) {
-            logger.debug("Audio playback completed")
-            deleteFile(tmpFilePath)
-        }
-        avAudioPlayer.play()
-    }
+        playbackJob = playbackScope.launch {
+            player = AVQueuePlayer.playerWithPlayerItem(item)
+            looper = AVPlayerLooper.playerLooperWithPlayer(player = player!!, templateItem = item)
 
-    @OptIn(ExperimentalForeignApi::class)
-    private fun writeDataToTmpFile(data: FloatArray, sampleRate: Int): String? {
-        val bytes = WavFileHeader.write(sampleRate.toUInt(), data.size.toUInt(), 1u).toByteArray()
-        val audioData = (bytes + data.toByteArrayLittleEndian()).toNSData()
-        val tempDirectoryPath = NSTemporaryDirectory()
-        val fileManager = NSFileManager.defaultManager
-        val tmpDirURL = NSURL.fileURLWithPath(tempDirectoryPath, isDirectory = true)
-        val soundFileURL = tmpDirURL.URLByAppendingPathComponent("temp")?.URLByAppendingPathExtension("wav")
-
-        nativeRunCatching {
-            fileManager.createDirectoryAtURL(tmpDirURL, withIntermediateDirectories = false, attributes = null, error = it)
-        }
-
-        val filePath = soundFileURL?.path ?: throw IllegalStateException("File path is null")
-        if (fileManager.fileExistsAtPath(filePath)) {
-            deleteFile(filePath)
-        }
-
-        nativeRunCatching {
-            audioData.writeToFile(filePath, NSDataWritingAtomic, it)
-
-            onError {
-                deleteFile(filePath)
+            if (!isLooping) {
+                looper?.disableLooping()
             }
-        }
 
-        return filePath.takeIf { fileManager.fileExistsAtPath(it) }
+            player?.addPeriodicTimeObserverForInterval(
+                interval = CMTimeMakeWithSeconds(0.001, NSEC_PER_SEC.toInt()),
+                queue = Dispatchers.IO.asDispatchQueue()
+            ) { time ->
+                val currentTime = CMTimeGetSeconds(time)
+                listener.onTimeReached(currentTime)
+            }
+
+            player?.addBoundaryTimeObserverForTimes(
+                times = listOf(CMTimeGetSeconds(item.duration)),
+                queue = Dispatchers.IO.asDispatchQueue()
+            ) {
+                logger.debug("Audio playback completed")
+                listener.onEndOfStreamReached()
+
+                if (!isLooping) {
+                    deleteFile(tmpFilePath)
+                }
+            }
+
+            logger.debug("Playing audio")
+            player?.play()
+        }
     }
 
-    @OptIn(ExperimentalForeignApi::class)
+    fun stop() {
+        playbackJob.cancel()
+        player?.pause()
+        player = null
+        looper = null
+    }
+
+    // ---
+
+
+    private fun writeDataToTmpFile(data: FloatArray, sampleRate: Int, channelCount: Int): String? {
+        val wavHeader = WavFileHeader.write(sampleRate.toUInt(), data.size.toUInt(), channelCount.toUShort()).toByteArray()
+        val audioData = wavHeader + data.toByteArrayLittleEndian()
+
+        val path = Path(SystemTemporaryDirectory, "audio.wav")
+        val sink = SystemFileSystem.sink(path).buffered()
+
+        sink.write(audioData)
+        sink.close()
+
+        return path.toString().takeIf { SystemFileSystem.exists(path) }
+    }
+
     private fun deleteFile(filePath: String) {
-        val fileManager = NSFileManager.defaultManager
-        nativeRunCatching {
-            fileManager.removeItemAtPath(filePath, it)
-        }
+        SystemFileSystem.delete(Path(filePath))
+    }
+
+    companion object {
+        val Instance = AudioPlayer()
     }
 }
 
-internal actual fun AudioStream.play(isLoopingEnabled: Boolean) {
+internal actual fun AudioStream.play(isLoopingEnabled: Boolean, tempo: Int) {
+    val logger = Logger(AudioService::class)
+
     try {
-        val logger = Logger(AudioService::class)
         logger.debug("Init playing audio")
 
-        val player = AudioPlayer(
-            data = this.data,
-            channelCount = this.output.value,
-            sampleRate = AudioStream.SAMPLE_RATE
-        )
+        val player = AudioPlayer.Instance
+        player.setLooping(isLoopingEnabled)
+
+        player.setOnPlaybackMarkerReachedListener(object : OnPlaybackMarkerReachedListener {
+            private var lastMarker = -1
+
+            override fun onTimeReached(time: Double) {
+                val markerPosition = time * AudioStream.SAMPLE_RATE
+                val nearestMarker = markers
+                    .filter { it.position <= markerPosition }
+                    .minByOrNull { markerPosition - it.position } ?: return // Find the nearest one above
+
+                if (nearestMarker.index == lastMarker) {
+                    return
+                }
+                lastMarker = nearestMarker.index
+                markerReachedCallback?.invoke(nearestMarker)
+            }
+
+            override fun onEndOfStreamReached() {
+                logger.info("End of stream reached")
+                if (isLoopingEnabled) {
+                    logger.info("Looping enabled, no-op on marker reached")
+                    return
+                }
+
+                logger.info("Looping disabled, invoking callback")
+                markerReachedCallback?.invoke(AudioStream.END_MARKER) // indicate that the end of the stream has been reached
+            }
+        })
 
         logger.debug("Playing audio")
-        player.play()
+        player.play(
+            data = this.data,
+            channelCount = this.output.value,
+        )
     } catch (e: Exception) {
-        println("Error playing audio: ${e.message}, ${e.stackTraceToString()}")
+        logger.error("Error playing audio", e)
     }
 }
 
 internal actual fun AudioStream.stop() {
     val logger = Logger(AudioService::class)
+
+    AudioPlayer.Instance.stop()
 
     logger.debug("Stopping audio")
 }

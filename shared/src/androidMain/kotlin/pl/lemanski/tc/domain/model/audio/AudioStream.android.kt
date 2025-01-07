@@ -147,7 +147,7 @@ private object PlaybackManager {
     }
 }
 
-internal actual fun AudioStream.play(isLoopingEnabled: Boolean) {
+internal actual fun AudioStream.play(isLoopingEnabled: Boolean, tempo: Int) {
     val logger = Logger(AudioStream::class)
     val notificationListener = object : OnPlaybackMarkerReachedListener {
         private var lastMarker = -1

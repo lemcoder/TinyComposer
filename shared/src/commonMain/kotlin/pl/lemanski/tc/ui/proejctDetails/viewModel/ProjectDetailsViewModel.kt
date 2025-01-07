@@ -183,7 +183,7 @@ internal class ProjectDetailsViewModel(
             audioStream = audioStream
         )
 
-        audioStream.play(isLoopingEnabled)
+        audioStream.play(isLoopingEnabled, project.bpm)
     }
 
     override fun onStopButtonClicked(): Job = viewModelScope.launch {
@@ -246,6 +246,7 @@ internal class ProjectDetailsViewModel(
     override fun onCleared() {
         super.onCleared()
 
+        audioStream.stop()
         val project = loadProjectOrThrow(key.projectId)
         saveProjectUseCase(SaveProjectUseCaseErrorHandler(), project)
 
