@@ -14,7 +14,7 @@ internal class LoadProjectUseCaseImpl(
     override fun invoke(id: UUID): Project? {
         logger.debug("Starting with id: $id")
         if (projectRepository.getCurrentProject()?.id == id) {
-            logger.debug("Fetching project from cache cached")
+            logger.debug("Fetching project from cache")
             return projectRepository.getCurrentProject()
         }
 

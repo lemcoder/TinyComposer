@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.ToComposable
@@ -29,6 +31,8 @@ internal fun ProjectAiGenerateScreen(
     submitButton: StateComponent.Button,
     snackBar: StateComponent.SnackBar?,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     LoaderScaffold(isLoading) { snackbarHostState ->
         Column(
             modifier = Modifier
@@ -60,7 +64,12 @@ internal fun ProjectAiGenerateScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                submitButton.ToComposable()
+                Button(onClick = {
+                    keyboardController?.hide()
+                    submitButton.onClick()
+                }) {
+                    Text(text = submitButton.text)
+                }
             }
 
             snackBar?.ToComposable(snackbarHostState)

@@ -25,6 +25,7 @@ internal class UpdateProjectUseCaseImpl(
             return null
         }
 
+        logger.debug("Updating project: $project")
         projectRepository.cacheProject(project)
 
         return project

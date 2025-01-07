@@ -21,11 +21,19 @@ internal class NlpRepositoryImpl(
     override suspend fun generateChordBeats(prompt: String): List<ChordBeats> = withContext(dispatcher) {
         val context = """
             You a music composer. You composing song.
-            Provide melody. The notes are in the JSON format:
+            Provide chords. The format is JSON format:
             [{"chord":{"type":"MAJOR","baseNote":{"value":60,"velocity":127}},"beats":4},{"chord":{"type":"MINOR","baseNote":{"value":62,"velocity":60}},"beats":2}]
             The "type" is the chord type, the "baseNote" is the MIDI note that is the root of a chord (it has value of 1-127 where 60 is C5 and velocity (volume level) of 1-127), the "beats" is the number of measures that chord should last.
             available chord types are:
             MINOR, MAJOR, DIMINISHED, AUGMENTED, MAJOR_SEVENTH, MINOR_SEVENTH, DOMINANT_SEVENTH, HALF_DIMINISHED_SEVENTH, DIMINISHED_SEVENTH, AUGMENTED_SEVENTH, MINOR_SIXTH, MAJOR_SIXTH
+            The sample chords for The ABC Song would be:
+                [{"chord":{"type":"MAJOR","baseNote":{"value":60,"velocity":127}},"beats":4},
+                {"chord":{"type":"MINOR","baseNote":{"value":62,"velocity":127}},"beats":2},
+                {"chord":{"type":"DOMINANT_SEVENTH","baseNote":{"value":55,"velocity":127}},"beats":2},
+                {"chord":{"type":"MAJOR","baseNote":{"value":65,"velocity":127}},"beats":2},
+                {"chord":{"type":"MINOR","baseNote":{"value":64,"velocity":127}},"beats":2},
+                {"chord":{"type":"MINOR","baseNote":{"value":62,"velocity":127}},"beats":2},
+                {"chord":{"type":"MAJOR","baseNote":{"value":60,"velocity":127}},"beats":2}]
         """.trimIndent()
 
         genAiApi.setup(context)
@@ -48,6 +56,21 @@ internal class NlpRepositoryImpl(
             Provide melody. The notes are in the JSON format:
             [{"note":{"value":60,"velocity":127},"beats":4},{"note":{"value":65,"velocity":60},"beats":4}]
             The "value" is the MIDI note (1-127 where 60 is C5), the "velocity" is volume level and the beats is the number of beats that note should last.
+            The sample melody for The ABC Song would be:
+                [{"note":{"value":60,"velocity":127},"beats":1},
+                {"note":{"value":60,"velocity":127},"beats":1},
+                {"note":{"value":67,"velocity":127},"beats":1},
+                {"note":{"value":67,"velocity":127},"beats":1},
+                {"note":{"value":69,"velocity":127},"beats":1},
+                {"note":{"value":69,"velocity":127},"beats":1},
+                {"note":{"value":67,"velocity":127},"beats":2},
+                {"note":{"value":65,"velocity":127},"beats":1},
+                {"note":{"value":65,"velocity":127},"beats":1},
+                {"note":{"value":64,"velocity":127},"beats":1},
+                {"note":{"value":64,"velocity":127},"beats":1},
+                {"note":{"value":62,"velocity":127},"beats":1},
+                {"note":{"value":62,"velocity":127},"beats":1},
+                {"note":{"value":60,"velocity":127},"beats":2}]
         """.trimIndent()
 
         genAiApi.setup(context)

@@ -235,7 +235,7 @@ internal class MelodyPageViewModel(
             mutableStateFlow.update { state ->
                 state.copy(
                     pageState = state.pageState.copy(
-                        bottomSheet = initialState
+                        bottomSheet = null
                     ),
                 )
             }
@@ -262,7 +262,8 @@ internal class MelodyPageViewModel(
                             durationValuePicker = state.pageState.bottomSheet.durationValuePicker.copy(
                                 value = value
                             )
-                        )
+                        ),
+                        noteBeats = getNoteComponents(newProject)
                     ),
                 )
             }
@@ -297,7 +298,8 @@ internal class MelodyPageViewModel(
                             octaveValuePicker = state.pageState.bottomSheet.octaveValuePicker.copy(
                                 value = value
                             )
-                        )
+                        ),
+                        noteBeats = getNoteComponents(newProject)
                     )
                 )
             }
@@ -324,7 +326,8 @@ internal class MelodyPageViewModel(
                             velocityValuePicker = state.pageState.bottomSheet.velocityValuePicker.copy(
                                 value = value
                             )
-                        )
+                        ),
+                        noteBeats = getNoteComponents(newProject)
                     )
                 )
             }
