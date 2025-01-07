@@ -11,6 +11,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.project.Project
+import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.goTo
 import pl.lemanski.tc.domain.useCase.saveProject.SaveProjectUseCase
@@ -20,6 +21,7 @@ import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.UUID
+import pl.lemanski.tc.utils.round
 
 internal class ProjectListViewModel(
     override val key: ProjectListDestination,
@@ -171,10 +173,17 @@ internal class ProjectListViewModel(
     internal fun mapProjectToProjectCard(project: Project): ProjectsListContract.State.ProjectCard = ProjectsListContract.State.ProjectCard(
         id = project.id,
         name = project.name,
-        description = "BPM: ${project.bpm}\n${i18n.projectList.duration}: ${(project.lengthInMeasures * project.bpm) / 60}s",
+        description = "BPM: ${project.bpm}\n${i18n.projectList.duration}: ${getProjectLengthInSeconds(project).round(2)}s",
         onDelete = ::onProjectDelete,
         onClick = ::onProjectClick
     )
+
+    internal fun getProjectLengthInSeconds(project: Project): Double {
+        return when(project.rhythm) {
+            Rhythm.FOUR_FOURS  -> (project.lengthInMeasures * 60).toDouble() / project.bpm
+            Rhythm.THREE_FOURS -> (project.lengthInMeasures * 60).toDouble() / project.bpm
+        }
+    }
 
 //---
 

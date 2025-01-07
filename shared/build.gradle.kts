@@ -66,6 +66,11 @@ kotlin {
 }
 
 android {
+    sourceSets["main"].apply {
+        manifest.srcFile("src/androidMain/AndroidManifest.xml")
+        resources.srcDirs("src/commonMain/composeResources")
+    }
+
     namespace = "pl.lemanski.tc"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -88,4 +93,8 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+}
+
+compose.resources {
+    generateResClass = always
 }

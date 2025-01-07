@@ -83,4 +83,18 @@ internal class TestI18n : I18n {
         override val promptOptionChords: String = "promptOptionChords"
         override val promptOptionMelody: String = "promptOptionMelody"
     }
+    override val chords = object : I18n.Chords {
+        override val minor: String = "minor"
+        override val major: String = "major"
+        override val diminished: String = "diminished"
+        override val augmented: String = "augmented"
+        override val majorSeventh: String = "majorSeventh"
+        override val minorSeventh: String = "minorSeventh"
+        override val dominantSeventh: String = "dominantSeventh"
+        override val halfDiminishedSeventh: String = "halfDiminishedSeventh"
+        override val diminishedSeventh: String = "diminishedSeventh"
+        override val augmentedSeventh: String = "augmentedSeventh"
+        override val minorSixth: String = "minorSixth"
+        override val majorSixth: String = "majorSixth"
+    }
 }

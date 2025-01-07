@@ -4,6 +4,18 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.getString
 import tinycomposer.shared.generated.resources.Res
+import tinycomposer.shared.generated.resources.chord_type_augmented
+import tinycomposer.shared.generated.resources.chord_type_augmented_seventh
+import tinycomposer.shared.generated.resources.chord_type_diminished
+import tinycomposer.shared.generated.resources.chord_type_diminished_seventh
+import tinycomposer.shared.generated.resources.chord_type_dominant_seventh
+import tinycomposer.shared.generated.resources.chord_type_half_diminished_seventh
+import tinycomposer.shared.generated.resources.chord_type_major
+import tinycomposer.shared.generated.resources.chord_type_major_seventh
+import tinycomposer.shared.generated.resources.chord_type_major_sixth
+import tinycomposer.shared.generated.resources.chord_type_minor
+import tinycomposer.shared.generated.resources.chord_type_minor_seventh
+import tinycomposer.shared.generated.resources.chord_type_minor_sixth
 import tinycomposer.shared.generated.resources.common_add
 import tinycomposer.shared.generated.resources.common_cancel
 import tinycomposer.shared.generated.resources.common_close
@@ -17,6 +29,15 @@ import tinycomposer.shared.generated.resources.common_retry
 import tinycomposer.shared.generated.resources.common_save
 import tinycomposer.shared.generated.resources.common_undo
 import tinycomposer.shared.generated.resources.common_yes
+import tinycomposer.shared.generated.resources.project_ai_generate_network_error
+import tinycomposer.shared.generated.resources.project_ai_generate_parsing_error
+import tinycomposer.shared.generated.resources.project_ai_generate_prompt_hint
+import tinycomposer.shared.generated.resources.project_ai_generate_prompt_option_chords
+import tinycomposer.shared.generated.resources.project_ai_generate_prompt_option_chords_for_melody
+import tinycomposer.shared.generated.resources.project_ai_generate_prompt_option_melody
+import tinycomposer.shared.generated.resources.project_ai_generate_prompt_option_melody_for_chords
+import tinycomposer.shared.generated.resources.project_ai_generate_prompt_options
+import tinycomposer.shared.generated.resources.project_ai_generate_unknown_error
 import tinycomposer.shared.generated.resources.project_create_invalid_project_bpm
 import tinycomposer.shared.generated.resources.project_create_invalid_project_name
 import tinycomposer.shared.generated.resources.project_create_project_bpm
@@ -24,15 +45,36 @@ import tinycomposer.shared.generated.resources.project_create_project_creation_e
 import tinycomposer.shared.generated.resources.project_create_project_name
 import tinycomposer.shared.generated.resources.project_create_project_rhythm
 import tinycomposer.shared.generated.resources.project_create_title
+import tinycomposer.shared.generated.resources.project_details_chord_type
+import tinycomposer.shared.generated.resources.project_details_chords_tab
+import tinycomposer.shared.generated.resources.project_details_control_state_error
+import tinycomposer.shared.generated.resources.project_details_duration
+import tinycomposer.shared.generated.resources.project_details_invalid_chord_beats
+import tinycomposer.shared.generated.resources.project_details_invalid_note_beats
+import tinycomposer.shared.generated.resources.project_details_invalid_tempo
+import tinycomposer.shared.generated.resources.project_details_melody_tab
+import tinycomposer.shared.generated.resources.project_details_octave
+import tinycomposer.shared.generated.resources.project_details_project_save_error
+import tinycomposer.shared.generated.resources.project_details_tempo
+import tinycomposer.shared.generated.resources.project_details_title
+import tinycomposer.shared.generated.resources.project_details_velocity
 import tinycomposer.shared.generated.resources.project_list_add_project
 import tinycomposer.shared.generated.resources.project_list_duration
+import tinycomposer.shared.generated.resources.project_list_load_sample_projects
+import tinycomposer.shared.generated.resources.project_list_no_projects
 import tinycomposer.shared.generated.resources.project_list_project_delete_failed
 import tinycomposer.shared.generated.resources.project_list_project_deleted
 import tinycomposer.shared.generated.resources.project_list_project_recreate_failed
 import tinycomposer.shared.generated.resources.project_list_title
+import tinycomposer.shared.generated.resources.project_options_chords_preset
+import tinycomposer.shared.generated.resources.project_options_export
+import tinycomposer.shared.generated.resources.project_options_melody_preset
+import tinycomposer.shared.generated.resources.project_options_save_error
+import tinycomposer.shared.generated.resources.project_options_tempo
+import tinycomposer.shared.generated.resources.project_options_tempo_error
+import tinycomposer.shared.generated.resources.project_options_title
 import tinycomposer.shared.generated.resources.rhythm_four_fours
 import tinycomposer.shared.generated.resources.rhythm_three_fours
-import tinycomposer.shared.generated.resources.welcome_title
 
 internal class I18nImpl : I18n {
 
@@ -45,6 +87,7 @@ internal class I18nImpl : I18n {
     override val rhythm: I18n.Rhythm by lazy { Rhythm() }
     override val projectOptions: I18n.ProjectOptions by lazy { ProjectOptions() }
     override val projectAiGenerate: I18n.ProjectAiGenerate by lazy { ProjectAiGenerate() }
+    override val chords: I18n.Chords by lazy { Chords() }
 
     private inner class Common : I18n.Common {
         override val ok: String = stringResourceBlocking(Res.string.common_ok)
@@ -69,8 +112,8 @@ internal class I18nImpl : I18n {
         override val projectDeleted: String = stringResourceBlocking(Res.string.project_list_project_deleted)
         override val projectDeleteFailed: String = stringResourceBlocking(Res.string.project_list_project_delete_failed)
         override val projectRecreateFailed: String = stringResourceBlocking(Res.string.project_list_project_recreate_failed)
-        override val loadSampleProjects: String = "Load sample projects"
-        override val noProjects: String = "No projects found. Create new project or load sample projects."
+        override val loadSampleProjects: String = stringResourceBlocking(Res.string.project_list_load_sample_projects)
+        override val noProjects: String = stringResourceBlocking(Res.string.project_list_no_projects)
     }
 
     private inner class ProjectCreate : I18n.ProjectCreate {
@@ -90,40 +133,55 @@ internal class I18nImpl : I18n {
     }
 
     private inner class ProjectDetails : I18n.ProjectDetails {
-        override val invalidTempo: String = "invalid tempo"
-        override val tempo: String = " tempo"
-        override val invalidChordBeats: String = "invalid chord beats"
-        override val invalidNoteBeats: String = "invalid note beats"
-        override val controlStateError: String = "Control state error"
-        override val projectSaveError: String = "Project save error"
-        override val chordsTab: String = "Chords"
-        override val melodyTab: String = "Melody"
-        override val duration: String = "duration"
-        override val octave: String = "octave"
-        override val chordType: String = "chord type"
-        override val velocity: String = "velocity"
-        override val title: String = " Project details"
+        override val invalidTempo: String = stringResourceBlocking(Res.string.project_details_invalid_tempo)
+        override val tempo: String = stringResourceBlocking(Res.string.project_details_tempo)
+        override val invalidChordBeats: String = stringResourceBlocking(Res.string.project_details_invalid_chord_beats)
+        override val invalidNoteBeats: String = stringResourceBlocking(Res.string.project_details_invalid_note_beats)
+        override val controlStateError: String = stringResourceBlocking(Res.string.project_details_control_state_error)
+        override val projectSaveError: String = stringResourceBlocking(Res.string.project_details_project_save_error)
+        override val chordsTab: String = stringResourceBlocking(Res.string.project_details_chords_tab)
+        override val melodyTab: String = stringResourceBlocking(Res.string.project_details_melody_tab)
+        override val duration: String = stringResourceBlocking(Res.string.project_details_duration)
+        override val octave: String = stringResourceBlocking(Res.string.project_details_octave)
+        override val chordType: String = stringResourceBlocking(Res.string.project_details_chord_type)
+        override val velocity: String = stringResourceBlocking(Res.string.project_details_velocity)
+        override val title: String = stringResourceBlocking(Res.string.project_details_title)
     }
 
     private inner class ProjectOptions : I18n.ProjectOptions {
-        override val export: String = "Export"
-        override val melodyPreset: String = "Melody preset"
-        override val chordsPreset: String = "Chords preset"
-        override val title: String = "Options"
-        override val tempo: String = "Tempo"
-        override val tempoError: String = "Bad tempo"
-        override val saveError: String = "Save error"
+        override val export: String = stringResourceBlocking(Res.string.project_options_export)
+        override val melodyPreset: String = stringResourceBlocking(Res.string.project_options_melody_preset)
+        override val chordsPreset: String = stringResourceBlocking(Res.string.project_options_chords_preset)
+        override val title: String = stringResourceBlocking(Res.string.project_options_title)
+        override val tempo: String = stringResourceBlocking(Res.string.project_options_tempo)
+        override val tempoError: String = stringResourceBlocking(Res.string.project_options_tempo_error)
+        override val saveError: String = stringResourceBlocking(Res.string.project_options_save_error)
     }
 
     private inner class ProjectAiGenerate : I18n.ProjectAiGenerate {
-        override val unknownError: String = "unknownError"
-        override val networkError: String = "networkError"
-        override val parsingError: String = "parsingError"
-        override val promptHint: String = "Prompt hint"
-        override val promptOptions: String = "Prompt options"
-        override val promptOptionChordsForMelody: String = "promptOptionChordsForMelody"
-        override val promptOptionMelodyForChords: String = "promptOptionMelodyForChords"
-        override val promptOptionChords: String = "promptOptionChords"
-        override val promptOptionMelody: String = "promptOptionMelody"
+        override val unknownError: String = stringResourceBlocking(Res.string.project_ai_generate_unknown_error)
+        override val networkError: String = stringResourceBlocking(Res.string.project_ai_generate_network_error)
+        override val parsingError: String = stringResourceBlocking(Res.string.project_ai_generate_parsing_error)
+        override val promptHint: String = stringResourceBlocking(Res.string.project_ai_generate_prompt_hint)
+        override val promptOptions: String = stringResourceBlocking(Res.string.project_ai_generate_prompt_options)
+        override val promptOptionChordsForMelody: String = stringResourceBlocking(Res.string.project_ai_generate_prompt_option_chords_for_melody)
+        override val promptOptionMelodyForChords: String = stringResourceBlocking(Res.string.project_ai_generate_prompt_option_melody_for_chords)
+        override val promptOptionChords: String = stringResourceBlocking(Res.string.project_ai_generate_prompt_option_chords)
+        override val promptOptionMelody: String = stringResourceBlocking(Res.string.project_ai_generate_prompt_option_melody)
+    }
+
+    private inner class Chords : I18n.Chords {
+        override val minor: String = stringResourceBlocking(Res.string.chord_type_minor)
+        override val major: String = stringResourceBlocking(Res.string.chord_type_major)
+        override val diminished: String = stringResourceBlocking(Res.string.chord_type_diminished)
+        override val augmented: String = stringResourceBlocking(Res.string.chord_type_augmented)
+        override val majorSeventh: String = stringResourceBlocking(Res.string.chord_type_major_seventh)
+        override val minorSeventh: String = stringResourceBlocking(Res.string.chord_type_minor_seventh)
+        override val dominantSeventh: String = stringResourceBlocking(Res.string.chord_type_dominant_seventh)
+        override val halfDiminishedSeventh: String = stringResourceBlocking(Res.string.chord_type_half_diminished_seventh)
+        override val diminishedSeventh: String = stringResourceBlocking(Res.string.chord_type_diminished_seventh)
+        override val augmentedSeventh: String = stringResourceBlocking(Res.string.chord_type_augmented_seventh)
+        override val minorSixth: String = stringResourceBlocking(Res.string.chord_type_minor_sixth)
+        override val majorSixth: String = stringResourceBlocking(Res.string.chord_type_major_sixth)
     }
 }

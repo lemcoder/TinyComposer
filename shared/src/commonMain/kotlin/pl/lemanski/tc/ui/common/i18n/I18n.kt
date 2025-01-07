@@ -8,6 +8,7 @@ internal interface I18n {
     val rhythm: Rhythm
     val projectOptions: ProjectOptions
     val projectAiGenerate: ProjectAiGenerate
+    val chords: Chords
 
     interface Common {
         val ok: String
@@ -88,5 +89,20 @@ internal interface I18n {
         val promptOptionMelodyForChords: String
         val promptOptionChords: String
         val promptOptionMelody: String
+    }
+
+    interface Chords {
+        val minor: String
+        val major: String
+        val diminished: String
+        val augmented: String
+        val majorSeventh: String
+        val minorSeventh: String
+        val dominantSeventh: String
+        val halfDiminishedSeventh: String
+        val diminishedSeventh: String
+        val augmentedSeventh: String
+        val minorSixth: String
+        val majorSixth: String
     }
 }

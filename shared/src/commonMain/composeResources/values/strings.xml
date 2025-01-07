@@ -14,13 +14,14 @@
     <string name="common_retry">Retry</string>
 
     <string name="welcome_title">Tiny composer</string>
-
     <string name="project_list_title">Projects</string>
     <string name="project_list_add_project">Create project</string>
     <string name="project_list_duration">Duration</string>
     <string name="project_list_project_deleted">Project deleted</string>
     <string name="project_list_project_delete_failed">Failed to delete project</string>
     <string name="project_list_project_recreate_failed">Failed to undo</string>
+    <string name="project_list_load_sample_projects">Load sample projects</string>
+    <string name="project_list_no_projects">No projects found. Create new project or load sample projects.</string>
 
     <string name="project_create_title">Create project</string>
     <string name="project_create_project_name">Project name</string>
@@ -33,4 +34,48 @@
     <string name="rhythm_four_fours">Four fours</string>
     <string name="rhythm_three_fours">Three fours</string>
 
+    <string name="project_details_invalid_tempo">Invalid tempo</string>
+    <string name="project_details_tempo">Tempo</string>
+    <string name="project_details_invalid_chord_beats">Invalid chord beats</string>
+    <string name="project_details_invalid_note_beats">Invalid note beats</string>
+    <string name="project_details_control_state_error">Control state error</string>
+    <string name="project_details_project_save_error">Project save error</string>
+    <string name="project_details_chords_tab">Chords</string>
+    <string name="project_details_melody_tab">Melody</string>
+    <string name="project_details_duration">Duration</string>
+    <string name="project_details_octave">Octave</string>
+    <string name="project_details_chord_type">Chord type</string>
+    <string name="project_details_velocity">Volume</string>
+    <string name="project_details_title">Project details</string>
+
+    <string name="project_options_export">Export</string>
+    <string name="project_options_melody_preset">Melody preset</string>
+    <string name="project_options_chords_preset">Chords preset</string>
+    <string name="project_options_title">Options</string>
+    <string name="project_options_tempo">Tempo</string>
+    <string name="project_options_tempo_error">Bad tempo</string>
+    <string name="project_options_save_error">Save error</string>
+
+    <string name="project_ai_generate_unknown_error">Unknown error</string>
+    <string name="project_ai_generate_network_error">Network error</string>
+    <string name="project_ai_generate_parsing_error">Parsing error</string>
+    <string name="project_ai_generate_prompt_hint">Enter prompt to generate music</string>
+    <string name="project_ai_generate_prompt_options">Prompt options</string>
+    <string name="project_ai_generate_prompt_option_chords_for_melody">Generate chords for melody</string>
+    <string name="project_ai_generate_prompt_option_melody_for_chords">Generate melody for chords</string>
+    <string name="project_ai_generate_prompt_option_chords">Generate chords</string>
+    <string name="project_ai_generate_prompt_option_melody">Generate melody</string>
+
+    <string name="chord_type_major">Major</string>
+    <string name="chord_type_minor">Minor</string>
+    <string name="chord_type_diminished">Diminished</string>
+    <string name="chord_type_augmented">Augmented</string>
+    <string name="chord_type_major_seventh">Major Seventh</string>
+    <string name="chord_type_minor_seventh">Minor Seventh</string>
+    <string name="chord_type_dominant_seventh">Dominant Seventh</string>
+    <string name="chord_type_half_diminished_seventh">Half Diminished Seventh</string>
+    <string name="chord_type_diminished_seventh">Diminished Seventh</string>
+    <string name="chord_type_augmented_seventh">Augmented Seventh</string>
+    <string name="chord_type_minor_sixth">Minor Sixth</string>
+    <string name="chord_type_major_sixth">Major Sixth</string>
 </resources>

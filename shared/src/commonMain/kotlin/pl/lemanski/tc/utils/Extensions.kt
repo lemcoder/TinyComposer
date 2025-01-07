@@ -2,6 +2,7 @@ package pl.lemanski.tc.utils
 
 import kotlinx.io.Buffer
 import kotlinx.io.readByteArray
+import kotlin.math.round
 
 /**
  * String extensions
@@ -33,5 +34,14 @@ internal fun Int.toByteArray(): ByteArray {
         writeInt(this@toByteArray)
         return readByteArray()
     }
+}
+
+/**
+ * Double extensions
+ */
+fun Double.round(decimals: Int): Double {
+    var multiplier = 1.0
+    repeat(decimals) { multiplier *= 10 }
+    return round(this * multiplier) / multiplier
 }
 

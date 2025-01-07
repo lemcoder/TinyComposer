@@ -1,6 +1,5 @@
 package pl.lemanski.tc.ui.proejctDetails.viewModel
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.update
 import pl.lemanski.tc.domain.model.core.Chord
 import pl.lemanski.tc.domain.model.core.ChordBeats
@@ -13,6 +12,7 @@ import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract
+import pl.lemanski.tc.ui.proejctDetails.utils.getFullName
 import pl.lemanski.tc.utils.Logger
 import pl.lemanski.tc.utils.UUID
 import pl.lemanski.tc.utils.exception.ViewModelInitException
@@ -201,7 +201,7 @@ internal class ChordPageViewModel(
         private val logger: Logger = Logger(this::class)
         private val chordTypeOptions = Chord.Type.entries.map { chordType ->
             StateComponent.SelectInput.Option(
-                name = chordType.name,
+                name = chordType.getFullName(i18n),
                 value = chordType
             )
         }.toSet()
