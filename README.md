@@ -1,7 +1,9 @@
 ![logo](https://raw.githubusercontent.com/lemcoder/TinyComposer/refs/heads/main/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/AppIcon-40%403x.png)
 # Tiny Composer
 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.1.0-blue.svg?logo=kotlin)](http://kotlinlang.org)  
+[![Kotlin](https://img.shields.io/badge/kotlin-2.1.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
+
+> This is my submission for the [Kotlin Student Coding Competition](https://kotlinconf.com/contest/). The [300 word essay](https://raw.githubusercontent.com/lemcoder/TinyComposer/refs/heads/main/Essay.md) is included in this repository.
 
 Tiny Composer is a Kotlin Multiplatform app that helps users create simple musical pieces using artificial intelligence. The project is designed to showcase the power of Kotlin for music generation and provide an intuitive user experience suitable for both beginners and experienced creators.
 
