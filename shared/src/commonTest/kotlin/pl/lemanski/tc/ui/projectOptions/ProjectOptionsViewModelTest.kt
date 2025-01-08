@@ -6,14 +6,20 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import pl.lemanski.tc.domain.model.audio.AudioStream
+import pl.lemanski.tc.domain.model.core.ChordBeats
+import pl.lemanski.tc.domain.model.core.NoteBeats
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
+import pl.lemanski.tc.domain.model.project.CompingStyle
 import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.model.project.Rhythm
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.goTo
+import pl.lemanski.tc.domain.useCase.generateAudio.GenerateAudioUseCase
 import pl.lemanski.tc.domain.useCase.getSoundFontPresets.GetSoundFontPresetsUseCase
 import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
+import pl.lemanski.tc.domain.useCase.shareFileUseCase.ShareFileUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
@@ -90,6 +96,17 @@ class ProjectOptionsViewModelTest {
         }
     }
 
+    private val shareFileUseCase = object : ShareFileUseCase {
+        override fun invoke(errorHandler: ShareFileUseCase.ErrorHandler, path: String) {
+        }
+    }
+
+    private val generateAudioUseCase = object : GenerateAudioUseCase {
+        override suspend fun invoke(errorHandler: GenerateAudioUseCase.ErrorHandler, chordBeats: List<ChordBeats>, chordsPreset: Int, noteBeats: List<NoteBeats>, notesPreset: Int, tempo: Int, compingStyle: CompingStyle): AudioStream {
+            return AudioStream.EMPTY
+        }
+    }
+
     private val TestScope.viewModel: ProjectOptionsViewModel
         get() = ProjectOptionsViewModel(
             ProjectOptionsDestination(projectId),
@@ -98,7 +115,9 @@ class ProjectOptionsViewModelTest {
             loadProjectUseCase,
             updateProjectUseCase,
             getSoundFontPresetsUseCase,
-            presetsControlUseCase
+            presetsControlUseCase,
+            shareFileUseCase,
+            generateAudioUseCase
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
