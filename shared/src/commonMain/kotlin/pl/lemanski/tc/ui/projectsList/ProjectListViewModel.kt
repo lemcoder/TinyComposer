@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.lemanski.tc.domain.model.core.Chord
+import pl.lemanski.tc.domain.model.core.ChordBeats
+import pl.lemanski.tc.domain.model.core.Note
+import pl.lemanski.tc.domain.model.core.build
 import pl.lemanski.tc.domain.model.navigation.ProjectCreateDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
@@ -137,10 +141,56 @@ internal class ProjectListViewModel(
     }
 
     override fun onLoadSampleProjectsClick(): Job = viewModelScope.launch {
-        logger.debug("Load sample projects clicked")
+        logger.debug("Load sample project clicked")
         hideSnackBar()
 
-        // TODO
+        _stateFlow.update { state ->
+            state.copy(
+                isLoading = true
+            )
+        }
+
+        val sampleProject = Project(
+            id = UUID.random(),
+            name = "ABC's",
+            bpm = 110,
+            rhythm = Rhythm.FOUR_FOURS,
+            chords = listOf(
+                Chord.Type.MAJOR.build(Note(60, 60)) to 4,
+                Chord.Type.MINOR.build(Note(62, 62)) to 2,
+                Chord.Type.DOMINANT_SEVENTH.build(Note(55, 55)) to 2,
+                Chord.Type.MAJOR.build(Note(65, 65)) to 2,
+                Chord.Type.MINOR.build(Note(64, 64)) to 2,
+                Chord.Type.MINOR.build(Note(62, 62)) to 2,
+                Chord.Type.MAJOR.build(Note(60, 60)) to 2
+            ),
+            melody = listOf(
+                Note(60, 127) to 1,
+                Note(60, 127) to 1,
+                Note(67, 127) to 1,
+                Note(67, 127) to 1,
+                Note(69, 127) to 1,
+                Note(69, 127) to 1,
+                Note(67, 127) to 2,
+                Note(65, 127) to 1,
+                Note(65, 127) to 1,
+                Note(64, 127) to 1,
+                Note(64, 127) to 1,
+                Note(62, 127) to 1,
+                Note(62, 127) to 1,
+                Note(60, 127) to 2
+            )
+        )
+
+        saveProjectUseCase(CreateProjectErrorHandler(), sampleProject)
+        val projects = getProjectsListUseCase()
+
+        _stateFlow.update { state ->
+            state.copy(
+                isLoading = false,
+                projectCards = projects.map(::mapProjectToProjectCard)
+            )
+        }
     }
 
     override fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?) {

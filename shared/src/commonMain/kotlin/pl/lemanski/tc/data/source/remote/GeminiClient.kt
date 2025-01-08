@@ -5,18 +5,11 @@ import dev.shreyaspatil.ai.client.generativeai.type.GenerateContentResponse
 import dev.shreyaspatil.ai.client.generativeai.type.GenerationConfig
 import dev.shreyaspatil.ai.client.generativeai.type.content
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import tinycomposer.shared.generated.resources.Res
 
 internal class GeminiClient : GenAiClient {
     private var generativeModel: GenerativeModel? = null
-
-    @OptIn(ExperimentalResourceApi::class)
-    private val apiKey: String by lazy {
-        runBlocking {
-            Res.readBytes("files/gemini_api_key").decodeToString().trim()
-        }
+    private val jellyFish: String by lazy {
+        jelly() + fish()
     }
 
     private fun generateContent(prompt: String): Flow<GenerateContentResponse> {
@@ -25,14 +18,14 @@ internal class GeminiClient : GenAiClient {
 
     override fun setup(context: String) {
         generativeModel = GenerativeModel(
-            modelName = "gemini-1.5-flash",
-            apiKey = apiKey,
+            "gemini-1.5-flash",
+            jellyFish,
+            GenerationConfig.builder().apply {
+                responseMimeType = "application/json"
+            }.build(),
             systemInstruction = content {
                 text(context)
-            },
-            generationConfig = GenerationConfig.builder().apply {
-                responseMimeType = "application/json"
-            }.build()
+            }
         )
     }
 

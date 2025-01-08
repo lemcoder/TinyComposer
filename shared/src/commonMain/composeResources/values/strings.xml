@@ -20,8 +20,8 @@
     <string name="project_list_project_deleted">Project deleted</string>
     <string name="project_list_project_delete_failed">Failed to delete project</string>
     <string name="project_list_project_recreate_failed">Failed to undo</string>
-    <string name="project_list_load_sample_projects">Load sample projects</string>
-    <string name="project_list_no_projects">No projects found. Create new project or load sample projects.</string>
+    <string name="project_list_load_sample_projects">Load sample project</string>
+    <string name="project_list_no_projects">No projects found. Create new project or load sample project.</string>
 
     <string name="project_create_title">Create project</string>
     <string name="project_create_project_name">Project name</string>
