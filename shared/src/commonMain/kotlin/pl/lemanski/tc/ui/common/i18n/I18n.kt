@@ -70,6 +70,7 @@ internal interface I18n {
     }
 
     interface ProjectOptions {
+        val exportError: String
         val title: String
         val tempo: String
         val tempoError: String

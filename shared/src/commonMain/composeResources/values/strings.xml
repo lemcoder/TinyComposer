@@ -48,13 +48,14 @@
     <string name="project_details_velocity">Volume</string>
     <string name="project_details_title">Project details</string>
 
-    <string name="project_options_export">Export</string>
+    <string name="project_options_export">Export as .wav</string>
     <string name="project_options_melody_preset">Melody preset</string>
     <string name="project_options_chords_preset">Chords preset</string>
     <string name="project_options_title">Options</string>
     <string name="project_options_tempo">Tempo</string>
     <string name="project_options_tempo_error">Bad tempo</string>
     <string name="project_options_save_error">Save error</string>
+    <string name="project_options_export_error">Export error</string>
 
     <string name="project_ai_generate_unknown_error">Unknown error</string>
     <string name="project_ai_generate_network_error">Network error</string>

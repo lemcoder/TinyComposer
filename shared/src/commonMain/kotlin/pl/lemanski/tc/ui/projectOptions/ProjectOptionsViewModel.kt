@@ -1,21 +1,34 @@
 package pl.lemanski.tc.ui.projectOptions
 
 import androidx.lifecycle.viewModelScope
+import io.github.lemcoder.mikrosoundfont.io.toByteArrayLittleEndian
+import io.github.lemcoder.mikrosoundfont.io.wav.WavFileHeader
+import io.github.lemcoder.mikrosoundfont.io.wav.toByteArray
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.files.SystemTemporaryDirectory
+import pl.lemanski.tc.domain.model.audio.AudioStream
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
+import pl.lemanski.tc.domain.model.project.CompingStyle
+import pl.lemanski.tc.domain.model.project.Project
 import pl.lemanski.tc.domain.service.navigation.NavigationService
 import pl.lemanski.tc.domain.service.navigation.back
+import pl.lemanski.tc.domain.useCase.generateAudio.GenerateAudioUseCase
 import pl.lemanski.tc.domain.useCase.getSoundFontPresets.GetSoundFontPresetsUseCase
 import pl.lemanski.tc.domain.useCase.loadProject.LoadProjectUseCase
 import pl.lemanski.tc.domain.useCase.projectPresetsControl.PresetsControlUseCase
+import pl.lemanski.tc.domain.useCase.shareFileUseCase.ShareFileUseCase
 import pl.lemanski.tc.domain.useCase.updateProject.UpdateProjectUseCase
 import pl.lemanski.tc.ui.common.StateComponent
 import pl.lemanski.tc.ui.common.i18n.I18n
 import pl.lemanski.tc.utils.Logger
+import pl.lemanski.tc.utils.exception.ApplicationStateException
 import pl.lemanski.tc.utils.exception.ViewModelInitException
 
 internal class ProjectOptionsViewModel(
@@ -25,7 +38,9 @@ internal class ProjectOptionsViewModel(
     private val loadProjectUseCase: LoadProjectUseCase,
     private val updateProjectUseCase: UpdateProjectUseCase,
     private val getSoundFontPresetsUseCase: GetSoundFontPresetsUseCase,
-    private val presetsControlUseCase: PresetsControlUseCase
+    private val presetsControlUseCase: PresetsControlUseCase,
+    private val shareFileUseCase: ShareFileUseCase,
+    private val generateAudioUseCase: GenerateAudioUseCase
 ) : ProjectOptionsContract.ViewModel() {
 
     private var project = loadProjectUseCase(key.projectId) ?: throw ViewModelInitException("Project with id ${key.projectId} not found")
@@ -143,7 +158,45 @@ internal class ProjectOptionsViewModel(
     }
 
     override fun onExportClicked() {
-        // TODO export to wav
+        _stateFlow.update { state ->
+            state.copy(
+                isLoading = true
+            )
+        }
+
+        val project: Project = loadProjectUseCase(key.projectId) ?: throw ApplicationStateException("Project with id ${key.projectId} not found")
+
+        viewModelScope.launch {
+            val audioData = generateAudioUseCase(
+                errorHandler = GenerateAudioErrorHandler(),
+                chordBeats = project.chords,
+                chordsPreset = _stateFlow.value.chordsPresetSelect.selected.value,
+                noteBeats = project.melody,
+                notesPreset = _stateFlow.value.melodyPresetSelect.selected.value,
+                tempo = project.bpm,
+                compingStyle = CompingStyle.STRAIGHT
+            )
+            val wavHeader = WavFileHeader.write(
+                numSamples = audioData.data.size.toUInt(),
+                numChannels = audioData.output.value.toUShort(),
+                sampleRate = AudioStream.SAMPLE_RATE.toUInt(),
+            )
+
+            val wavFileBytes = wavHeader.toByteArray() + audioData.data.toByteArrayLittleEndian()
+
+            val path = Path(SystemTemporaryDirectory, "${project.name}.wav")
+            val sink = SystemFileSystem.sink(path).buffered()
+            sink.write(wavFileBytes)
+            sink.close()
+
+            _stateFlow.update { state ->
+                state.copy(
+                    isLoading = false
+                )
+            }
+
+            shareFileUseCase(ShareFileErrorHandler(), path.toString())
+        }
     }
 
     override fun showSnackBar(message: String, action: String?, onAction: (() -> Unit)?) {
@@ -171,16 +224,16 @@ internal class ProjectOptionsViewModel(
         logger.debug("Cleared")
     }
 
-    //---
+    // ---
 
-    fun mapToPresetOption(preset: Pair<Int, String>): StateComponent.SelectInput.Option<Int> {
+    private fun mapToPresetOption(preset: Pair<Int, String>): StateComponent.SelectInput.Option<Int> {
         return StateComponent.SelectInput.Option(
             value = preset.first,
             name = preset.second
         )
     }
 
-    //---
+    // ---
 
     inner class UpdateProjectErrorHandler : UpdateProjectUseCase.ErrorHandler {
         override fun onInvalidProjectName() {
@@ -195,6 +248,25 @@ internal class ProjectOptionsViewModel(
                     )
                 )
             }
+        }
+    }
+
+    inner class GenerateAudioErrorHandler : GenerateAudioUseCase.ErrorHandler {
+        override fun onInvalidChordBeats() {
+            logger.error("Invalid chord beats")
+            showSnackBar(i18n.projectOptions.export, null, null)
+        }
+
+        override fun onInvalidNoteBeats() {
+            logger.error("Invalid note beats")
+            showSnackBar(i18n.projectOptions.exportError, null, null)
+        }
+    }
+
+    inner class ShareFileErrorHandler : ShareFileUseCase.ErrorHandler {
+        override fun onFileNotExistsAtPath() {
+            logger.error("File does not exist at path")
+            showSnackBar(i18n.projectOptions.exportError, null, null)
         }
     }
 }

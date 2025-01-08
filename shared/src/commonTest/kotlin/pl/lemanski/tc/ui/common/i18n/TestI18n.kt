@@ -62,6 +62,7 @@ internal class TestI18n : I18n {
     }
 
     override val projectOptions = object : I18n.ProjectOptions {
+        override val exportError: String = "exportError"
         override val title: String = "title"
         override val tempo: String = "tempo"
         override val tempoError: String = "tempoError"

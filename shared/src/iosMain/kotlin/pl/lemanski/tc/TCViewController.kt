@@ -17,6 +17,7 @@ import pl.lemanski.tc.domain.model.navigation.ProjectDetailsDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectListDestination
 import pl.lemanski.tc.domain.model.navigation.ProjectOptionsDestination
 import pl.lemanski.tc.domain.service.navigation.NavigationService
+import pl.lemanski.tc.domain.service.sharing.SharingManagerHelper
 import pl.lemanski.tc.ui.common.localViewModel
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsContract
 import pl.lemanski.tc.ui.proejctDetails.ProjectDetailsRouter
@@ -227,6 +228,7 @@ object TCViewController : KoinComponent {
 fun getNavigationController(): UINavigationController? {
     val topVc = getTopViewController()
     return topVc?.let { topViewController ->
+        SharingManagerHelper.setViewController(topViewController) // Set as view controller for sharing files
         topViewController as? UINavigationController
             ?: topViewController.navigationController
     }

@@ -68,6 +68,7 @@ import tinycomposer.shared.generated.resources.project_list_project_recreate_fai
 import tinycomposer.shared.generated.resources.project_list_title
 import tinycomposer.shared.generated.resources.project_options_chords_preset
 import tinycomposer.shared.generated.resources.project_options_export
+import tinycomposer.shared.generated.resources.project_options_export_error
 import tinycomposer.shared.generated.resources.project_options_melody_preset
 import tinycomposer.shared.generated.resources.project_options_save_error
 import tinycomposer.shared.generated.resources.project_options_tempo
@@ -152,6 +153,7 @@ internal class I18nImpl : I18n {
         override val export: String = stringResourceBlocking(Res.string.project_options_export)
         override val melodyPreset: String = stringResourceBlocking(Res.string.project_options_melody_preset)
         override val chordsPreset: String = stringResourceBlocking(Res.string.project_options_chords_preset)
+        override val exportError: String = stringResourceBlocking(Res.string.project_options_export_error)
         override val title: String = stringResourceBlocking(Res.string.project_options_title)
         override val tempo: String = stringResourceBlocking(Res.string.project_options_tempo)
         override val tempoError: String = stringResourceBlocking(Res.string.project_options_tempo_error)
