@@ -1,5 +1,4 @@
-![logo](https://raw.githubusercontent.com/lemcoder/TinyComposer/refs/heads/main/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/AppIcon-40%403x.png)
-# Tiny Composer
+<h1 align="center"><p><img src="https://raw.githubusercontent.com/lemcoder/TinyComposer/refs/heads/main/iosApp/iosApp/Assets.xcassets/AppIcon.appiconset/AppIcon-40%403x.png"></p><p>Tiny Composer</p></h1>
 
 [![Kotlin](https://img.shields.io/badge/kotlin-2.1.0-blue.svg?logo=kotlin)](http://kotlinlang.org)
 
